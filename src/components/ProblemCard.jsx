@@ -1,0 +1,72 @@
+import StarRating from "./StarRating";
+import DifficultyBadge from "./DifficultyBadge";
+import PatternTag from "./PatternTag";
+import { todayStr, formatRelativeDate } from "../utils/dateHelpers";
+
+export default function ProblemCard({ problem, onEdit, onDelete }) {
+  const isDue = problem.nextReviewDate <= todayStr();
+
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    onDelete(problem);
+  };
+
+  return (
+    <div
+      onClick={() => onEdit(problem)}
+      className="cursor-pointer rounded-[10px] border border-pb-border bg-pb-surface px-5 py-4 transition-[border-color,box-shadow] duration-150 hover:border-pb-text-dim hover:shadow-[0_0_0_1px_rgba(124,107,245,0.1),0_4px_12px_rgba(0,0,0,0.3)]"
+    >
+      {/* Title row */}
+      <div className="mb-2.5 flex items-start justify-between">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+          <span className="text-[15px] font-semibold text-pb-text">
+            {problem.title}
+          </span>
+          {problem.leetcodeNumber && (
+            <span className="text-xs text-pb-text-muted">
+              #{problem.leetcodeNumber}
+            </span>
+          )}
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <DifficultyBadge difficulty={problem.difficulty} />
+          <button
+            onClick={handleDelete}
+            title="Delete problem"
+            className="cursor-pointer rounded border-none bg-transparent px-1.5 py-0.5 text-sm leading-none text-pb-text-dim transition-colors duration-150 hover:text-pb-hard"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      {/* Pattern tags */}
+      <div className="mb-2.5 flex flex-wrap gap-1.5">
+        {problem.patterns.map((p) => (
+          <PatternTag key={p} name={p} />
+        ))}
+      </div>
+
+      {/* Confidence and review date */}
+      <div
+        className={`flex items-center justify-between ${problem.notes ? "mb-2.5" : ""}`}
+      >
+        <StarRating value={problem.confidence} size={16} />
+        <span
+          className={`text-xs ${isDue ? "text-pb-star" : "text-pb-text-dim"}`}
+        >
+          {isDue
+            ? "Due for review"
+            : `Next review: ${formatRelativeDate(problem.nextReviewDate)}`}
+        </span>
+      </div>
+
+      {/* Notes preview */}
+      {problem.notes && (
+        <div className="max-h-[60px] overflow-hidden whitespace-pre-wrap rounded-md bg-pb-bg px-3 py-2 text-[13px] leading-relaxed text-pb-text-muted">
+          {problem.notes}
+        </div>
+      )}
+    </div>
+  );
+}
