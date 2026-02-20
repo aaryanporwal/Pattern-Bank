@@ -3,12 +3,12 @@ import { PATTERNS, DIFFICULTIES } from "../utils/constants";
 import ProblemCard from "./ProblemCard";
 import FilterSelect from "./FilterSelect";
 
-export default function AllProblemsView({ problems, onEdit, onDelete }) {
+export default function AllProblemsView({ problems, onEdit, onDelete, initialSort = "dateAdded" }) {
   const [search, setSearch] = useState("");
   const [filterPattern, setFilterPattern] = useState("all");
   const [filterDifficulty, setFilterDifficulty] = useState("all");
   const [filterConfidence, setFilterConfidence] = useState("all");
-  const [sortBy, setSortBy] = useState("dateAdded");
+  const [sortBy, setSortBy] = useState(initialSort);
 
   const patternOptions = [
     { value: "all", label: "All Patterns" },

@@ -1,4 +1,4 @@
-import { STORAGE_KEY, REVIEW_LOG_KEY } from "./constants";
+import { STORAGE_KEY, REVIEW_LOG_KEY, PREFERENCES_KEY, DEFAULT_PREFERENCES } from "./constants";
 import { todayStr, addDays } from "./dateHelpers";
 
 export function loadProblems() {
@@ -56,6 +56,21 @@ export function calculateStreak() {
 export function countReviewedToday(problems) {
   const today = todayStr();
   return problems.filter((p) => p.lastReviewed === today).length;
+}
+
+export function loadPreferences() {
+  try {
+    const raw = localStorage.getItem(PREFERENCES_KEY);
+    if (!raw) return { ...DEFAULT_PREFERENCES };
+    // Merge with defaults so new preference keys get picked up
+    return { ...DEFAULT_PREFERENCES, ...JSON.parse(raw) };
+  } catch {
+    return { ...DEFAULT_PREFERENCES };
+  }
+}
+
+export function savePreferences(prefs) {
+  localStorage.setItem(PREFERENCES_KEY, JSON.stringify(prefs));
 }
 
 export function importData(file) {

@@ -1,16 +1,28 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { STORAGE_KEY } from "./utils/constants";
 import { todayStr, addDays } from "./utils/dateHelpers";
 import { getIntervalDays } from "./utils/spacedRepetition";
 import {
   loadProblems,
   saveProblems,
+  loadPreferences,
+  savePreferences,
+  loadReviewLog,
   logReviewToday,
   exportData,
   importData,
   saveReviewLog,
+  countReviewedToday,
 } from "./utils/storage";
+import {
+  syncOnSignIn,
+  pushProblemToCloud,
+  deleteProblemFromCloud,
+  pushReviewToCloud,
+  pushPreferencesToCloud,
+} from "./utils/sync";
 
+import useAuth from "./hooks/useAuth";
 import Toast from "./components/Toast";
 import ConfirmDialog from "./components/ConfirmDialog";
 import Header from "./components/Header";
@@ -18,20 +30,60 @@ import NavBar from "./components/NavBar";
 import ProblemModal from "./components/ProblemModal";
 import DashboardView from "./components/DashboardView";
 import AllProblemsView from "./components/AllProblemsView";
+import SettingsModal from "./components/SettingsModal";
 
 export default function App() {
+  const { user, signInWithGoogle, signOut } = useAuth();
+
   // Initialize directly from localStorage — no race condition
   const [problems, setProblems] = useState(() => loadProblems());
+  const [preferences, setPreferences] = useState(() => loadPreferences());
   const [activeTab, setActiveTab] = useState("dashboard");
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProblem, setEditingProblem] = useState(null);
   const [toast, setToast] = useState({ visible: false, message: "" });
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [problemsInitialSort, setProblemsInitialSort] = useState("dateAdded");
+  const [clearDataConfirm, setClearDataConfirm] = useState(false);
 
   // Save problems to localStorage whenever they change
   useEffect(() => {
     saveProblems(problems);
   }, [problems]);
+
+  // Save preferences to localStorage whenever they change
+  useEffect(() => {
+    savePreferences(preferences);
+  }, [preferences]);
+
+  // Sync with Supabase when user signs in
+  const hasSyncedRef = useRef(false);
+  useEffect(() => {
+    if (!user) {
+      hasSyncedRef.current = false;
+      return;
+    }
+    if (hasSyncedRef.current) return;
+    hasSyncedRef.current = true;
+
+    syncOnSignIn(user.id, problems, loadReviewLog(), preferences).then(
+      (result) => {
+        if (result.error) {
+          showToast("Sync failed — working offline");
+          return;
+        }
+        setProblems(result.problems);
+        saveReviewLog(result.reviewLog);
+        setPreferences(result.preferences);
+        if (result.problems.length > 0) {
+          showToast("Data synced");
+        }
+      }
+    );
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Deps intentionally limited to `user` — we only sync on sign-in transition,
+  // not on every problems/preferences change.
 
   const showToast = useCallback(
     (msg) => setToast({ visible: true, message: msg }),
@@ -52,7 +104,8 @@ export default function App() {
     });
     if (confidenceChanged) logReviewToday();
     setEditingProblem(null);
-  }, [showToast]);
+    if (user) pushProblemToCloud(user.id, problem);
+  }, [showToast, user]);
 
   const handleEdit = useCallback((problem) => {
     setEditingProblem(problem);
@@ -68,32 +121,46 @@ export default function App() {
     if (deleteTarget) {
       setProblems((prev) => prev.filter((p) => p.id !== deleteTarget.id));
       showToast(`Deleted ${deleteTarget.title}`);
+      if (user) deleteProblemFromCloud(deleteTarget.id);
       setDeleteTarget(null);
     }
-  }, [deleteTarget, showToast]);
+  }, [deleteTarget, showToast, user]);
 
   const handleReview = useCallback(
     (problemId, newConfidence) => {
       const today = todayStr();
       const intervalDays = getIntervalDays(newConfidence);
+
+      // Compute progress BEFORE setProblems (state hasn't changed yet)
+      const currentReviewed = countReviewedToday(problems);
+      const totalDue = problems.filter((p) => p.nextReviewDate <= today).length;
+      const effectiveGoal = Math.min(
+        preferences.dailyReviewGoal,
+        totalDue + currentReviewed
+      );
+      const newReviewedCount = currentReviewed + 1;
+
+      // Find the problem and compute updated version for cloud push
+      const original = problems.find((p) => p.id === problemId);
+      const updatedProblem = original
+        ? { ...original, confidence: newConfidence, lastReviewed: today, nextReviewDate: addDays(today, intervalDays) }
+        : null;
+
       setProblems((prev) =>
-        prev.map((p) =>
-          p.id === problemId
-            ? {
-                ...p,
-                confidence: newConfidence,
-                lastReviewed: today,
-                nextReviewDate: addDays(today, intervalDays),
-              }
-            : p
-        )
+        prev.map((p) => (p.id === problemId ? { ...p, confidence: newConfidence, lastReviewed: today, nextReviewDate: addDays(today, intervalDays) } : p))
       );
       logReviewToday();
-      showToast(
-        `Reviewed! Next review in ${intervalDays} day${intervalDays !== 1 ? "s" : ""}`
-      );
+
+      if (user && updatedProblem) {
+        pushProblemToCloud(user.id, updatedProblem);
+        pushReviewToCloud(user.id, problemId, original.confidence, newConfidence);
+      }
+
+      const progress = `${newReviewedCount} of ${effectiveGoal} done`;
+      const interval = `Next review in ${intervalDays} day${intervalDays !== 1 ? "s" : ""}`;
+      showToast(`${progress} · ${interval}`);
     },
-    [showToast]
+    [showToast, problems, preferences.dailyReviewGoal, user]
   );
 
   const handleUpdateNotes = useCallback((problemId, newNotes) => {
@@ -102,21 +169,32 @@ export default function App() {
         p.id === problemId ? { ...p, notes: newNotes.trim() } : p
       )
     );
-  }, []);
+    if (user) {
+      const problem = problems.find((p) => p.id === problemId);
+      if (problem) pushProblemToCloud(user.id, { ...problem, notes: newNotes.trim() });
+    }
+  }, [user, problems]);
 
   const handleDismiss = useCallback((problemId) => {
+    const tomorrow = addDays(todayStr(), 1);
     setProblems((prev) =>
       prev.map((p) =>
         p.id === problemId
-          ? { ...p, nextReviewDate: addDays(todayStr(), 1) }
+          ? { ...p, nextReviewDate: tomorrow }
           : p
       )
     );
-  }, []);
+    if (user) {
+      const problem = problems.find((p) => p.id === problemId);
+      if (problem) pushProblemToCloud(user.id, { ...problem, nextReviewDate: tomorrow });
+    }
+  }, [user, problems]);
 
   const handleSetAllDue = useCallback(() => {
     const today = todayStr();
-    setProblems((prev) => prev.map((p) => ({ ...p, nextReviewDate: today })));
+    setProblems((prev) =>
+      prev.map((p) => ({ ...p, nextReviewDate: today, lastReviewed: null }))
+    );
   }, []);
 
   const handleRestoreDates = useCallback((snapshot) => {
@@ -144,9 +222,16 @@ export default function App() {
             added++;
           }
         });
-        setProblems(Array.from(existing.values()));
+        const mergedProblems = Array.from(existing.values());
+        setProblems(mergedProblems);
         if (data.reviewLog) {
           saveReviewLog(data.reviewLog);
+        }
+        // Push imported problems to cloud
+        if (user) {
+          for (const p of data.problems) {
+            pushProblemToCloud(user.id, p);
+          }
         }
         showToast(
           `Imported ${added} new, ${updated} updated`
@@ -155,8 +240,39 @@ export default function App() {
         showToast(err.message || "Import failed");
       }
     },
-    [problems, showToast]
+    [problems, showToast, user]
   );
+
+  const handleUpdatePreferences = useCallback((updates) => {
+    setPreferences((prev) => {
+      const next = { ...prev, ...updates };
+      if (user) pushPreferencesToCloud(user.id, next);
+      return next;
+    });
+  }, [user]);
+
+  const handleClearAllData = useCallback(() => {
+    // Close settings, open confirmation
+    setSettingsOpen(false);
+    setClearDataConfirm(true);
+  }, []);
+
+  const handleClearAllDataConfirm = useCallback(() => {
+    setProblems([]);
+    saveReviewLog([]);
+    setClearDataConfirm(false);
+    showToast("All data cleared");
+  }, [showToast]);
+
+  const handleViewAllDue = useCallback(() => {
+    setProblemsInitialSort("nextReview");
+    setActiveTab("problems");
+  }, []);
+
+  const handleTabChange = useCallback((tab) => {
+    setProblemsInitialSort("dateAdded");
+    setActiveTab(tab);
+  }, []);
 
   const openAddModal = () => {
     setEditingProblem(null);
@@ -177,21 +293,40 @@ export default function App() {
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDeleteTarget(null)}
       />
-      <Header
-        onAddClick={openAddModal}
+      <ConfirmDialog
+        isOpen={clearDataConfirm}
+        title="Clear all data?"
+        message="This will permanently delete all problems, review history, and streak data. This cannot be undone."
+        confirmLabel="Clear Everything"
+        onConfirm={handleClearAllDataConfirm}
+        onCancel={() => setClearDataConfirm(false)}
+      />
+      <SettingsModal
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        preferences={preferences}
+        onUpdatePreferences={handleUpdatePreferences}
         onExport={exportData}
         onImport={handleImport}
+        onSetAllDue={handleSetAllDue}
+        onClearAllData={handleClearAllData}
         problemCount={problems.length}
+        user={user}
+        onSignInGoogle={signInWithGoogle}
+        onSignOut={signOut}
+      />
+      <Header
+        onSettingsClick={() => setSettingsOpen(true)}
       />
 
       {activeTab === "dashboard" && (
         <DashboardView
           problems={problems}
+          dailyGoal={preferences.dailyReviewGoal}
           onReview={handleReview}
           onDismiss={handleDismiss}
           onUpdateNotes={handleUpdateNotes}
-          onSetAllDue={handleSetAllDue}
-          onRestoreDates={handleRestoreDates}
+          onViewAllDue={handleViewAllDue}
         />
       )}
       {activeTab === "problems" && (
@@ -199,12 +334,13 @@ export default function App() {
           problems={problems}
           onEdit={handleEdit}
           onDelete={handleDeleteRequest}
+          initialSort={problemsInitialSort}
         />
       )}
 
       <NavBar
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
         onAddClick={openAddModal}
       />
       <ProblemModal
