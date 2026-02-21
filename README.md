@@ -155,17 +155,17 @@ The companion React Native app lives in a [separate repository](https://github.c
 
 ## Development
 
-Built in 5 sprints over 3 days:
+Built iteratively across 5 sprints:
 
-| Sprint | Focus | Time |
-|--------|-------|------|
-| 1 | Extract from prototype, deploy to Vercel | ~30 min |
-| 2 | Daily cap, priority algorithm, settings | ~2 hours |
-| 3 | Supabase backend, OAuth, cloud sync | ~2 hours |
-| 4 | React Native mobile app | ~5 hours |
-| 5 | Heatmap, bulk add, accessibility, performance testing | ~5.5 hours |
+| Sprint | Focus |
+|--------|-------|
+| 1 | Extract from prototype, deploy to Vercel |
+| 2 | Daily cap, priority algorithm, settings |
+| 3 | Supabase backend, OAuth, cloud sync |
+| 4 | React Native mobile app |
+| 5 | Heatmap, bulk add, accessibility, performance testing |
 
-Each sprint was planned before coding — numbered task lists, discovery questions, architectural decisions made upfront. The 90/10 planning rule (90% planning, 10% coding) drove the velocity.
+Each sprint was planned before coding — numbered task lists, discovery questions, architectural decisions made upfront.
 
 ---
 
