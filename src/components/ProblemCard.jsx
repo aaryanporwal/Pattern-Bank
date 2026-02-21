@@ -56,7 +56,7 @@ export default function ProblemCard({ problem, onEdit, onDelete }) {
           className={`text-xs ${isDue ? "text-pb-star" : "text-pb-text-dim"}`}
         >
           {isDue
-            ? "Due for review"
+            ? (problem.lastReviewed ? "Due for review" : "New")
             : `Next review: ${formatRelativeDate(problem.nextReviewDate)}`}
         </span>
       </div>

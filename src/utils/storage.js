@@ -11,7 +11,11 @@ export function loadProblems() {
 }
 
 export function saveProblems(problems) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(problems));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(problems));
+  } catch (e) {
+    console.error("Failed to save problems:", e);
+  }
 }
 
 export function loadReviewLog() {
@@ -24,7 +28,11 @@ export function loadReviewLog() {
 }
 
 export function saveReviewLog(log) {
-  localStorage.setItem(REVIEW_LOG_KEY, JSON.stringify(log));
+  try {
+    localStorage.setItem(REVIEW_LOG_KEY, JSON.stringify(log));
+  } catch (e) {
+    console.error("Failed to save review log:", e);
+  }
 }
 
 export function logReviewToday() {
@@ -70,7 +78,11 @@ export function loadPreferences() {
 }
 
 export function savePreferences(prefs) {
-  localStorage.setItem(PREFERENCES_KEY, JSON.stringify(prefs));
+  try {
+    localStorage.setItem(PREFERENCES_KEY, JSON.stringify(prefs));
+  } catch (e) {
+    console.error("Failed to save preferences:", e);
+  }
 }
 
 export function importData(file) {

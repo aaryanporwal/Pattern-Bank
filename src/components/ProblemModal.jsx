@@ -152,6 +152,7 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData }) {
           </h2>
           <button
             onClick={onClose}
+            aria-label="Close"
             className="cursor-pointer rounded-md border-none bg-transparent px-2 py-1 text-xl leading-none text-pb-text-muted hover:text-pb-text"
           >
             ✕

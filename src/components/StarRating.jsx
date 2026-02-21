@@ -5,11 +5,16 @@ export default function StarRating({ value, onChange, size = 20 }) {
   const interactive = !!onChange;
 
   return (
-    <div className="flex items-center gap-0.5">
+    <div className="flex items-center gap-0.5" role={interactive ? "radiogroup" : "img"} aria-label={`${value} out of 5 stars`}>
       {[1, 2, 3, 4, 5].map((star) => (
         <span
           key={star}
+          role={interactive ? "radio" : undefined}
+          aria-checked={interactive ? star === value : undefined}
+          aria-label={`${star} star${star !== 1 ? "s" : ""}`}
+          tabIndex={interactive ? 0 : undefined}
           onClick={() => interactive && onChange(star)}
+          onKeyDown={(e) => interactive && e.key === "Enter" && onChange(star)}
           onMouseEnter={() => interactive && setHover(star)}
           onMouseLeave={() => interactive && setHover(0)}
           className="select-none leading-none transition-colors duration-150"

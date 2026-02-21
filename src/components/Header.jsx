@@ -32,6 +32,7 @@ export default function Header({ onSettingsClick, syncStatus }) {
         <button
           onClick={onSettingsClick}
           title="Settings"
+          aria-label="Settings"
           className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-pb-border bg-transparent text-lg text-pb-text-muted transition-all duration-150 hover:border-pb-text-muted hover:text-pb-text"
         >
           ⚙

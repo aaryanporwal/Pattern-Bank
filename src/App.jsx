@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { STORAGE_KEY } from "./utils/constants";
-import { todayStr, addDays } from "./utils/dateHelpers";
+import { todayStr, addDays, generateId } from "./utils/dateHelpers";
 import { getIntervalDays } from "./utils/spacedRepetition";
+import { buildLeetCodeUrl } from "./utils/leetcodeProblems";
 import {
   loadProblems,
   saveProblems,
@@ -45,6 +46,7 @@ export default function App() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [problemsInitialSort, setProblemsInitialSort] = useState("dateAdded");
+  const [problemsInitialPatternFilter, setProblemsInitialPatternFilter] = useState("all");
   const [clearDataConfirm, setClearDataConfirm] = useState(false);
   const [syncStatus, setSyncStatus] = useState("idle"); // idle | syncing | synced | error
 
@@ -264,13 +266,86 @@ export default function App() {
     showToast("All data cleared");
   }, [showToast]);
 
+  const handleBulkAdd = useCallback((lcProblems) => {
+    const today = todayStr();
+    const now = new Date().toISOString();
+    const dailyGoal = preferences.dailyReviewGoal;
+
+    // Check which are already in library by leetcode number
+    const existingNums = new Set(problems.map((p) => p.leetcodeNumber).filter(Boolean));
+    const newLc = lcProblems.filter((lc) => !existingNums.has(lc.n));
+    if (newLc.length === 0) {
+      showToast("All problems already in your library");
+      return;
+    }
+
+    // Round-robin by difficulty to maximize variety per day
+    // (no pattern tags on bulk-add, so spread by difficulty as proxy)
+    const buckets = { Easy: [], Medium: [], Hard: [] };
+    newLc.forEach((lc) => {
+      const bucket = buckets[lc.d] || buckets.Medium;
+      bucket.push(lc);
+    });
+    const interleaved = [];
+    const keys = Object.keys(buckets).filter((k) => buckets[k].length > 0);
+    let exhausted = false;
+    while (!exhausted) {
+      exhausted = true;
+      for (const key of keys) {
+        if (buckets[key].length > 0) {
+          interleaved.push(buckets[key].shift());
+          exhausted = false;
+        }
+      }
+    }
+
+    // Stagger review dates based on daily goal
+    const newProblems = interleaved.map((lc, i) => ({
+      id: generateId(),
+      title: lc.t,
+      leetcodeNumber: lc.n,
+      url: buildLeetCodeUrl(lc.s),
+      difficulty: lc.d,
+      patterns: [],
+      confidence: 1,
+      notes: "",
+      dateAdded: today,
+      lastReviewed: null,
+      nextReviewDate: addDays(today, Math.floor(i / dailyGoal)),
+      updatedAt: now,
+    }));
+
+    setProblems((prev) => [...prev, ...newProblems]);
+
+    // Push to cloud
+    if (user) {
+      for (const p of newProblems) {
+        pushProblemToCloud(user.id, p);
+      }
+    }
+
+    const skipped = lcProblems.length - newLc.length;
+    const msg = skipped > 0
+      ? `Added ${newLc.length} problems (${skipped} already existed)`
+      : `Added ${newLc.length} problems`;
+    showToast(msg);
+  }, [problems, preferences.dailyReviewGoal, user, showToast]);
+
   const handleViewAllDue = useCallback(() => {
     setProblemsInitialSort("nextReview");
+    setProblemsInitialPatternFilter("all");
+    setActiveTab("problems");
+  }, []);
+
+  const handlePatternClick = useCallback((pattern) => {
+    setProblemsInitialPatternFilter(pattern);
+    setProblemsInitialSort("dateAdded");
     setActiveTab("problems");
   }, []);
 
   const handleTabChange = useCallback((tab) => {
     setProblemsInitialSort("dateAdded");
+    setProblemsInitialPatternFilter("all");
     setActiveTab(tab);
   }, []);
 
@@ -310,7 +385,9 @@ export default function App() {
         onImport={handleImport}
         onSetAllDue={handleSetAllDue}
         onClearAllData={handleClearAllData}
+        onBulkAdd={handleBulkAdd}
         problemCount={problems.length}
+        existingProblemNumbers={new Set(problems.map((p) => p.leetcodeNumber).filter(Boolean))}
         user={user}
         onSignInGoogle={signInWithGoogle}
         onSignInGitHub={signInWithGitHub}
@@ -329,6 +406,7 @@ export default function App() {
           onDismiss={handleDismiss}
           onUpdateNotes={handleUpdateNotes}
           onViewAllDue={handleViewAllDue}
+          onPatternClick={handlePatternClick}
         />
       )}
       {activeTab === "problems" && (
@@ -337,6 +415,7 @@ export default function App() {
           onEdit={handleEdit}
           onDelete={handleDeleteRequest}
           initialSort={problemsInitialSort}
+          initialPatternFilter={problemsInitialPatternFilter}
         />
       )}
 

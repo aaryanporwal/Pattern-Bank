@@ -1,14 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PATTERNS, DIFFICULTIES } from "../utils/constants";
 import ProblemCard from "./ProblemCard";
 import FilterSelect from "./FilterSelect";
 
-export default function AllProblemsView({ problems, onEdit, onDelete, initialSort = "dateAdded" }) {
+export default function AllProblemsView({ problems, onEdit, onDelete, initialSort = "dateAdded", initialPatternFilter = "all" }) {
   const [search, setSearch] = useState("");
-  const [filterPattern, setFilterPattern] = useState("all");
+  const [filterPattern, setFilterPattern] = useState(initialPatternFilter);
   const [filterDifficulty, setFilterDifficulty] = useState("all");
   const [filterConfidence, setFilterConfidence] = useState("all");
   const [sortBy, setSortBy] = useState(initialSort);
+
+  // Sync with parent-driven filter/sort changes
+  useEffect(() => { setFilterPattern(initialPatternFilter); }, [initialPatternFilter]);
+  useEffect(() => { setSortBy(initialSort); }, [initialSort]);
 
   const patternOptions = [
     { value: "all", label: "All Patterns" },

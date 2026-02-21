@@ -1,6 +1,6 @@
 import ReviewCard from "./ReviewCard";
 import SectionHeader from "./SectionHeader";
-import PatternProgressRow from "./PatternProgressRow";
+import PatternHeatmap from "./PatternHeatmap";
 import StatsBar from "./StatsBar";
 import { todayStr } from "../utils/dateHelpers";
 import { calculateStreak, countReviewedToday } from "../utils/storage";
@@ -13,6 +13,7 @@ export default function DashboardView({
   onDismiss,
   onUpdateNotes,
   onViewAllDue,
+  onPatternClick,
 }) {
   const today = todayStr();
 
@@ -29,23 +30,6 @@ export default function DashboardView({
 
   // Prioritize and cap to remaining slots
   const todaysReviews = prioritizeProblems(allDueProblems, remainingSlots);
-
-  // Pattern stats
-  const patternMap = {};
-  problems.forEach((p) => {
-    p.patterns.forEach((pat) => {
-      if (!patternMap[pat]) patternMap[pat] = { count: 0, totalConf: 0 };
-      patternMap[pat].count++;
-      patternMap[pat].totalConf += p.confidence;
-    });
-  });
-  const patternStats = Object.entries(patternMap)
-    .map(([pattern, data]) => ({
-      pattern,
-      count: data.count,
-      avgConfidence: data.totalConf / data.count,
-    }))
-    .sort((a, b) => b.count - a.count);
 
   const streak = calculateStreak();
 
@@ -136,20 +120,11 @@ export default function DashboardView({
         )}
       </div>
 
-      {/* Pattern Progress */}
-      {patternStats.length > 0 && (
+      {/* Pattern Confidence Heatmap */}
+      {problems.length > 0 && (
         <div>
-          <SectionHeader title="Pattern Progress" />
-          <div className="rounded-[10px] border border-pb-border bg-pb-surface px-5 py-3">
-            {patternStats.map((ps) => (
-              <PatternProgressRow
-                key={ps.pattern}
-                pattern={ps.pattern}
-                count={ps.count}
-                avgConfidence={ps.avgConfidence}
-              />
-            ))}
-          </div>
+          <SectionHeader title="Pattern Confidence" />
+          <PatternHeatmap problems={problems} onPatternClick={onPatternClick} />
         </div>
       )}
     </div>

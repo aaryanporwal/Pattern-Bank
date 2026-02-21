@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import BulkAddSection from "./BulkAddSection";
 
 export default function SettingsModal({
   isOpen,
@@ -9,7 +10,9 @@ export default function SettingsModal({
   onImport,
   onSetAllDue,
   onClearAllData,
+  onBulkAdd,
   problemCount,
+  existingProblemNumbers,
   user,
   onSignInGoogle,
   onSignInGitHub,
@@ -92,6 +95,7 @@ export default function SettingsModal({
           <h2 className="text-base font-semibold text-pb-text">Settings</h2>
           <button
             onClick={onClose}
+            aria-label="Close settings"
             className="cursor-pointer rounded-md border-none bg-transparent px-2 py-1 text-xl leading-none text-pb-text-muted hover:text-pb-text"
           >
             ✕
@@ -201,6 +205,17 @@ export default function SettingsModal({
               Maximum reviews shown on your dashboard each day.
               You can always see more from All Problems.
             </p>
+          </div>
+
+          {/* Bulk Add */}
+          <div>
+            <label className="mb-2 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
+              Bulk Add
+            </label>
+            <BulkAddSection
+              onBulkAdd={(problems) => { onBulkAdd(problems); onClose(); }}
+              existingIds={existingProblemNumbers}
+            />
           </div>
 
           {/* Data */}
