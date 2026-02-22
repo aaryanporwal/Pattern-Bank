@@ -18,7 +18,7 @@ export default function NavBar({ activeTab, onTabChange, onAddClick }) {
                 : "border-t-2 border-t-transparent font-medium text-pb-text-dim"
             } cursor-pointer`}
           >
-            <span className="text-lg leading-none">{tab.icon}</span>
+            <span className="flex h-7 items-center justify-center text-lg leading-none">{tab.icon}</span>
             {tab.label}
           </button>
         );

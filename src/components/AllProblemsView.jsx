@@ -82,7 +82,7 @@ export default function AllProblemsView({ problems, onEdit, onDelete, initialSor
     return (
       <div className="p-5">
         <div className="rounded-xl border border-pb-border bg-pb-surface px-6 py-12 text-center">
-          <div className="mb-4 text-[28px] font-bold text-pb-accent">⟡</div>
+          <img src="/favicon-32.png" alt="" className="mx-auto mb-4 h-12 w-12 rounded-lg" />
           <h2 className="mb-2 text-lg font-semibold text-pb-text">
             No problems yet
           </h2>

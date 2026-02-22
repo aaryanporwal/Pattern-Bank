@@ -38,7 +38,7 @@ export default function DashboardView({
     return (
       <div className="flex flex-col gap-6 p-5">
         <div className="rounded-xl border border-pb-border bg-pb-surface px-6 py-12 text-center">
-          <div className="mb-4 text-[28px] font-bold text-pb-accent">⟡</div>
+          <img src="/favicon-32.png" alt="" className="mx-auto mb-4 h-12 w-12 rounded-lg" />
           <h2 className="mb-2.5 text-xl font-semibold text-pb-text">
             Welcome to PatternBank
           </h2>
