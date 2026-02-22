@@ -87,24 +87,6 @@ PatternBank follows a **localStorage-first** design. Every action writes locally
 
 ---
 
-## Quick Start
-
-```bash
-git clone https://github.com/DerekZ-113/Pattern-Bank.git
-cd Pattern-Bank
-npm install
-npm run dev
-```
-
-The app runs fully functional without any Supabase configuration — all data persists in localStorage. To enable cloud sync and auth, create a `.env` file:
-
-```
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
----
-
 ## Spaced Repetition Algorithm
 
 Simplified SM-2 with confidence-based intervals:
