@@ -4,12 +4,19 @@ import { Analytics } from "@vercel/analytics/react";
 import "./index.css";
 import AuthProvider from "./contexts/AuthContext.jsx";
 import App from "./App.jsx";
+import PrivacyPolicy from "./PrivacyPolicy.jsx";
+
+const isPrivacy = window.location.pathname === "/privacy";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <AuthProvider>
-      <App />
-      <Analytics />
-    </AuthProvider>
+    {isPrivacy ? (
+      <PrivacyPolicy />
+    ) : (
+      <AuthProvider>
+        <App />
+        <Analytics />
+      </AuthProvider>
+    )}
   </StrictMode>
 );
