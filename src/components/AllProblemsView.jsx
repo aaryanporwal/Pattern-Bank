@@ -40,7 +40,8 @@ export default function AllProblemsView({ problems, onEdit, onDelete, initialSor
     if (
       s &&
       !p.title.toLowerCase().includes(s) &&
-      !(p.notes && p.notes.toLowerCase().includes(s))
+      !(p.notes && p.notes.toLowerCase().includes(s)) &&
+      !(p.leetcodeNumber && String(p.leetcodeNumber).includes(s))
     )
       return false;
     if (filterPattern !== "all" && !p.patterns.includes(filterPattern))
