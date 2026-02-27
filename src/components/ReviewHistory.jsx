@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
 import { fetchProblemReviewHistory } from "../utils/supabaseData";
-import { formatRelativeDate } from "../utils/dateHelpers";
+import { formatRelativeDate, utcToLocalDateStr } from "../utils/dateHelpers";
 
 function MiniStars({ count }) {
   return (
@@ -108,7 +108,7 @@ export default function ReviewHistory({ problemId, isOpen }) {
               className="h-1.5 w-1.5 shrink-0 rounded-full bg-pb-text-dim"
             />
             <span className="min-w-[72px] text-[13px] text-pb-text-muted">
-              {formatRelativeDate(entry.reviewDate)}
+              {formatRelativeDate(utcToLocalDateStr(entry.createdAt) || entry.reviewDate)}
             </span>
             <span className="ml-auto">
               <MiniStars count={entry.newConfidence} />

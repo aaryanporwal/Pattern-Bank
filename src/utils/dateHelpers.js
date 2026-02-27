@@ -2,6 +2,16 @@ export function todayStr() {
   return new Date().toISOString().split("T")[0];
 }
 
+export function utcToLocalDateStr(isoTimestamp) {
+  if (!isoTimestamp) return null;
+  const d = new Date(isoTimestamp);
+  if (isNaN(d.getTime())) return null;
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function addDays(dateStr, days) {
   const d = new Date(dateStr);
   d.setDate(d.getDate() + days);
