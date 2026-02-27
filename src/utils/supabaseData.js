@@ -128,6 +128,27 @@ export async function logReview(userId, problemId, oldConfidence, newConfidence)
   }
 }
 
+export async function fetchProblemReviewHistory(userId, problemId) {
+  if (!supabase) return { data: null, error: null };
+  try {
+    const { data, error } = await supabase
+      .from("review_log")
+      .select("review_date, new_confidence, created_at")
+      .eq("user_id", userId)
+      .eq("problem_id", problemId)
+      .order("created_at", { ascending: false });
+    if (error) return { data: null, error };
+    const history = data.map((row) => ({
+      reviewDate: row.review_date,
+      newConfidence: row.new_confidence,
+      createdAt: row.created_at,
+    }));
+    return { data: history, error: null };
+  } catch (err) {
+    return { data: null, error: err };
+  }
+}
+
 // ============================================================
 // PREFERENCES
 // ============================================================

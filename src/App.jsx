@@ -34,7 +34,7 @@ import AllProblemsView from "./components/AllProblemsView";
 import SettingsModal from "./components/SettingsModal";
 
 export default function App() {
-  const { user, signInWithGoogle, signInWithGitHub, signOut } = useAuth();
+  const { user, signInWithGoogle, signInWithGitHub, signInWithApple, signOut } = useAuth();
 
   // Initialize directly from localStorage — no race condition
   const [problems, setProblems] = useState(() => loadProblems());
@@ -391,6 +391,7 @@ export default function App() {
         user={user}
         onSignInGoogle={signInWithGoogle}
         onSignInGitHub={signInWithGitHub}
+        onSignInApple={signInWithApple}
         onSignOut={signOut}
       />
       <Header

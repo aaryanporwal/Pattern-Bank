@@ -5,6 +5,7 @@ import { getIntervalDays } from "../utils/spacedRepetition";
 import StarRating from "./StarRating";
 import InlineError from "./InlineError";
 import LeetCodeSearch from "./LeetCodeSearch";
+import ReviewHistory from "./ReviewHistory";
 
 export default function ProblemModal({ isOpen, onClose, onSave, initialData }) {
   // Escape key to close
@@ -148,7 +149,7 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData }) {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-pb-border px-6 py-4">
           <h2 className="text-base font-semibold text-pb-text">
-            {isEdit ? "Edit Problem" : "Add New Problem"}
+            {isEdit ? "Problem Details" : "Add New Problem"}
           </h2>
           <button
             onClick={onClose}
@@ -385,6 +386,11 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData }) {
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
             />
           </div>
+
+          {/* Review History — only in edit mode */}
+          {isEdit && (
+            <ReviewHistory problemId={initialData?.id} isOpen={isOpen} />
+          )}
         </div>
 
         {/* Footer */}
