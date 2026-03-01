@@ -1,6 +1,6 @@
 # PatternBank
 
-![React](https://img.shields.io/badge/React-61DAFB) ![React Native](https://img.shields.io/badge/React_Native-61DAFB) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6) ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E) ![Tailwind](https://img.shields.io/badge/Tailwind_CSS-06B6D4) ![Vercel](https://img.shields.io/badge/Vercel-000000)
+![React](https://img.shields.io/badge/React-61DAFB) ![React Native](https://img.shields.io/badge/React_Native-61DAFB) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E) ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E) ![Tailwind](https://img.shields.io/badge/Tailwind_CSS-06B6D4) ![Vercel](https://img.shields.io/badge/Vercel-000000)
 
 **Spaced repetition for LeetCode interview prep**
 
@@ -80,7 +80,7 @@ PatternBank follows a **localStorage-first** design. Every action writes locally
 | Styling | Tailwind CSS v4 | NativeWind v4.1 |
 | Data (local) | localStorage | AsyncStorage |
 | Data (cloud) | Supabase PostgreSQL | Supabase PostgreSQL (shared) |
-| Auth | Supabase Auth (Google + GitHub) | Supabase Auth (browser OAuth) |
+| Auth | Supabase Auth (Google, GitHub, Apple) | Supabase Auth (Google, GitHub, Apple) |
 | Notifications | — | expo-notifications |
 | Hosting | Vercel | EAS Build (pending) |
 | Testing | Playwright MCP | Manual |
@@ -123,7 +123,7 @@ src/
 │   ├── sync             Bidirectional merge + fire-and-forget push
 │   ├── supabaseData     7 CRUD functions with field mapping
 │   └── ...
-├── contexts/            AuthContext (Google + GitHub OAuth)
+├── contexts/            AuthContext (Google, GitHub, Apple OAuth)
 └── hooks/               useAuth
 ```
 
