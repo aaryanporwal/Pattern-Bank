@@ -266,7 +266,7 @@ export default function App() {
     showToast("All data cleared");
   }, [showToast]);
 
-  const handleBulkAdd = useCallback((lcProblems) => {
+  const handleBulkAdd = useCallback((lcProblems, patternMap = null) => {
     const today = todayStr();
     const now = new Date().toISOString();
     const dailyGoal = preferences.dailyReviewGoal;
@@ -306,7 +306,7 @@ export default function App() {
       leetcodeNumber: lc.n,
       url: buildLeetCodeUrl(lc.s),
       difficulty: lc.d,
-      patterns: [],
+      patterns: patternMap?.get(lc.n) || [],
       confidence: 1,
       notes: "",
       dateAdded: today,

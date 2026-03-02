@@ -1,6 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import BulkAddSection from "./BulkAddSection";
+import ProblemListPicker from "./ProblemListPicker";
 import { submitFeedback } from "../utils/supabaseData";
+import qrAppStore from "../assets/qr-appstore.png";
+
+const APP_STORE_URL = "https://apps.apple.com/app/patternbank/id6759760762";
 
 export default function SettingsModal({
   isOpen,
@@ -198,20 +202,51 @@ export default function SettingsModal({
             )}
           </div>
 
-          {/* iOS Version */}
+          {/* Mobile App */}
           <div>
             <label className="mb-2 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-              iOS Version
+              Mobile App
             </label>
+
+            {/* Desktop: QR code */}
+            <div className="mb-3 hidden flex-col items-center md:flex">
+              <div className="mb-2 rounded-xl border border-pb-border bg-white p-3">
+                <img
+                  src={qrAppStore}
+                  alt="Download PatternBank on the App Store"
+                  width={148}
+                  height={148}
+                  className="block"
+                />
+              </div>
+              <span className="text-xs text-pb-text-dim">
+                Scan to download on iOS
+              </span>
+            </div>
+
             <p className="mb-2.5 text-xs leading-relaxed text-pb-text-dim">
-              iOS version available! Sign in to sync your progress across platforms.
+              Your data syncs automatically when signed in.
             </p>
-            <button
-              disabled={true}
-              className="flex w-full items-center gap-2.5 rounded-lg border border-pb-border bg-transparent px-3.5 py-2.5 text-[13px] font-medium text-pb-text-dim disabled:cursor-not-allowed disabled:opacity-50"
+
+            {/* Mobile: download button */}
+            <a
+              href={APP_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-full items-center justify-center gap-2 rounded-lg border border-pb-border bg-transparent px-3.5 py-2.5 text-[13px] font-medium text-pb-text-muted no-underline transition-all duration-150 hover:border-pb-text-muted hover:text-pb-text md:hidden"
             >
-              Show QR Code (coming soon)
-            </button>
+              Download on App Store
+            </a>
+
+            {/* Desktop: subtle text link fallback */}
+            <a
+              href={APP_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden text-xs text-pb-text-dim no-underline transition-colors duration-150 hover:text-pb-accent md:inline-flex md:items-center md:gap-1"
+            >
+              App Store ↗
+            </a>
           </div>
 
           {/* Daily Review Goal */}
@@ -243,6 +278,12 @@ export default function SettingsModal({
               You can always see more from All Problems.
             </p>
           </div>
+
+          {/* Import Problem List */}
+          <ProblemListPicker
+            existingIds={existingProblemNumbers}
+            onBulkAdd={(problems, patternMap) => { onBulkAdd(problems, patternMap); onClose(); }}
+          />
 
           {/* Bulk Add */}
           <div>
