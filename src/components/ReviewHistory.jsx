@@ -52,8 +52,8 @@ export default function ReviewHistory({ problemId, isOpen }) {
           Review History
         </label>
         <div className="rounded-lg bg-pb-bg p-3">
-          <p className="m-0 text-[13px] text-pb-text-dim">
-            Sign in via Settings to track your review history and sync across devices.
+          <p className="m-0 text-[13px] text-pb-text-muted">
+            Sign in to start tracking your review history and sync across devices.
           </p>
         </div>
       </div>
