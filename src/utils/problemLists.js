@@ -41,6 +41,11 @@ const PATTERN_MAP = {
   409: "Hash Table",   // Longest Palindrome
   525: "Hash Table",   // Contiguous Array
   560: "Hash Table",   // Subarray Sum Equals K
+  43: "Hash Table",    // Multiply Strings
+  66: "Hash Table",    // Plus One
+  202: "Hash Table",   // Happy Number
+  371: "Hash Table",   // Sum of Two Integers
+  2013: "Hash Table",  // Detect Squares
 
   // Two Pointers
   11: "Two Pointers",  // Container With Most Water
@@ -89,6 +94,7 @@ const PATTERN_MAP = {
   253: "Sorting",  // Meeting Rooms II
   435: "Sorting",  // Non-overlapping Intervals
   759: "Sorting",  // Employee Free Time
+  1851: "Sorting", // Minimum Interval to Include Each Query
 
   // Linked List
   2: "Linked List",    // Add Two Numbers
@@ -122,6 +128,7 @@ const PATTERN_MAP = {
   739: "Stack",  // Daily Temperatures
   844: "Stack",  // Backspace String Compare
   895: "Stack",  // Maximum Frequency Stack
+  853: "Stack",  // Car Fleet
 
   // Tree
   94: "Tree",    // Binary Tree Inorder Traversal
@@ -144,6 +151,7 @@ const PATTERN_MAP = {
   437: "Tree",   // Path Sum III
   543: "Tree",   // Diameter of Binary Tree
   572: "Tree",   // Subtree of Another Tree
+  1448: "Tree",  // Count Good Nodes in Binary Tree
 
   // BFS
   102: "BFS",    // Binary Tree Level Order Traversal
@@ -161,6 +169,8 @@ const PATTERN_MAP = {
   994: "BFS",    // Rotting Oranges
   1197: "BFS",   // Minimum Knight Moves
   1730: "BFS",   // Shortest Path to Get Food
+  286: "BFS",    // Walls and Gates
+  695: "BFS",    // Max Area of Island
 
   // DFS
   329: "DFS",    // Longest Increasing Path in a Matrix
@@ -174,6 +184,9 @@ const PATTERN_MAP = {
   632: "Heap",   // Smallest Range Covering Elements from K Lists
   692: "Heap",   // Top K Frequent Words
   973: "Heap",   // K Closest Points to Origin
+  355: "Heap",   // Design Twitter
+  703: "Heap",   // Kth Largest Element in a Stream
+  1046: "Heap",  // Last Stone Weight
 
   // Greedy
   45: "Greedy",    // Jump Game II
@@ -181,6 +194,9 @@ const PATTERN_MAP = {
   121: "Greedy",   // Best Time to Buy and Sell Stock
   134: "Greedy",   // Gas Station
   763: "Greedy",   // Partition Labels
+  678: "Greedy",   // Valid Parenthesis String
+  846: "Greedy",   // Hand of Straights
+  1899: "Greedy",  // Merge Triplets to Form Target Triplet
 
   // Backtracking
   17: "Backtracking",  // Letter Combinations of a Phone Number
@@ -192,6 +208,8 @@ const PATTERN_MAP = {
   78: "Backtracking",  // Subsets
   79: "Backtracking",  // Word Search
   131: "Backtracking", // Palindrome Partitioning
+  40: "Backtracking",  // Combination Sum II
+  90: "Backtracking",  // Subsets II
 
   // Graph
   133: "Graph",  // Clone Graph
@@ -203,6 +221,12 @@ const PATTERN_MAP = {
   336: "Graph",  // Palindrome Pairs
   721: "Graph",  // Accounts Merge
   787: "Graph",  // Cheapest Flights Within K Stops
+  130: "Graph",  // Surrounded Regions
+  332: "Graph",  // Reconstruct Itinerary
+  684: "Graph",  // Redundant Connection
+  743: "Graph",  // Network Delay Time
+  778: "Graph",  // Swim in Rising Water
+  1584: "Graph", // Min Cost to Connect All Points
 
   // Union Find
   // (none exclusively in these lists)
@@ -235,6 +259,15 @@ const PATTERN_MAP = {
   416: "DP",     // Partition Equal Subset Sum
   1143: "DP",    // Longest Common Subsequence
   1235: "DP",    // Maximum Profit in Job Scheduling
+  10: "DP",      // Regular Expression Matching
+  97: "DP",      // Interleaving String
+  115: "DP",     // Distinct Subsequences
+  309: "DP",     // Best Time to Buy and Sell Stock with Cooldown
+  312: "DP",     // Burst Balloons
+  494: "DP",     // Target Sum
+  518: "DP",     // Coin Change II
+  647: "DP",     // Palindromic Substrings
+  746: "DP",     // Min Cost Climbing Stairs
 };
 
 // ============================================================
@@ -243,18 +276,38 @@ const PATTERN_MAP = {
 
 const PROBLEM_LISTS = [
   {
-    id: "blind75",
-    name: "Blind 75",
-    nameZh: "Blind 75",
-    description: "The original curated interview prep list. 75 essential problems covering all core patterns.",
-    source: "https://leetcode.com/list/oizxjoit",
+    id: "neetcode75",
+    name: "NeetCode 75",
+    nameZh: "NeetCode 75",
+    description: "The essential 75 interview problems, curated by NeetCode. The foundation of NeetCode 150.",
+    source: "https://neetcode.io/practice/neetcode75",
     numbers: [
-      1, 3, 5, 11, 15, 19, 20, 21, 23, 33, 39, 42, 48, 49, 53, 54, 55,
+      1, 3, 5, 11, 15, 19, 20, 21, 23, 33, 39, 48, 49, 53, 54, 55,
       56, 57, 62, 70, 73, 76, 79, 91, 98, 100, 102, 104, 105, 121, 124,
-      125, 128, 133, 139, 141, 143, 152, 153, 155, 169, 190, 191, 198,
-      200, 206, 207, 208, 211, 212, 213, 217, 226, 230, 235, 238, 242,
-      252, 261, 268, 269, 271, 295, 297, 300, 322, 323, 338, 347, 416,
-      417, 424, 435, 572,
+      125, 128, 133, 139, 141, 143, 152, 153, 190, 191, 198, 200, 206,
+      207, 208, 211, 212, 213, 217, 226, 230, 235, 238, 242, 252, 253,
+      261, 268, 269, 271, 295, 297, 300, 322, 323, 338, 347, 371, 417,
+      424, 435, 572, 647, 1143,
+    ],
+  },
+  {
+    id: "neetcode150",
+    name: "NeetCode 150",
+    nameZh: "NeetCode 150",
+    description: "NeetCode 75 + 75 more problems. Organized by pattern with NeetCode video explanations.",
+    source: "https://neetcode.io/practice/neetcode150",
+    numbers: [
+      1, 2, 3, 4, 5, 7, 10, 11, 15, 17, 19, 20, 21, 22, 23, 25, 33,
+      36, 39, 40, 42, 43, 45, 46, 48, 49, 50, 51, 53, 54, 55, 56, 57,
+      62, 66, 70, 72, 73, 74, 76, 78, 79, 84, 90, 91, 97, 98, 100,
+      102, 104, 105, 110, 115, 121, 124, 125, 127, 128, 130, 131, 133,
+      134, 136, 138, 139, 141, 143, 146, 150, 152, 153, 155, 167, 190,
+      191, 198, 199, 200, 202, 206, 207, 208, 210, 211, 212, 213, 215,
+      217, 226, 230, 235, 238, 239, 242, 252, 253, 261, 268, 269, 271,
+      286, 287, 295, 297, 300, 309, 312, 322, 323, 329, 332, 338, 347,
+      355, 371, 416, 417, 424, 435, 494, 518, 543, 567, 572, 621, 647,
+      678, 684, 695, 703, 704, 739, 743, 746, 763, 778, 787, 846, 853,
+      875, 973, 981, 994, 1046, 1143, 1448, 1584, 1851, 1899, 2013,
     ],
   },
   {
