@@ -7,14 +7,15 @@ import {
   computeReviewProgress,
   buildReviewedProblem,
 } from "../src/utils/problemTransforms";
+import type { LeetCodeProblem, Problem } from "../src/types";
 
 // Mock storage for countReviewedToday
 const mockLocalStorage = (() => {
-  let store = {};
+  let store: Record<string, string> = {};
   return {
-    getItem: vi.fn((key) => store[key] ?? null),
-    setItem: vi.fn((key, val) => { store[key] = String(val); }),
-    removeItem: vi.fn((key) => { delete store[key]; }),
+    getItem: vi.fn((key: string) => store[key] ?? null),
+    setItem: vi.fn((key: string, val: string) => { store[key] = String(val); }),
+    removeItem: vi.fn((key: string) => { delete store[key]; }),
     clear: vi.fn(() => { store = {}; }),
   };
 })();
@@ -30,11 +31,11 @@ describe("filterExistingProblems", () => {
       { n: 1, t: "Two Sum" },
       { n: 2, t: "Add Two Numbers" },
       { n: 3, t: "Longest Substring" },
-    ];
+    ] as LeetCodeProblem[];
     const existing = [
       { id: "a", leetcodeNumber: 1 },
       { id: "b", leetcodeNumber: 3 },
-    ];
+    ] as Problem[];
     const { newProblems, skippedCount } = filterExistingProblems(lcProblems, existing);
     expect(newProblems).toHaveLength(1);
     expect(newProblems[0].n).toBe(2);
@@ -42,21 +43,21 @@ describe("filterExistingProblems", () => {
   });
 
   it("returns all problems when none exist", () => {
-    const lcProblems = [{ n: 1 }, { n: 2 }];
+    const lcProblems = [{ n: 1 }, { n: 2 }] as LeetCodeProblem[];
     const { newProblems, skippedCount } = filterExistingProblems(lcProblems, []);
     expect(newProblems).toHaveLength(2);
     expect(skippedCount).toBe(0);
   });
 
   it("handles empty input", () => {
-    const { newProblems, skippedCount } = filterExistingProblems([], [{ id: "a", leetcodeNumber: 1 }]);
+    const { newProblems, skippedCount } = filterExistingProblems([], [{ id: "a", leetcodeNumber: 1 } as Problem]);
     expect(newProblems).toHaveLength(0);
     expect(skippedCount).toBe(0);
   });
 
   it("ignores custom problems with null leetcodeNumber", () => {
-    const lcProblems = [{ n: 5 }];
-    const existing = [{ id: "a", leetcodeNumber: null }];
+    const lcProblems = [{ n: 5 }] as LeetCodeProblem[];
+    const existing = [{ id: "a", leetcodeNumber: null }] as Problem[];
     const { newProblems } = filterExistingProblems(lcProblems, existing);
     expect(newProblems).toHaveLength(1);
   });
@@ -71,7 +72,7 @@ describe("interleaveByDifficulty", () => {
       { n: 4, d: "Medium" },
       { n: 5, d: "Hard" },
       { n: 6, d: "Hard" },
-    ];
+    ] as LeetCodeProblem[];
     const result = interleaveByDifficulty(problems);
     expect(result.map((p) => p.d)).toEqual([
       "Easy", "Medium", "Hard",
@@ -86,7 +87,7 @@ describe("interleaveByDifficulty", () => {
       { n: 3, d: "Easy" },
       { n: 4, d: "Medium" },
       { n: 5, d: "Hard" },
-    ];
+    ] as LeetCodeProblem[];
     const result = interleaveByDifficulty(problems);
     expect(result).toHaveLength(5);
     expect(result[0].d).toBe("Easy");
@@ -100,7 +101,7 @@ describe("interleaveByDifficulty", () => {
     const problems = [
       { n: 1, d: "Medium" },
       { n: 2, d: "Medium" },
-    ];
+    ] as LeetCodeProblem[];
     const result = interleaveByDifficulty(problems);
     expect(result).toHaveLength(2);
     expect(result.every((p) => p.d === "Medium")).toBe(true);
@@ -110,7 +111,7 @@ describe("interleaveByDifficulty", () => {
     const problems = Array.from({ length: 10 }, (_, i) => ({
       n: i + 1,
       d: ["Easy", "Medium", "Hard"][i % 3],
-    }));
+    })) as LeetCodeProblem[];
     const result = interleaveByDifficulty(problems);
     expect(result).toHaveLength(10);
   });
@@ -122,7 +123,7 @@ describe("interleaveByDifficulty", () => {
 
 describe("buildNewProblems", () => {
   it("creates problem objects with all required fields", () => {
-    const lcProblems = [{ n: 1, t: "Two Sum", s: "two-sum", d: "Easy" }];
+    const lcProblems = [{ n: 1, t: "Two Sum", s: "two-sum", d: "Easy" }] as LeetCodeProblem[];
     const result = buildNewProblems(lcProblems, {
       today: "2026-03-13",
       now: "2026-03-13T00:00:00.000Z",
@@ -149,7 +150,7 @@ describe("buildNewProblems", () => {
   it("distributes nextReviewDate across days based on dailyGoal", () => {
     const lcProblems = Array.from({ length: 6 }, (_, i) => ({
       n: i + 1, t: `P${i}`, s: `p${i}`, d: "Easy",
-    }));
+    })) as LeetCodeProblem[];
     const result = buildNewProblems(lcProblems, {
       today: "2026-03-13",
       now: "2026-03-13T00:00:00.000Z",
@@ -166,7 +167,7 @@ describe("buildNewProblems", () => {
   });
 
   it("applies patternMap when provided", () => {
-    const lcProblems = [{ n: 1, t: "Two Sum", s: "two-sum", d: "Easy" }];
+    const lcProblems = [{ n: 1, t: "Two Sum", s: "two-sum", d: "Easy" }] as LeetCodeProblem[];
     const patternMap = new Map([[1, ["Hash Table", "Two Pointers"]]]);
     const result = buildNewProblems(lcProblems, {
       today: "2026-03-13",
@@ -180,8 +181,8 @@ describe("buildNewProblems", () => {
 
 describe("mergeImportedProblems", () => {
   it("adds new problems and counts correctly", () => {
-    const existing = [{ id: "a", title: "Existing" }];
-    const imported = [{ id: "b", title: "New" }];
+    const existing = [{ id: "a", title: "Existing" }] as Problem[];
+    const imported = [{ id: "b", title: "New" }] as Problem[];
     const { mergedProblems, addedCount, updatedCount } = mergeImportedProblems(existing, imported);
     expect(mergedProblems).toHaveLength(2);
     expect(addedCount).toBe(1);
@@ -189,8 +190,8 @@ describe("mergeImportedProblems", () => {
   });
 
   it("overwrites existing problems by id", () => {
-    const existing = [{ id: "a", title: "Old Title", notes: "old" }];
-    const imported = [{ id: "a", title: "New Title", notes: "new" }];
+    const existing = [{ id: "a", title: "Old Title", notes: "old" }] as Problem[];
+    const imported = [{ id: "a", title: "New Title", notes: "new" }] as Problem[];
     const { mergedProblems, addedCount, updatedCount } = mergeImportedProblems(existing, imported);
     expect(mergedProblems).toHaveLength(1);
     expect(mergedProblems[0].title).toBe("New Title");
@@ -202,8 +203,8 @@ describe("mergeImportedProblems", () => {
     const existing = [
       { id: "a", title: "Keep" },
       { id: "b", title: "Also Keep" },
-    ];
-    const imported = [{ id: "c", title: "New" }];
+    ] as Problem[];
+    const imported = [{ id: "c", title: "New" }] as Problem[];
     const { mergedProblems } = mergeImportedProblems(existing, imported);
     expect(mergedProblems).toHaveLength(3);
     expect(mergedProblems.find((p) => p.id === "a")).toBeTruthy();
@@ -211,7 +212,7 @@ describe("mergeImportedProblems", () => {
   });
 
   it("handles empty import", () => {
-    const existing = [{ id: "a" }];
+    const existing = [{ id: "a" }] as Problem[];
     const { mergedProblems, addedCount, updatedCount } = mergeImportedProblems(existing, []);
     expect(mergedProblems).toHaveLength(1);
     expect(addedCount).toBe(0);
@@ -224,7 +225,7 @@ describe("computeReviewProgress", () => {
     const problems = [
       { id: "a", nextReviewDate: "2020-01-01", lastReviewed: null },
       { id: "b", nextReviewDate: "2020-01-01", lastReviewed: null },
-    ];
+    ] as Problem[];
     const { currentReviewed, totalDue, effectiveGoal } = computeReviewProgress(problems, 10);
     expect(currentReviewed).toBe(0);
     expect(totalDue).toBe(2);
@@ -234,7 +235,7 @@ describe("computeReviewProgress", () => {
   it("handles zero due problems", () => {
     const problems = [
       { id: "a", nextReviewDate: "2099-01-01", lastReviewed: null },
-    ];
+    ] as Problem[];
     const { totalDue, effectiveGoal } = computeReviewProgress(problems, 5);
     expect(totalDue).toBe(0);
     expect(effectiveGoal).toBe(0);
@@ -257,7 +258,7 @@ describe("buildReviewedProblem", () => {
       lastReviewed: null,
       nextReviewDate: "2026-03-10",
       notes: "some notes",
-    };
+    } as Problem;
     const result = buildReviewedProblem(original, 4);
     expect(result.confidence).toBe(4);
     expect(result.lastReviewed).toBeTruthy();
@@ -282,7 +283,7 @@ describe("buildReviewedProblem", () => {
       lastReviewed: null,
       nextReviewDate: "2026-03-01",
       updatedAt: "old",
-    };
+    } as Problem;
     const result = buildReviewedProblem(original, 3);
     expect(result.id).toBe("xyz");
     expect(result.title).toBe("Test");
@@ -296,7 +297,7 @@ describe("buildReviewedProblem", () => {
   });
 
   it("applies correct SM-2 intervals", () => {
-    const base = { id: "a", confidence: 1, lastReviewed: null, nextReviewDate: "2026-03-13" };
+    const base = { id: "a", confidence: 1, lastReviewed: null, nextReviewDate: "2026-03-13" } as Problem;
     // Confidence 1 → 1 day, 3 → 3 days, 5 → 14 days
     const r1 = buildReviewedProblem(base, 1);
     const r3 = buildReviewedProblem(base, 3);

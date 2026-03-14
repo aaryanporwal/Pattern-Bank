@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { INTERVALS, getIntervalDays, prioritizeProblems } from "../src/utils/spacedRepetition";
+import type { Confidence, Problem } from "../src/types";
 
 describe("INTERVALS", () => {
   it("maps confidence 1-5 to expected days", () => {
@@ -21,10 +22,10 @@ describe("getIntervalDays", () => {
   });
 
   it("returns 1 as fallback for invalid confidence", () => {
-    expect(getIntervalDays(0)).toBe(1);
-    expect(getIntervalDays(6)).toBe(1);
-    expect(getIntervalDays(undefined)).toBe(1);
-    expect(getIntervalDays(null)).toBe(1);
+    expect(getIntervalDays(0 as unknown as Confidence)).toBe(1);
+    expect(getIntervalDays(6 as unknown as Confidence)).toBe(1);
+    expect(getIntervalDays(undefined as unknown as Confidence)).toBe(1);
+    expect(getIntervalDays(null as unknown as Confidence)).toBe(1);
   });
 });
 
@@ -34,12 +35,12 @@ describe("prioritizeProblems", () => {
   });
 
   it("returns empty array for limit 0", () => {
-    const problems = [{ id: "a", confidence: 1, nextReviewDate: "2026-01-01" }];
+    const problems = [{ id: "a", confidence: 1, nextReviewDate: "2026-01-01" }] as Problem[];
     expect(prioritizeProblems(problems, 0)).toEqual([]);
   });
 
   it("returns single problem unchanged", () => {
-    const problems = [{ id: "a", confidence: 3, nextReviewDate: "2026-01-01" }];
+    const problems = [{ id: "a", confidence: 3, nextReviewDate: "2026-01-01" }] as Problem[];
     const result = prioritizeProblems(problems, 5);
     expect(result).toHaveLength(1);
     expect(result[0].id).toBe("a");
@@ -50,7 +51,7 @@ describe("prioritizeProblems", () => {
       { id: "high", confidence: 5, nextReviewDate: "2026-01-01" },
       { id: "low", confidence: 1, nextReviewDate: "2026-01-01" },
       { id: "mid", confidence: 3, nextReviewDate: "2026-01-01" },
-    ];
+    ] as Problem[];
     const result = prioritizeProblems(problems, 3);
     expect(result[0].id).toBe("low");
     expect(result[1].id).toBe("mid");
@@ -62,7 +63,7 @@ describe("prioritizeProblems", () => {
       { id: "recent", confidence: 3, nextReviewDate: "2026-03-11" },
       { id: "old", confidence: 3, nextReviewDate: "2026-01-01" },
       { id: "medium", confidence: 3, nextReviewDate: "2026-02-01" },
-    ];
+    ] as Problem[];
     const result = prioritizeProblems(problems, 3);
     // Most overdue (oldest nextReviewDate) should come first
     expect(result[0].id).toBe("old");
@@ -74,7 +75,7 @@ describe("prioritizeProblems", () => {
       { id: "a", confidence: 1, nextReviewDate: "2026-01-01" },
       { id: "b", confidence: 2, nextReviewDate: "2026-01-01" },
       { id: "c", confidence: 3, nextReviewDate: "2026-01-01" },
-    ];
+    ] as Problem[];
     const result = prioritizeProblems(problems, 2);
     expect(result).toHaveLength(2);
   });
@@ -84,7 +85,7 @@ describe("prioritizeProblems", () => {
       { id: "a", confidence: 3, nextReviewDate: "2026-01-01" },
       { id: "b", confidence: 3, nextReviewDate: "2026-01-01" },
       { id: "c", confidence: 3, nextReviewDate: "2026-01-01" },
-    ];
+    ] as Problem[];
     const result1 = prioritizeProblems(problems, 3);
     const result2 = prioritizeProblems(problems, 3);
     expect(result1.map((p) => p.id)).toEqual(result2.map((p) => p.id));
@@ -94,7 +95,7 @@ describe("prioritizeProblems", () => {
     const problems = [
       { id: "b", confidence: 5, nextReviewDate: "2026-01-01" },
       { id: "a", confidence: 1, nextReviewDate: "2026-01-01" },
-    ];
+    ] as Problem[];
     const original = [...problems];
     prioritizeProblems(problems, 2);
     expect(problems[0].id).toBe(original[0].id);
@@ -105,7 +106,7 @@ describe("prioritizeProblems", () => {
     const problems = [
       { id: "no-conf", nextReviewDate: "2026-01-01" },
       { id: "low", confidence: 1, nextReviewDate: "2026-01-01" },
-    ];
+    ] as Problem[];
     const result = prioritizeProblems(problems, 2);
     expect(result[0].id).toBe("low");
     expect(result[1].id).toBe("no-conf");

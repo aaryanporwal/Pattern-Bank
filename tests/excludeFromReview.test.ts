@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
+import type { Problem } from "../src/types";
 
 // Helper to create a test problem
-function makeProblem(overrides = {}) {
+function makeProblem(overrides: Partial<Problem> = {}): Problem {
   return {
     id: "test-1",
     title: "Two Sum",
@@ -21,12 +22,12 @@ function makeProblem(overrides = {}) {
 }
 
 // Simulates the DashboardView filtering logic
-function filterDueProblems(problems, today) {
+function filterDueProblems(problems: Problem[], today: string): Problem[] {
   return problems.filter((p) => p.nextReviewDate <= today && !p.excludeFromReview);
 }
 
 // Simulates the AllProblemsView review status filter
-function filterByReviewStatus(problems, status) {
+function filterByReviewStatus(problems: Problem[], status: string): Problem[] {
   if (status === "active") return problems.filter((p) => !p.excludeFromReview);
   if (status === "excluded") return problems.filter((p) => p.excludeFromReview);
   return problems;
@@ -61,9 +62,9 @@ describe("Exclude from Review — Due List Filtering", () => {
   });
 
   it("treats problems without excludeFromReview field as active (backward compat)", () => {
-    const problem = makeProblem({ nextReviewDate: "2026-03-12" });
+    const problem = makeProblem({ nextReviewDate: "2026-03-12" }) as Partial<Problem>;
     delete problem.excludeFromReview;
-    const due = filterDueProblems([problem], today);
+    const due = filterDueProblems([problem as Problem], today);
     expect(due).toHaveLength(1);
   });
 

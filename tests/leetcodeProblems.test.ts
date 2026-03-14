@@ -5,9 +5,9 @@ describe("getProblemByNumber", () => {
   it("returns problem for valid number", () => {
     const problem = getProblemByNumber(1);
     expect(problem).not.toBeNull();
-    expect(problem.t).toBe("Two Sum");
-    expect(problem.d).toBe("Easy");
-    expect(problem.s).toBe("two-sum");
+    expect(problem!.t).toBe("Two Sum");
+    expect(problem!.d).toBe("Easy");
+    expect(problem!.s).toBe("two-sum");
   });
 
   it("returns null for non-existent number", () => {
@@ -31,7 +31,7 @@ describe("searchProblems", () => {
   it("returns empty array for empty query", () => {
     expect(searchProblems("")).toEqual([]);
     expect(searchProblems("  ")).toEqual([]);
-    expect(searchProblems(null)).toEqual([]);
+    expect(searchProblems(null as unknown as string)).toEqual([]);
   });
 
   it("finds exact number match", () => {

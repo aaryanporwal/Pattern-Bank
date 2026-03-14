@@ -1,12 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import type { Problem } from "../src/types";
 
 // Mock localStorage before importing storage module
 const localStorageMock = (() => {
-  let store = {};
+  let store: Record<string, string> = {};
   return {
-    getItem: vi.fn((key) => store[key] ?? null),
-    setItem: vi.fn((key, value) => { store[key] = String(value); }),
-    removeItem: vi.fn((key) => { delete store[key]; }),
+    getItem: vi.fn((key: string) => store[key] ?? null),
+    setItem: vi.fn((key: string, value: string) => { store[key] = String(value); }),
+    removeItem: vi.fn((key: string) => { delete store[key]; }),
     clear: vi.fn(() => { store = {}; }),
     get _store() { return store; },
   };
@@ -41,7 +42,7 @@ describe("loadProblems / saveProblems", () => {
   it("round-trips problems", () => {
     const problems = [
       { id: "1", title: "Two Sum", difficulty: "Easy", patterns: ["Hash Table"] },
-    ];
+    ] as Problem[];
     saveProblems(problems);
     expect(loadProblems()).toEqual(problems);
   });
@@ -138,7 +139,7 @@ describe("countReviewedToday", () => {
       { id: "1", lastReviewed: today },
       { id: "2", lastReviewed: addDays(today, -1) },
       { id: "3", lastReviewed: today },
-    ];
+    ] as Problem[];
     expect(countReviewedToday(problems)).toBe(2);
   });
 });

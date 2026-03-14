@@ -30,7 +30,7 @@ describe("getListSummaries", () => {
   it("counts existing problems correctly", () => {
     const existing = new Set([1, 2, 3]); // Two Sum, Add Two Numbers, LSWRC
     const summaries = getListSummaries(existing);
-    const neetcode75 = summaries.find((s) => s.id === "neetcode75");
+    const neetcode75 = summaries.find((s) => s.id === "neetcode75")!;
     expect(neetcode75.existing).toBeGreaterThan(0);
     expect(neetcode75.newCount).toBe(neetcode75.total - neetcode75.existing);
   });

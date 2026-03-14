@@ -1,14 +1,18 @@
 import { describe, it, expect } from "vitest";
 import { deduplicateProblems } from "../src/utils/sync";
+import type { Problem } from "../src/types";
 
-function makeProblem(overrides = {}) {
+function makeProblem(overrides: Partial<Problem> = {}): Problem {
   return {
     id: `id-${Math.random().toString(36).slice(2, 8)}`,
     title: "Test Problem",
     leetcodeNumber: null,
+    url: null,
     difficulty: "Medium",
+    patterns: [],
     confidence: 3,
     notes: "",
+    excludeFromReview: false,
     dateAdded: "2026-03-01",
     lastReviewed: null,
     nextReviewDate: "2026-03-02",
@@ -118,8 +122,8 @@ describe("deduplicateProblems", () => {
   });
 
   it("falls back to keeping first when updatedAt is missing", () => {
-    const p1 = makeProblem({ id: "a", leetcodeNumber: 1, updatedAt: null });
-    const p2 = makeProblem({ id: "b", leetcodeNumber: 1, updatedAt: null });
+    const p1 = makeProblem({ id: "a", leetcodeNumber: 1, updatedAt: null as unknown as string });
+    const p2 = makeProblem({ id: "b", leetcodeNumber: 1, updatedAt: null as unknown as string });
     const { problems: result, removedIds } = deduplicateProblems([p1, p2]);
     expect(result).toHaveLength(1);
     expect(result[0].id).toBe("a");
