@@ -46,7 +46,7 @@ export default function useCloudSync({
         }
         onSyncComplete(result);
         setSyncStatus("synced");
-        if (result.problems.length > 0) {
+        if (result.hasChanges) {
           showToast("Data synced");
         }
       }

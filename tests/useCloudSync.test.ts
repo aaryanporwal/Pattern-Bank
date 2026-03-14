@@ -56,9 +56,10 @@ const mockProblem: Problem = {
 function makeSuccessResult(
   problems: Problem[] = [],
   reviewLog: ReviewLogEntry[] = [],
-  preferences: Preferences = defaultPreferences
+  preferences: Preferences = defaultPreferences,
+  hasChanges: boolean = false
 ) {
-  return { problems, reviewLog, preferences, error: null };
+  return { problems, reviewLog, preferences, hasChanges, error: null };
 }
 
 function makeDefaultParams(overrides: Partial<Parameters<typeof useCloudSync>[0]> = {}) {
@@ -233,8 +234,8 @@ describe("useCloudSync", () => {
     });
   });
 
-  it("shows 'Data synced' toast when problems exist in result", async () => {
-    const syncResult = makeSuccessResult([mockProblem]);
+  it("shows 'Data synced' toast when sync has changes", async () => {
+    const syncResult = makeSuccessResult([mockProblem], [], defaultPreferences, true);
     mockSyncOnSignIn.mockResolvedValue(syncResult);
 
     const params = makeDefaultParams();
@@ -249,8 +250,8 @@ describe("useCloudSync", () => {
     });
   });
 
-  it("does not show 'Data synced' toast when result has no problems", async () => {
-    const syncResult = makeSuccessResult([]);
+  it("does not show 'Data synced' toast when sync has no changes", async () => {
+    const syncResult = makeSuccessResult([mockProblem], [], defaultPreferences, false);
     mockSyncOnSignIn.mockResolvedValue(syncResult);
 
     const params = makeDefaultParams();

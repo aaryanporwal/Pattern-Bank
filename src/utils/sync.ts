@@ -15,6 +15,7 @@ export interface SyncResult {
   problems: Problem[];
   reviewLog: ReviewLogEntry[];
   preferences: Preferences;
+  hasChanges: boolean;
   error: unknown;
 }
 
@@ -42,7 +43,7 @@ export async function syncOnSignIn(
     // If any fetch failed critically, return local data unchanged
     if (cloudProblemsRes.error) {
       console.error("Sync: failed to fetch problems", cloudProblemsRes.error);
-      return { problems: localProblems, reviewLog: localReviewLog, preferences: localPreferences, error: cloudProblemsRes.error };
+      return { problems: localProblems, reviewLog: localReviewLog, preferences: localPreferences, hasChanges: false, error: cloudProblemsRes.error };
     }
 
     const cloudProblems = cloudProblemsRes.data || [];
@@ -97,10 +98,19 @@ export async function syncOnSignIn(
       await upsertProblems(userId, problemsToPush);
     }
 
+    // Detect whether sync actually changed local state
+    const hasChanges =
+      dupIds.length > 0 ||
+      mergedProblems.length !== localProblems.length ||
+      mergedProblems.some((p, i) => p.id !== localProblems[i]?.id || p.updatedAt !== localProblems[i]?.updatedAt) ||
+      mergedLog.length !== localReviewLog.length ||
+      (cloudPrefs !== null && cloudPrefs.dailyReviewGoal !== localPreferences.dailyReviewGoal);
+
     return {
       problems: mergedProblems,
       reviewLog: mergedLog,
       preferences: mergedPreferences,
+      hasChanges,
       error: null,
     };
   } catch (err) {
@@ -109,6 +119,7 @@ export async function syncOnSignIn(
       problems: localProblems,
       reviewLog: localReviewLog,
       preferences: localPreferences,
+      hasChanges: false,
       error: err,
     };
   }
