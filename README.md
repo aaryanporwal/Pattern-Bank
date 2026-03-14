@@ -1,12 +1,15 @@
 # PatternBank
 
-![React](https://img.shields.io/badge/React-61DAFB) ![React Native](https://img.shields.io/badge/React_Native-61DAFB) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E) ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E) ![Tailwind](https://img.shields.io/badge/Tailwind_CSS-06B6D4) ![Vercel](https://img.shields.io/badge/Vercel-000000)
+![React](https://img.shields.io/badge/React-61DAFB) ![React Native](https://img.shields.io/badge/React_Native-61DAFB) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6) ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E) ![Tailwind](https://img.shields.io/badge/Tailwind_CSS-06B6D4) ![Vercel](https://img.shields.io/badge/Vercel-000000)
+
+[![App Store](https://img.shields.io/badge/App_Store-0D96F6?logo=apple&logoColor=white)](https://apps.apple.com/app/patternbank/id6759760762)
 
 **Spaced repetition for LeetCode interview prep**
 
 PatternBank is a cross-platform app that solves the retention problem in technical interview preparation. You log problems, tag them by algorithmic pattern, rate your confidence, and the app tells you when to review. No more forgetting solutions two weeks after solving them.
 
 **Web:** [pattern-bank.vercel.app](https://pattern-bank.vercel.app)
+**iOS:** [App Store](https://apps.apple.com/app/patternbank/id6759760762)
 
 ---
 
@@ -23,11 +26,14 @@ The gap isn't tracking. It's retention. PatternBank fills that gap with spaced r
 - **Spaced Repetition** — SM-2 algorithm calculates review intervals based on your confidence rating (1-5 stars). Low confidence = review tomorrow. High confidence = review in two weeks.
 - **Pattern Organization** — 18 algorithmic categories from Two Pointers to Dynamic Programming. Tag problems by pattern and see where your gaps are.
 - **Confidence Heatmap** — Visual grid showing average confidence per pattern. Red = weak, green = strong. Click any cell to filter problems by that pattern.
+- **Curated Problem Lists** — 6 built-in lists: NeetCode 75, NeetCode 150, NeetCode 250, Grind 75, Grind 169, and LeetCode Hot 100.
 - **Smart Daily Cap** — Set a daily review goal (1-10). The priority algorithm surfaces your weakest, most overdue problems first. Never says "overdue" or "behind."
 - **LeetCode Database** — 3,846 problems with instant search by number or title. Auto-fills title, difficulty, and URL.
 - **Bulk Add** — Paste LeetCode problem numbers, validated in real-time. Review dates staggered by difficulty to prevent queue overwhelm.
+- **Review History** — Per-problem timeline of past reviews with confidence progression (signed-in users).
+- **Exclude from Review** — Toggle problems out of the daily review queue while keeping them in your library.
 - **Cross-Platform** — React web app + React Native mobile app with shared Supabase backend.
-- **Cloud Sync** — Sign in with Google or GitHub. Data syncs across devices with timestamp-based conflict resolution.
+- **Cloud Sync** — Sign in with Google, GitHub, or Apple. Data syncs across devices with timestamp-based conflict resolution.
 - **Offline-First** — Works without an account. localStorage (web) and AsyncStorage (mobile) persist everything locally. Cloud sync is additive, never required.
 - **Push Notifications** — Daily review reminders on mobile with configurable time.
 
@@ -77,13 +83,15 @@ PatternBank follows a **localStorage-first** design. Every action writes locally
 | Layer | Web | Mobile |
 |-------|-----|--------|
 | Framework | React 19 + Vite | React Native 0.81 + Expo SDK 54 |
+| Language | TypeScript (strict) | TypeScript |
 | Styling | Tailwind CSS v4 | NativeWind v4.1 |
 | Data (local) | localStorage | AsyncStorage |
 | Data (cloud) | Supabase PostgreSQL | Supabase PostgreSQL (shared) |
 | Auth | Supabase Auth (Google, GitHub, Apple) | Supabase Auth (Google, GitHub, Apple) |
 | Notifications | — | expo-notifications |
-| Hosting | Vercel | EAS Build (pending) |
-| Testing | Playwright MCP | Manual |
+| Hosting | Vercel | App Store (live via EAS Build) |
+| Testing | Vitest (unit) + Playwright (e2e) | Manual (Vitest + Playwright planned) |
+| Monitoring | Sentry, PostHog, Vercel Analytics + Speed Insights | Sentry, PostHog |
 
 ---
 
@@ -111,21 +119,30 @@ When more problems are due than the daily goal allows, a three-tier priority sor
 
 ```
 src/
-├── components/          20 components
+├── components/          33 components
 │   ├── PatternHeatmap   Radial gradient confidence grid
 │   ├── BulkAddSection   Chip input with LC database validation
 │   ├── ReviewCard       Active recall flow (notes hidden by default)
 │   ├── DashboardView    Stats, review queue, heatmap
+│   ├── SettingsModal    → AccountSection, DailyGoalSection, DataSection,
+│   │                      FeedbackSection, MobileAppSection
+│   ├── ProblemModal     → ModeToggle, ProblemInfo, PatternSelector,
+│   │                      NotesEditor, ConfidenceInfo
 │   └── ...
-├── utils/               8 modules
+├── utils/               11 modules
 │   ├── spacedRepetition SM-2 intervals + priority algorithm
+│   ├── problemTransforms Pure business logic (bulk add, import merge, review progress)
 │   ├── leetcodeProblems 3,846 problems with instant search
 │   ├── sync             Bidirectional merge + fire-and-forget push
 │   ├── supabaseData     7 CRUD functions with field mapping
 │   └── ...
 ├── contexts/            AuthContext (Google, GitHub, Apple OAuth)
-└── hooks/               useAuth
+└── hooks/               useProblems (coordinator), useUI (UI state),
+                         usePreferences (prefs + persistence),
+                         useCloudSync (sign-in sync + status), useAuth
 ```
+
+App.tsx composes the hooks; pure business logic lives in `problemTransforms.ts`.
 
 ---
 
@@ -137,7 +154,7 @@ The companion React Native app lives in a [separate repository](https://github.c
 
 ## Development
 
-Built iteratively across 5 sprints:
+Built iteratively across 6+ sprints plus post-launch sessions:
 
 | Sprint | Focus |
 |--------|-------|
@@ -146,6 +163,7 @@ Built iteratively across 5 sprints:
 | 3 | Supabase backend, OAuth, cloud sync |
 | 4 | React Native mobile app |
 | 5 | Heatmap, bulk add, accessibility, performance testing |
+| 6+ | TypeScript migration (strict mode), ESLint, Vitest + Playwright test infrastructure (278 unit + 24 e2e tests) |
 
 Each sprint was planned before coding — numbered task lists, discovery questions, architectural decisions made upfront.
 
@@ -159,4 +177,4 @@ MS Computer Science, Northeastern University
 
 *Built because I solved 347 LeetCode problems and kept forgetting them.*
 
-Copyright (c) 2026 Derek Zhang. All rights reserved.
+Licensed under the [GNU General Public License v3.0](LICENSE).
