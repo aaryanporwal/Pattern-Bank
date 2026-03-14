@@ -35,8 +35,6 @@ export default function SettingsModal({
   onUpdatePreferences,
   onExport,
   onImport,
-  onSetAllDue,
-  onClearAllData,
   onBulkAdd,
   problemCount,
   existingProblemNumbers,

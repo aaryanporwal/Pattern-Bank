@@ -303,7 +303,6 @@ describe("buildReviewedProblem", () => {
     const r3 = buildReviewedProblem(base, 3);
     const r5 = buildReviewedProblem(base, 5);
 
-    const today = r1.lastReviewed; // all use same today
     expect(r1.nextReviewDate).not.toBe(r3.nextReviewDate);
     expect(r3.nextReviewDate).not.toBe(r5.nextReviewDate);
   });

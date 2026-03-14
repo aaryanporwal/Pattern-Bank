@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { searchProblems, buildLeetCodeUrl } from "../utils/leetcodeProblems";
 import type { LeetCodeProblem, Difficulty } from "../types";
 
@@ -8,29 +8,29 @@ interface Props {
 
 export default function LeetCodeSearch({ onSelect }: Props) {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<LeetCodeProblem[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
   const [highlightIndex, setHighlightIndex] = useState(0);
+  const [dropdownClosed, setDropdownClosed] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (query.trim()) {
-      const matches = searchProblems(query);
-      setResults(matches);
-      setIsOpen(matches.length > 0);
-      setHighlightIndex(0);
-    } else {
-      setResults([]);
-      setIsOpen(false);
-    }
-  }, [query]);
+  const results = useMemo<LeetCodeProblem[]>(
+    () => (query.trim() ? searchProblems(query) : []),
+    [query]
+  );
+
+  const isOpen = results.length > 0 && !dropdownClosed;
+
+  const handleQueryChange = (value: string) => {
+    setQuery(value);
+    setDropdownClosed(false);
+    setHighlightIndex(0);
+  };
 
   // Close dropdown on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
+        setDropdownClosed(true);
       }
     };
     document.addEventListener("mousedown", handleClick);
@@ -45,8 +45,7 @@ export default function LeetCodeSearch({ onSelect }: Props) {
       url: buildLeetCodeUrl(problem.s),
     });
     setQuery("");
-    setResults([]);
-    setIsOpen(false);
+    setDropdownClosed(true);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -62,7 +61,7 @@ export default function LeetCodeSearch({ onSelect }: Props) {
       e.preventDefault();
       handleSelect(results[highlightIndex]);
     } else if (e.key === "Escape") {
-      setIsOpen(false);
+      setDropdownClosed(true);
     }
   };
 
@@ -77,9 +76,9 @@ export default function LeetCodeSearch({ onSelect }: Props) {
         ref={inputRef}
         type="text"
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => handleQueryChange(e.target.value)}
         onKeyDown={handleKeyDown}
-        onFocus={() => query.trim() && results.length > 0 && setIsOpen(true)}
+        onFocus={() => setDropdownClosed(false)}
         placeholder="Type number or title... e.g. '1' or 'two sum'"
         className="w-full rounded-lg border border-pb-border bg-pb-bg px-3 py-2.5 text-sm text-pb-text outline-none transition-colors duration-150 focus:border-pb-accent"
       />

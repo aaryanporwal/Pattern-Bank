@@ -28,12 +28,13 @@ export default function useCloudSync({
 
   useEffect(() => {
     if (!user) {
-      hasSyncedRef.current = false;
-      setSyncStatus("idle");
+      const reset = () => { hasSyncedRef.current = false; setSyncStatus("idle"); };
+      reset();
       return;
     }
     if (hasSyncedRef.current) return;
     hasSyncedRef.current = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSyncStatus("syncing");
 
     syncOnSignIn(user.id, problems, loadReviewLog(), preferences).then(

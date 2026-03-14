@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import useProblems from "../src/hooks/useProblems";
 import {
   loadProblems,

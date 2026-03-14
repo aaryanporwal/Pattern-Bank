@@ -4,6 +4,7 @@ import posthog from "posthog-js";
 import { supabase } from "../utils/supabaseClient";
 import type { AuthContextValue } from "../hooks/useAuth";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext<AuthContextValue | null>(null);
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -13,6 +14,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     // No Supabase client = skip auth entirely, run as anonymous
     if (!supabase) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false);
       return;
     }

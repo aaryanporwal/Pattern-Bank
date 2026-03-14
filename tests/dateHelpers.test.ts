@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { todayStr, utcToLocalDateStr, addDays, formatRelativeDate, generateId } from "../src/utils/dateHelpers";
 
 describe("todayStr", () => {

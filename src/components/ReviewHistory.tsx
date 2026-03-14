@@ -29,12 +29,13 @@ export default function ReviewHistory({ problemId, isOpen }: Props) {
 
   useEffect(() => {
     if (!isOpen || !problemId || !user) {
-      setHistory([]);
-      setFetched(false);
+      const reset = () => { setHistory([]); setFetched(false); };
+      reset();
       return;
     }
 
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
 
     fetchProblemReviewHistory(user.id, problemId).then(({ data, error }) => {

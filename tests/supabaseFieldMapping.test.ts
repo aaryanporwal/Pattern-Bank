@@ -38,7 +38,6 @@ function makeSnakeCaseRow(overrides: Record<string, unknown> = {}) {
     next_review_date: "2025-01-02",
     updated_at: "2025-01-01T00:00:00.000Z",
     ...overrides,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 }
 

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Problem, Confidence, Preferences } from "../src/types";
 
 vi.mock("../src/utils/supabaseData", () => ({
