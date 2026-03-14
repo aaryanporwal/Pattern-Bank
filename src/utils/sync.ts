@@ -11,7 +11,7 @@ import {
 } from "./supabaseData";
 import type { Problem, ReviewLogEntry, Preferences, Confidence } from "../types";
 
-interface SyncResult {
+export interface SyncResult {
   problems: Problem[];
   reviewLog: ReviewLogEntry[];
   preferences: Preferences;

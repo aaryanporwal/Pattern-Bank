@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { User } from "@supabase/supabase-js";
 import { todayStr, addDays } from "../utils/dateHelpers";
 import { getIntervalDays } from "../utils/spacedRepetition";
 import {
@@ -26,8 +27,32 @@ import {
   deduplicateProblems,
 } from "../utils/sync";
 import posthog from "posthog-js";
+import type { Problem, Preferences, SyncStatus, Confidence, LeetCodeProblem } from "../types";
+import type { SyncResult } from "../utils/sync";
 
-export default function useProblems({ user, showToast }) {
+interface UseProblemsParams {
+  user: User | null;
+  showToast: (msg: string) => void;
+}
+
+interface UseProblemsReturn {
+  problems: Problem[];
+  preferences: Preferences;
+  syncStatus: SyncStatus;
+  handleSaveProblem: (problem: Problem, confidenceChanged?: boolean) => void;
+  handleDeleteConfirm: (deleteTarget: Problem | null) => void;
+  handleReview: (problemId: string, newConfidence: Confidence) => void;
+  handleUpdateNotes: (problemId: string, newNotes: string) => void;
+  handleDismiss: (problemId: string) => void;
+  handleSetAllDue: () => void;
+  handleImport: (file: File) => Promise<void>;
+  handleUpdatePreferences: (updates: Partial<Preferences>) => void;
+  handleBulkAdd: (lcProblems: LeetCodeProblem[], patternMap?: Map<number, string[]> | null) => void;
+  handleToggleExclude: (problemId: string) => void;
+  handleClearAllData: () => void;
+}
+
+export default function useProblems({ user, showToast }: UseProblemsParams): UseProblemsReturn {
   const { preferences, handleUpdatePreferences, replacePreferences } = usePreferences({ user });
 
   const [problems, setProblems] = useState(() => {
@@ -42,7 +67,7 @@ export default function useProblems({ user, showToast }) {
   useEffect(() => { saveProblems(problems); }, [problems]);
 
   // Sync with Supabase on sign-in
-  const handleSyncComplete = useCallback((result) => {
+  const handleSyncComplete = useCallback((result: SyncResult) => {
     setProblems(result.problems);
     saveReviewLog(result.reviewLog);
     replacePreferences(result.preferences);
@@ -53,7 +78,7 @@ export default function useProblems({ user, showToast }) {
     onSyncComplete: handleSyncComplete,
   });
 
-  const handleSaveProblem = useCallback((problem, confidenceChanged) => {
+  const handleSaveProblem = useCallback((problem: Problem, confidenceChanged?: boolean) => {
     let rejected = false;
     setProblems((prev) => {
       const idx = prev.findIndex((p) => p.id === problem.id);
@@ -81,7 +106,7 @@ export default function useProblems({ user, showToast }) {
     if (user) pushProblemToCloud(user.id, problem);
   }, [showToast, user]);
 
-  const handleDeleteConfirm = useCallback((deleteTarget) => {
+  const handleDeleteConfirm = useCallback((deleteTarget: Problem | null) => {
     if (deleteTarget) {
       setProblems((prev) => prev.filter((p) => p.id !== deleteTarget.id));
       showToast(`Deleted ${deleteTarget.title}`);
@@ -91,7 +116,7 @@ export default function useProblems({ user, showToast }) {
   }, [showToast, user]);
 
   const handleReview = useCallback(
-    (problemId, newConfidence) => {
+    (problemId: string, newConfidence: Confidence) => {
       const { currentReviewed, effectiveGoal } = computeReviewProgress(problems, preferences.dailyReviewGoal);
       const newReviewedCount = currentReviewed + 1;
 
@@ -104,7 +129,7 @@ export default function useProblems({ user, showToast }) {
       logReviewToday();
       posthog.capture("problem_reviewed", { old_confidence: original?.confidence, new_confidence: newConfidence, platform: "web" });
 
-      if (user && updatedProblem) {
+      if (user && updatedProblem && original) {
         pushProblemToCloud(user.id, updatedProblem);
         pushReviewToCloud(user.id, problemId, original.confidence, newConfidence);
       }
@@ -117,7 +142,7 @@ export default function useProblems({ user, showToast }) {
     [showToast, problems, preferences.dailyReviewGoal, user]
   );
 
-  const handleUpdateNotes = useCallback((problemId, newNotes) => {
+  const handleUpdateNotes = useCallback((problemId: string, newNotes: string) => {
     const now = new Date().toISOString();
     setProblems((prev) =>
       prev.map((p) =>
@@ -130,7 +155,7 @@ export default function useProblems({ user, showToast }) {
     }
   }, [user, problems]);
 
-  const handleDismiss = useCallback((problemId) => {
+  const handleDismiss = useCallback((problemId: string) => {
     const tomorrow = addDays(todayStr(), 1);
     const now = new Date().toISOString();
     setProblems((prev) =>
@@ -156,7 +181,7 @@ export default function useProblems({ user, showToast }) {
   }, []);
 
   const handleImport = useCallback(
-    async (file) => {
+    async (file: File) => {
       try {
         const data = await importData(file);
         const { mergedProblems, addedCount, updatedCount } = mergeImportedProblems(problems, data.problems);
@@ -170,13 +195,13 @@ export default function useProblems({ user, showToast }) {
         posthog.capture("data_imported", { added: addedCount, updated: updatedCount, platform: "web" });
         showToast(`Imported ${addedCount} new, ${updatedCount} updated`);
       } catch (err) {
-        showToast(err.message || "Import failed");
+        showToast((err as Error).message || "Import failed");
       }
     },
     [problems, showToast, user]
   );
 
-  const handleBulkAdd = useCallback((lcProblems, patternMap = null) => {
+  const handleBulkAdd = useCallback((lcProblems: LeetCodeProblem[], patternMap: Map<number, string[]> | null = null) => {
     const { newProblems: newLc, skippedCount } = filterExistingProblems(lcProblems, problems);
     if (newLc.length === 0) {
       showToast("All problems already in your library");
@@ -204,7 +229,7 @@ export default function useProblems({ user, showToast }) {
     showToast(msg);
   }, [problems, preferences.dailyReviewGoal, user, showToast]);
 
-  const handleToggleExclude = useCallback((problemId) => {
+  const handleToggleExclude = useCallback((problemId: string) => {
     const now = new Date().toISOString();
     setProblems((prev) =>
       prev.map((p) =>

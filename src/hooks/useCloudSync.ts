@@ -1,9 +1,29 @@
 import { useState, useEffect, useRef } from "react";
+import { User } from "@supabase/supabase-js";
 import { loadReviewLog } from "../utils/storage";
-import { syncOnSignIn } from "../utils/sync";
+import { syncOnSignIn, SyncResult } from "../utils/sync";
+import type { Problem, Preferences, SyncStatus } from "../types";
 
-export default function useCloudSync({ user, problems, preferences, showToast, onSyncComplete }) {
-  const [syncStatus, setSyncStatus] = useState("idle");
+interface UseCloudSyncParams {
+  user: User | null;
+  problems: Problem[];
+  preferences: Preferences;
+  showToast: (msg: string) => void;
+  onSyncComplete: (result: SyncResult) => void;
+}
+
+interface UseCloudSyncReturn {
+  syncStatus: SyncStatus;
+}
+
+export default function useCloudSync({
+  user,
+  problems,
+  preferences,
+  showToast,
+  onSyncComplete,
+}: UseCloudSyncParams): UseCloudSyncReturn {
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>("idle");
   const hasSyncedRef = useRef(false);
 
   useEffect(() => {
