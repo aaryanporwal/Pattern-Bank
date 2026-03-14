@@ -25,17 +25,17 @@ export function toSnakeCase(problem: Problem): SnakeCaseProblem {
   return {
     id: problem.id,
     title: problem.title,
-    leetcode_number: problem.leetcodeNumber || null,
-    url: problem.url || null,
+    leetcode_number: problem.leetcodeNumber ?? null,
+    url: problem.url ?? null,
     difficulty: problem.difficulty,
     patterns: problem.patterns,
     confidence: problem.confidence,
-    notes: problem.notes || "",
+    notes: problem.notes ?? "",
     date_added: problem.dateAdded,
-    last_reviewed: problem.lastReviewed || null,
+    last_reviewed: problem.lastReviewed ?? null,
     next_review_date: problem.nextReviewDate,
     updated_at: problem.updatedAt || new Date().toISOString(),
-    exclude_from_review: problem.excludeFromReview || false,
+    exclude_from_review: problem.excludeFromReview ?? false,
   };
 }
 
@@ -43,17 +43,17 @@ export function toCamelCase(row: SnakeCaseProblem): Problem {
   return {
     id: row.id,
     title: row.title,
-    leetcodeNumber: row.leetcode_number || null,
-    url: row.url || null,
+    leetcodeNumber: row.leetcode_number ?? null,
+    url: row.url ?? null,
     difficulty: row.difficulty as Difficulty,
-    patterns: row.patterns || [],
+    patterns: row.patterns ?? [],
     confidence: row.confidence as Confidence,
-    notes: row.notes || "",
+    notes: row.notes ?? "",
     dateAdded: row.date_added,
-    lastReviewed: row.last_reviewed || null,
+    lastReviewed: row.last_reviewed ?? null,
     nextReviewDate: row.next_review_date,
     updatedAt: row.updated_at || new Date().toISOString(),
-    excludeFromReview: row.exclude_from_review || false,
+    excludeFromReview: row.exclude_from_review ?? false,
   };
 }
 

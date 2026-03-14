@@ -79,29 +79,38 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
   });
 
   const handleSaveProblem = useCallback((problem: Problem, confidenceChanged?: boolean) => {
-    let rejected = false;
+    type SaveAction = "updated" | "added" | "duplicate";
+    let action = "added" as SaveAction;
+
     setProblems((prev) => {
       const idx = prev.findIndex((p) => p.id === problem.id);
       if (idx >= 0) {
+        action = "updated";
         const updated = [...prev];
         updated[idx] = problem;
-        showToast("Problem updated");
-        posthog.capture("problem_edited", { confidence_changed: !!confidenceChanged, platform: "web" });
         return updated;
       }
       if (problem.leetcodeNumber) {
         const duplicate = prev.find((p) => p.leetcodeNumber === problem.leetcodeNumber);
         if (duplicate) {
-          showToast(`Problem #${problem.leetcodeNumber} already in your library`);
-          rejected = true;
+          action = "duplicate";
           return prev;
         }
       }
-      showToast("Problem added");
-      posthog.capture("problem_added", { difficulty: problem.difficulty, pattern_count: problem.patterns.length, platform: "web" });
       return [...prev, problem];
     });
-    if (rejected) return;
+
+    if (action === "duplicate") {
+      showToast(`Problem #${problem.leetcodeNumber} already in your library`);
+      return;
+    }
+    if (action === "updated") {
+      showToast("Problem updated");
+      posthog.capture("problem_edited", { confidence_changed: !!confidenceChanged, platform: "web" });
+    } else {
+      showToast("Problem added");
+      posthog.capture("problem_added", { difficulty: problem.difficulty, pattern_count: problem.patterns.length, platform: "web" });
+    }
     if (confidenceChanged) logReviewToday();
     if (user) pushProblemToCloud(user.id, problem);
   }, [showToast, user]);
@@ -118,8 +127,6 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
   const handleReview = useCallback(
     (problemId: string, newConfidence: Confidence) => {
       const { currentReviewed, effectiveGoal } = computeReviewProgress(problems, preferences.dailyReviewGoal);
-      const newReviewedCount = currentReviewed + 1;
-
       const original = problems.find((p) => p.id === problemId);
       const updatedProblem = original ? buildReviewedProblem(original, newConfidence) : null;
 
@@ -135,6 +142,7 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
       }
 
       const intervalDays = getIntervalDays(newConfidence);
+      const newReviewedCount = currentReviewed + 1;
       const progress = `${newReviewedCount} of ${effectiveGoal} done`;
       const interval = `Next review in ${intervalDays} day${intervalDays !== 1 ? "s" : ""}`;
       showToast(`${progress} · ${interval}`);
@@ -144,20 +152,21 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
 
   const handleUpdateNotes = useCallback((problemId: string, newNotes: string) => {
     const now = new Date().toISOString();
+    const problem = problems.find((p) => p.id === problemId);
     setProblems((prev) =>
       prev.map((p) =>
         p.id === problemId ? { ...p, notes: newNotes.trim(), updatedAt: now } : p
       )
     );
-    if (user) {
-      const problem = problems.find((p) => p.id === problemId);
-      if (problem) pushProblemToCloud(user.id, { ...problem, notes: newNotes.trim(), updatedAt: now });
+    if (user && problem) {
+      pushProblemToCloud(user.id, { ...problem, notes: newNotes.trim(), updatedAt: now });
     }
   }, [user, problems]);
 
   const handleDismiss = useCallback((problemId: string) => {
     const tomorrow = addDays(todayStr(), 1);
     const now = new Date().toISOString();
+    const problem = problems.find((p) => p.id === problemId);
     setProblems((prev) =>
       prev.map((p) =>
         p.id === problemId
@@ -166,9 +175,8 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
       )
     );
     posthog.capture("problem_dismissed", { platform: "web" });
-    if (user) {
-      const problem = problems.find((p) => p.id === problemId);
-      if (problem) pushProblemToCloud(user.id, { ...problem, nextReviewDate: tomorrow, updatedAt: now });
+    if (user && problem) {
+      pushProblemToCloud(user.id, { ...problem, nextReviewDate: tomorrow, updatedAt: now });
     }
   }, [user, problems]);
 
@@ -231,6 +239,7 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
 
   const handleToggleExclude = useCallback((problemId: string) => {
     const now = new Date().toISOString();
+    const problem = problems.find((p) => p.id === problemId);
     setProblems((prev) =>
       prev.map((p) =>
         p.id === problemId
@@ -238,9 +247,8 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
           : p
       )
     );
-    if (user) {
-      const problem = problems.find((p) => p.id === problemId);
-      if (problem) pushProblemToCloud(user.id, { ...problem, excludeFromReview: !problem.excludeFromReview, updatedAt: now });
+    if (user && problem) {
+      pushProblemToCloud(user.id, { ...problem, excludeFromReview: !problem.excludeFromReview, updatedAt: now });
     }
   }, [user, problems]);
 
