@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import type { Problem } from "../src/types";
+import type { BackupData } from "../src/types";
 
 // Mock localStorage before importing storage module
 const localStorageMock = (() => {
@@ -25,6 +26,8 @@ const {
   countReviewedToday,
   loadPreferences,
   savePreferences,
+  importData,
+  exportData,
 } = await import("../src/utils/storage");
 
 const { todayStr, addDays } = await import("../src/utils/dateHelpers");
@@ -163,5 +166,205 @@ describe("loadPreferences / savePreferences", () => {
   it("returns defaults on corrupted JSON", () => {
     localStorageMock.setItem("patternbank-preferences", "bad{json");
     expect(loadPreferences()).toEqual({ dailyReviewGoal: 5 });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// importData
+// ---------------------------------------------------------------------------
+
+class MockFileReader {
+  onload: ((e: { target: { result: string } }) => void) | null = null;
+  onerror: (() => void) | null = null;
+  readAsText(_file: File) {
+    // overridden per test
+  }
+}
+
+describe("importData", () => {
+  beforeEach(() => {
+    vi.stubGlobal("FileReader", MockFileReader);
+  });
+
+  it("resolves with parsed BackupData for valid JSON file", async () => {
+    const backup: BackupData = {
+      exportedAt: "2026-03-14T00:00:00.000Z",
+      problems: [
+        { id: "1", title: "Two Sum", difficulty: "Easy", patterns: ["Hash Table"] } as Problem,
+      ],
+    };
+
+    MockFileReader.prototype.readAsText = function () {
+      this.onload?.({ target: { result: JSON.stringify(backup) } });
+    };
+
+    const mockFile = new Blob([JSON.stringify(backup)]) as File;
+    const result = await importData(mockFile);
+    expect(result.exportedAt).toBe(backup.exportedAt);
+    expect(result.problems).toHaveLength(1);
+    expect(result.problems[0].id).toBe("1");
+  });
+
+  it("includes reviewLog when present in backup", async () => {
+    const backup: BackupData = {
+      exportedAt: "2026-03-14T00:00:00.000Z",
+      problems: [
+        { id: "1", title: "Two Sum", difficulty: "Easy", patterns: ["Hash Table"] } as Problem,
+      ],
+      reviewLog: [{ date: "2026-03-13" }, { date: "2026-03-14" }],
+    };
+
+    MockFileReader.prototype.readAsText = function () {
+      this.onload?.({ target: { result: JSON.stringify(backup) } });
+    };
+
+    const mockFile = new Blob([JSON.stringify(backup)]) as File;
+    const result = await importData(mockFile);
+    expect(result.reviewLog).toHaveLength(2);
+    expect(result.reviewLog?.[0].date).toBe("2026-03-13");
+  });
+
+  it("rejects when problems array is missing", async () => {
+    const badData = { exportedAt: "2026-03-14T00:00:00.000Z" };
+
+    MockFileReader.prototype.readAsText = function () {
+      this.onload?.({ target: { result: JSON.stringify(badData) } });
+    };
+
+    const mockFile = new Blob([JSON.stringify(badData)]) as File;
+    await expect(importData(mockFile)).rejects.toThrow(
+      "Invalid backup file: missing problems array"
+    );
+  });
+
+  it("rejects when problems is not an array", async () => {
+    const badData = { exportedAt: "2026-03-14T00:00:00.000Z", problems: "not-an-array" };
+
+    MockFileReader.prototype.readAsText = function () {
+      this.onload?.({ target: { result: JSON.stringify(badData) } });
+    };
+
+    const mockFile = new Blob([JSON.stringify(badData)]) as File;
+    await expect(importData(mockFile)).rejects.toThrow(
+      "Invalid backup file: missing problems array"
+    );
+  });
+
+  it("rejects when problems have missing required fields", async () => {
+    const badData = {
+      exportedAt: "2026-03-14T00:00:00.000Z",
+      problems: [{ id: "1", title: "Two Sum" }], // missing difficulty and patterns
+    };
+
+    MockFileReader.prototype.readAsText = function () {
+      this.onload?.({ target: { result: JSON.stringify(badData) } });
+    };
+
+    const mockFile = new Blob([JSON.stringify(badData)]) as File;
+    await expect(importData(mockFile)).rejects.toThrow(
+      "Invalid backup file: problems have missing fields"
+    );
+  });
+
+  it("rejects on invalid JSON", async () => {
+    MockFileReader.prototype.readAsText = function () {
+      this.onload?.({ target: { result: "not valid json{{{{" } });
+    };
+
+    const mockFile = new Blob(["not valid json{{{{"]) as File;
+    await expect(importData(mockFile)).rejects.toThrow(
+      "Could not parse file. Is it a valid JSON backup?"
+    );
+  });
+
+  it("rejects on FileReader error", async () => {
+    MockFileReader.prototype.readAsText = function () {
+      this.onerror?.();
+    };
+
+    const mockFile = new Blob(["anything"]) as File;
+    await expect(importData(mockFile)).rejects.toThrow("Failed to read file");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// exportData
+// ---------------------------------------------------------------------------
+
+describe("exportData", () => {
+  let mockClick: ReturnType<typeof vi.fn>;
+  let mockCreateObjectURL: ReturnType<typeof vi.fn>;
+  let mockRevokeObjectURL: ReturnType<typeof vi.fn>;
+  let mockCreateElement: ReturnType<typeof vi.fn>;
+  let mockAnchor: { href: string; download: string; click: ReturnType<typeof vi.fn> };
+
+  beforeEach(() => {
+    mockClick = vi.fn();
+    mockCreateObjectURL = vi.fn(() => "blob:mock-url");
+    mockRevokeObjectURL = vi.fn();
+    mockAnchor = { href: "", download: "", click: mockClick };
+    mockCreateElement = vi.fn(() => mockAnchor);
+
+    vi.stubGlobal("URL", {
+      createObjectURL: mockCreateObjectURL,
+      revokeObjectURL: mockRevokeObjectURL,
+    });
+    vi.stubGlobal("document", {
+      createElement: mockCreateElement,
+    });
+    vi.stubGlobal("Blob", class MockBlob {
+      content: string[];
+      type: string;
+      constructor(content: string[], options?: { type?: string }) {
+        this.content = content;
+        this.type = options?.type ?? "";
+      }
+    });
+  });
+
+  it("creates a download link with correct filename pattern", () => {
+    exportData();
+
+    expect(mockCreateElement).toHaveBeenCalledWith("a");
+    expect(mockAnchor.href).toBe("blob:mock-url");
+    expect(mockAnchor.download).toMatch(/^patternbank-backup-\d{4}-\d{2}-\d{2}\.json$/);
+  });
+
+  it("triggers a click on the anchor element", () => {
+    exportData();
+    expect(mockClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("includes problems and reviewLog in exported JSON", () => {
+    const problems = [
+      { id: "1", title: "Two Sum", difficulty: "Easy", patterns: ["Hash Table"] } as Problem,
+    ];
+    saveProblems(problems);
+    saveReviewLog([{ date: "2026-03-14" }]);
+
+    exportData();
+
+    expect(mockCreateObjectURL).toHaveBeenCalledTimes(1);
+    const blobArg = mockCreateObjectURL.mock.calls[0][0] as { content: string[] };
+    const exported = JSON.parse(blobArg.content[0]) as BackupData;
+    expect(exported.problems).toHaveLength(1);
+    expect(exported.problems[0].id).toBe("1");
+    expect(exported.reviewLog).toHaveLength(1);
+    expect(exported.reviewLog?.[0].date).toBe("2026-03-14");
+  });
+
+  it("calls URL.revokeObjectURL after click", () => {
+    exportData();
+    expect(mockRevokeObjectURL).toHaveBeenCalledWith("blob:mock-url");
+  });
+
+  it("sets exportedAt to a valid ISO timestamp", () => {
+    exportData();
+
+    const blobArg = mockCreateObjectURL.mock.calls[0][0] as { content: string[] };
+    const exported = JSON.parse(blobArg.content[0]) as BackupData;
+    const exportedAt = exported.exportedAt!;
+    expect(() => new Date(exportedAt)).not.toThrow();
+    expect(new Date(exportedAt).toISOString()).toBe(exportedAt);
   });
 });

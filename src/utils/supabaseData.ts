@@ -21,7 +21,7 @@ interface SnakeCaseProblem {
   exclude_from_review: boolean;
 }
 
-function toSnakeCase(problem: Problem): SnakeCaseProblem {
+export function toSnakeCase(problem: Problem): SnakeCaseProblem {
   return {
     id: problem.id,
     title: problem.title,
@@ -39,7 +39,7 @@ function toSnakeCase(problem: Problem): SnakeCaseProblem {
   };
 }
 
-function toCamelCase(row: SnakeCaseProblem): Problem {
+export function toCamelCase(row: SnakeCaseProblem): Problem {
   return {
     id: row.id,
     title: row.title,

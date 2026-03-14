@@ -118,7 +118,7 @@ export async function syncOnSignIn(
 // MERGE HELPERS
 // ============================================================
 
-function mergeProblems(localProblems: Problem[], cloudProblems: Problem[]): Problem[] {
+export function mergeProblems(localProblems: Problem[], cloudProblems: Problem[]): Problem[] {
   const localMap = new Map(localProblems.map((p) => [p.id, p]));
   const cloudMap = new Map(cloudProblems.map((p) => [p.id, p]));
   const merged = new Map<string, Problem>();
@@ -179,7 +179,7 @@ export function deduplicateProblems(problems: Problem[]): { problems: Problem[];
   return { problems: kept, removedIds };
 }
 
-function mergeReviewLog(localLog: ReviewLogEntry[], cloudLog: ReviewLogEntry[]): ReviewLogEntry[] {
+export function mergeReviewLog(localLog: ReviewLogEntry[], cloudLog: ReviewLogEntry[]): ReviewLogEntry[] {
   // Deduplicate by date — we only need one entry per date for streak calculation
   const dates = new Set<string>();
   const merged: ReviewLogEntry[] = [];
