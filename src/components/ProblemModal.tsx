@@ -98,6 +98,7 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData, exi
 
   const updateForm = (updates: Partial<ProblemFormState>) => setForm((prev) => ({ ...prev, ...updates }));
   const isDuplicate = !isEdit && !!form.leetcodeNumber && existingProblemNumbers.has(Number(form.leetcodeNumber));
+  const isLeetCodeEdit = isEdit && !!form.leetcodeNumber;
 
   const handleLeetCodeSelect = (selected: { title: string; leetcodeNumber: number; difficulty: Difficulty; url: string }) => {
     updateForm({
@@ -203,47 +204,51 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData, exi
 
           {(mode === "custom" || isEdit) && (
             <>
-              <div>
-                <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-                  Problem Title *
-                </label>
-                <input
-                  className={errors.title ? inputError : inputNormal}
-                  placeholder="e.g. Two Sum"
-                  value={form.title}
-                  onChange={(e) => updateForm({ title: e.target.value })}
-                />
-                <InlineError message={errors.title} />
-              </div>
+              {!isLeetCodeEdit && (
+                <div>
+                  <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
+                    Problem Title *
+                  </label>
+                  <input
+                    className={errors.title ? inputError : inputNormal}
+                    placeholder="e.g. Two Sum"
+                    value={form.title}
+                    onChange={(e) => updateForm({ title: e.target.value })}
+                  />
+                  <InlineError message={errors.title} />
+                </div>
+              )}
 
-              <div className="grid grid-cols-[1fr_2fr] gap-3">
-                <div>
-                  <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-                    Problem #
-                  </label>
-                  <input
-                    className={inputNormal}
-                    type="number"
-                    placeholder="1"
-                    value={form.leetcodeNumber}
-                    onChange={(e) =>
-                      updateForm({ leetcodeNumber: e.target.value })
-                    }
-                  />
+              {isLeetCodeEdit ? null : (
+                <div className="grid grid-cols-[1fr_2fr] gap-3">
+                  <div>
+                    <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
+                      Problem #
+                    </label>
+                    <input
+                      className={inputNormal}
+                      type="number"
+                      placeholder="1"
+                      value={form.leetcodeNumber}
+                      onChange={(e) =>
+                        updateForm({ leetcodeNumber: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
+                      URL
+                    </label>
+                    <input
+                      className={errors.url ? inputError : inputNormal}
+                      placeholder="https://..."
+                      value={form.url}
+                      onChange={(e) => updateForm({ url: e.target.value })}
+                    />
+                    <InlineError message={errors.url} />
+                  </div>
                 </div>
-                <div>
-                  <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-                    URL
-                  </label>
-                  <input
-                    className={errors.url ? inputError : inputNormal}
-                    placeholder="https://..."
-                    value={form.url}
-                    onChange={(e) => updateForm({ url: e.target.value })}
-                  />
-                  <InlineError message={errors.url} />
-                </div>
-              </div>
+              )}
 
               {mode === "custom" && !form.leetcodeNumber && (
                 <div>

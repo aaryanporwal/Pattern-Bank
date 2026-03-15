@@ -4,6 +4,7 @@ interface ProblemInfoForm {
   leetcodeNumber: string | number;
   title: string;
   difficulty: Difficulty;
+  url?: string;
 }
 
 interface Props {
@@ -35,6 +36,15 @@ export default function ProblemInfo({ form, isEdit, onClear, isDuplicate }: Prop
       >
         {form.difficulty}
       </span>
+      {form.url && (
+        <button
+          onClick={(e) => { e.stopPropagation(); window.open(form.url, "_blank"); }}
+          title="Open problem"
+          className="cursor-pointer border-none bg-transparent text-base text-pb-accent transition-colors duration-150 hover:text-pb-accent-hover"
+        >
+          ↗
+        </button>
+      )}
       {!isEdit && (
         <button
           onClick={onClear}
