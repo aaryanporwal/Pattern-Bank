@@ -26,7 +26,6 @@ export default function ProblemCard({ problem, onEdit, onDelete, onToggleExclude
   };
 
   const getReviewStatusText = () => {
-    if (isExcluded) return "Excluded from review";
     if (isDue) return problem.lastReviewed ? "Due for review" : "New";
     return `Next review: ${formatRelativeDate(problem.nextReviewDate)}`;
   };
@@ -47,6 +46,11 @@ export default function ProblemCard({ problem, onEdit, onDelete, onToggleExclude
               #{problem.leetcodeNumber}
             </span>
           )}
+          {isExcluded && (
+            <span className="text-[11px] font-medium text-pb-text-dim">
+              Excluded
+            </span>
+          )}
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <DifficultyBadge difficulty={problem.difficulty} />
@@ -54,19 +58,19 @@ export default function ProblemCard({ problem, onEdit, onDelete, onToggleExclude
             <button
               onClick={handleToggleExclude}
               title={isExcluded ? "Include in reviews" : "Exclude from reviews"}
-              className={`cursor-pointer rounded border-none bg-transparent px-1.5 py-0.5 text-sm leading-none transition-colors duration-150 ${
+              className={`cursor-pointer rounded border-none bg-transparent px-1.5 py-0.5 text-[17px] leading-none transition-colors duration-150 ${
                 isExcluded
                   ? "text-pb-accent hover:text-pb-accent-hover"
                   : "text-pb-text-dim hover:text-pb-text-muted"
               }`}
             >
-              {isExcluded ? "↩" : "⏸"}
+              {isExcluded ? "◉" : "◎"}
             </button>
           )}
           <button
             onClick={handleDelete}
             title="Delete problem"
-            className="cursor-pointer rounded border-none bg-transparent px-1.5 py-0.5 text-sm leading-none text-pb-text-dim transition-colors duration-150 hover:text-pb-hard"
+            className="cursor-pointer rounded border-none bg-transparent px-1.5 py-0.5 text-[17px] leading-none text-pb-text-dim transition-colors duration-150 hover:text-pb-hard"
           >
             ✕
           </button>

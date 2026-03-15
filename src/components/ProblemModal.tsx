@@ -97,6 +97,7 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData, exi
   }, [form, attempted, validate]);
 
   const updateForm = (updates: Partial<ProblemFormState>) => setForm((prev) => ({ ...prev, ...updates }));
+  const isDuplicate = !isEdit && !!form.leetcodeNumber && existingProblemNumbers.has(Number(form.leetcodeNumber));
 
   const handleLeetCodeSelect = (selected: { title: string; leetcodeNumber: number; difficulty: Difficulty; url: string }) => {
     updateForm({
@@ -115,6 +116,7 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData, exi
   };
 
   const handleSave = () => {
+    if (isDuplicate) return;
     setAttempted(true);
     if (!validate()) return;
     const today = todayStr();
@@ -183,6 +185,7 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData, exi
             <ProblemInfo
               form={form}
               isEdit={isEdit}
+              isDuplicate={isDuplicate}
               onClear={() =>
                 updateForm({
                   title: "",
@@ -192,13 +195,6 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData, exi
                 })
               }
             />
-          )}
-
-          {!isEdit && form.leetcodeNumber && existingProblemNumbers.has(Number(form.leetcodeNumber)) && (
-            <div className="flex items-center gap-2 rounded-lg border border-pb-star/30 bg-pb-star/10 px-4 py-2.5 text-[13px] text-pb-star">
-              <span>⚠</span>
-              <span>This problem is already in your library.</span>
-            </div>
           )}
 
           {mode === "leetcode" && !form.title && attempted && (
@@ -320,32 +316,6 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData, exi
           />
 
           {isEdit && (
-            <div className="flex items-center justify-between rounded-lg border border-pb-border bg-pb-bg px-4 py-3">
-              <div>
-                <div className="text-[13px] font-semibold text-pb-text-muted">
-                  Exclude from Review
-                </div>
-                <div className="text-[12px] text-pb-text-dim">
-                  Keep in library but skip daily reviews
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => updateForm({ excludeFromReview: !form.excludeFromReview })}
-                className={`relative h-6 w-11 shrink-0 cursor-pointer rounded-full border-none transition-colors duration-200 ${
-                  form.excludeFromReview ? "bg-pb-accent" : "bg-pb-border"
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white transition-transform duration-200 ${
-                    form.excludeFromReview ? "translate-x-5" : ""
-                  }`}
-                />
-              </button>
-            </div>
-          )}
-
-          {isEdit && (
             <ReviewHistory problemId={initialData?.id} isOpen={isOpen} />
           )}
         </div>
@@ -360,7 +330,12 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData, exi
           </button>
           <button
             onClick={handleSave}
-            className="cursor-pointer rounded-lg border-none bg-pb-accent px-5 py-2 text-[13px] font-semibold text-white hover:opacity-85"
+            disabled={isDuplicate}
+            className={`rounded-lg border-none px-5 py-2 text-[13px] font-semibold text-white ${
+              isDuplicate
+                ? "cursor-not-allowed bg-pb-text-dim opacity-50"
+                : "cursor-pointer bg-pb-accent hover:opacity-85"
+            }`}
           >
             {isEdit ? "Save Changes" : "Save Problem"}
           </button>
