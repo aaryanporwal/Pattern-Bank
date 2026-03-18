@@ -108,7 +108,7 @@ export function computeReviewProgress(
 ): { currentReviewed: number; totalDue: number; effectiveGoal: number } {
   const today = todayStr();
   const currentReviewed = countReviewedToday(problems);
-  const totalDue = problems.filter((p) => p.nextReviewDate <= today).length;
+  const totalDue = problems.filter((p) => p.nextReviewDate <= today && !p.excludeFromReview).length;
   const effectiveGoal = Math.min(dailyReviewGoal, totalDue + currentReviewed);
   return { currentReviewed, totalDue, effectiveGoal };
 }

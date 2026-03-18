@@ -224,6 +224,7 @@ export async function fetchPreferences(userId: string): Promise<{ data: Preferen
       data: {
         dailyReviewGoal: (data as { daily_review_goal: number }).daily_review_goal,
         hidePatternsDuringReview: (data as { hide_patterns_during_review?: boolean }).hide_patterns_during_review ?? false,
+        enabledExtraPatterns: (data as { enabled_extra_patterns?: string[] }).enabled_extra_patterns ?? [],
       },
       error: null,
     };
@@ -288,6 +289,7 @@ export async function upsertPreferences(userId: string, prefs: Preferences): Pro
       user_id: userId,
       daily_review_goal: prefs.dailyReviewGoal,
       hide_patterns_during_review: prefs.hidePatternsDuringReview,
+      enabled_extra_patterns: prefs.enabledExtraPatterns,
       updated_at: new Date().toISOString(),
     };
     const { data, error } = await supabase
@@ -300,6 +302,7 @@ export async function upsertPreferences(userId: string, prefs: Preferences): Pro
       data: {
         dailyReviewGoal: (data as { daily_review_goal: number }).daily_review_goal,
         hidePatternsDuringReview: (data as { hide_patterns_during_review?: boolean }).hide_patterns_during_review ?? false,
+        enabledExtraPatterns: (data as { enabled_extra_patterns?: string[] }).enabled_extra_patterns ?? [],
       },
       error: null,
     };

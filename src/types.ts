@@ -33,6 +33,7 @@ export interface ReviewLogEntry {
 export interface Preferences {
   dailyReviewGoal: number;
   hidePatternsDuringReview: boolean;
+  enabledExtraPatterns: string[];
 }
 
 export interface ToastState {

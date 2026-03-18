@@ -6,6 +6,7 @@ import ProblemListPicker from "./ProblemListPicker";
 import BulkAddSection from "./BulkAddSection";
 import DataSection from "./DataSection";
 import FeedbackSection from "./FeedbackSection";
+import ExtraPatternsSection from "./ExtraPatternsSection";
 import type { User } from "@supabase/supabase-js";
 import type { Preferences, LeetCodeProblem } from "../types";
 
@@ -113,6 +114,17 @@ export default function SettingsModal({
               Test your pattern recognition — tap to reveal on each card.
             </p>
           </div>
+
+          <ExtraPatternsSection
+            enabledExtraPatterns={preferences.enabledExtraPatterns}
+            onToggle={(pattern) => {
+              const current = preferences.enabledExtraPatterns;
+              const updated = current.includes(pattern)
+                ? current.filter((p) => p !== pattern)
+                : [...current, pattern];
+              onUpdatePreferences({ enabledExtraPatterns: updated });
+            }}
+          />
 
           <ProblemListPicker
             existingIds={existingProblemNumbers}

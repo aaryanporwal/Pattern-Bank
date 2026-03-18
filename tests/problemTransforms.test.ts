@@ -247,6 +247,17 @@ describe("computeReviewProgress", () => {
     expect(totalDue).toBe(0);
     expect(effectiveGoal).toBe(0);
   });
+
+  it("excludes excludeFromReview problems from totalDue", () => {
+    const problems = [
+      { id: "a", nextReviewDate: "2020-01-01", lastReviewed: null, excludeFromReview: false },
+      { id: "b", nextReviewDate: "2020-01-01", lastReviewed: null, excludeFromReview: true },
+      { id: "c", nextReviewDate: "2020-01-01", lastReviewed: null, excludeFromReview: false },
+    ] as Problem[];
+    const result = computeReviewProgress(problems, 10);
+    expect(result.totalDue).toBe(2);
+    expect(result.effectiveGoal).toBe(2);
+  });
 });
 
 describe("buildReviewedProblem", () => {

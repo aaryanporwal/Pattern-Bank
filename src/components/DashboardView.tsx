@@ -11,6 +11,7 @@ interface Props {
   problems: Problem[];
   dailyGoal: number;
   hidePatterns?: boolean;
+  enabledExtraPatterns?: string[];
   onReview: (id: string, confidence: Confidence) => void;
   onDismiss: (id: string) => void;
   onUpdateNotes: (id: string, notes: string) => void;
@@ -22,6 +23,7 @@ export default function DashboardView({
   problems,
   dailyGoal,
   hidePatterns,
+  enabledExtraPatterns,
   onReview,
   onDismiss,
   onUpdateNotes,
@@ -77,7 +79,7 @@ export default function DashboardView({
       {problems.length > 0 && (
         <div>
           <SectionHeader title="Pattern Confidence" />
-          <PatternHeatmap problems={problems} onPatternClick={onPatternClick} />
+          <PatternHeatmap problems={problems} onPatternClick={onPatternClick} enabledExtraPatterns={enabledExtraPatterns} />
         </div>
       )}
 

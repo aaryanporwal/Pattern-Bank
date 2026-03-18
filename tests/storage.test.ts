@@ -149,12 +149,12 @@ describe("countReviewedToday", () => {
 
 describe("loadPreferences / savePreferences", () => {
   it("returns defaults when nothing stored", () => {
-    expect(loadPreferences()).toEqual({ dailyReviewGoal: 5, hidePatternsDuringReview: false });
+    expect(loadPreferences()).toEqual({ dailyReviewGoal: 5, hidePatternsDuringReview: false, enabledExtraPatterns: [] });
   });
 
   it("round-trips preferences", () => {
-    savePreferences({ dailyReviewGoal: 8, hidePatternsDuringReview: false });
-    expect(loadPreferences()).toEqual({ dailyReviewGoal: 8, hidePatternsDuringReview: false });
+    savePreferences({ dailyReviewGoal: 8, hidePatternsDuringReview: false, enabledExtraPatterns: [] });
+    expect(loadPreferences()).toEqual({ dailyReviewGoal: 8, hidePatternsDuringReview: false, enabledExtraPatterns: [] });
   });
 
   it("merges with defaults for missing keys", () => {
@@ -165,7 +165,7 @@ describe("loadPreferences / savePreferences", () => {
 
   it("returns defaults on corrupted JSON", () => {
     localStorageMock.setItem("patternbank-preferences", "bad{json");
-    expect(loadPreferences()).toEqual({ dailyReviewGoal: 5, hidePatternsDuringReview: false });
+    expect(loadPreferences()).toEqual({ dailyReviewGoal: 5, hidePatternsDuringReview: false, enabledExtraPatterns: [] });
   });
 });
 

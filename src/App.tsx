@@ -87,6 +87,7 @@ export default function App() {
           problems={problems}
           dailyGoal={preferences.dailyReviewGoal}
           hidePatterns={preferences.hidePatternsDuringReview}
+          enabledExtraPatterns={preferences.enabledExtraPatterns}
           onReview={handleReview}
           onDismiss={handleDismiss}
           onUpdateNotes={handleUpdateNotes}
@@ -102,6 +103,7 @@ export default function App() {
           onToggleExclude={handleToggleExclude}
           initialSort={ui.problemsInitialSort}
           initialPatternFilter={ui.problemsInitialPatternFilter}
+          enabledExtraPatterns={preferences.enabledExtraPatterns}
         />
       )}
 
@@ -119,6 +121,7 @@ export default function App() {
         }}
         initialData={ui.editingProblem}
         existingProblemNumbers={new Set(problems.map((p) => p.leetcodeNumber).filter((n): n is number => Boolean(n)))}
+        enabledExtraPatterns={preferences.enabledExtraPatterns}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { User } from "@supabase/supabase-js";
 import { todayStr, addDays } from "../utils/dateHelpers";
 import { getIntervalDays } from "../utils/spacedRepetition";
@@ -63,6 +63,10 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
     }
     return deduped;
   });
+  // Keep ref in sync so callbacks always read latest state without stale closures
+  const problemsRef = useRef(problems);
+  problemsRef.current = problems;
+
   // Persist to localStorage on change
   useEffect(() => { saveProblems(problems); }, [problems]);
 
@@ -126,8 +130,9 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
 
   const handleReview = useCallback(
     (problemId: string, newConfidence: Confidence) => {
-      const { currentReviewed, effectiveGoal } = computeReviewProgress(problems, preferences.dailyReviewGoal);
-      const original = problems.find((p) => p.id === problemId);
+      const current = problemsRef.current;
+      const { currentReviewed, effectiveGoal } = computeReviewProgress(current, preferences.dailyReviewGoal);
+      const original = current.find((p) => p.id === problemId);
       const updatedProblem = original ? buildReviewedProblem(original, newConfidence) : null;
 
       setProblems((prev) =>
@@ -147,12 +152,12 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
       const interval = `Next review in ${intervalDays} day${intervalDays !== 1 ? "s" : ""}`;
       showToast(`${progress} · ${interval}`);
     },
-    [showToast, problems, preferences.dailyReviewGoal, user]
+    [showToast, preferences.dailyReviewGoal, user]
   );
 
   const handleUpdateNotes = useCallback((problemId: string, newNotes: string) => {
     const now = new Date().toISOString();
-    const problem = problems.find((p) => p.id === problemId);
+    const problem = problemsRef.current.find((p) => p.id === problemId);
     setProblems((prev) =>
       prev.map((p) =>
         p.id === problemId ? { ...p, notes: newNotes.trim(), updatedAt: now } : p
@@ -161,12 +166,12 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
     if (user && problem) {
       pushProblemToCloud(user.id, { ...problem, notes: newNotes.trim(), updatedAt: now });
     }
-  }, [user, problems]);
+  }, [user]);
 
   const handleDismiss = useCallback((problemId: string) => {
     const tomorrow = addDays(todayStr(), 1);
     const now = new Date().toISOString();
-    const problem = problems.find((p) => p.id === problemId);
+    const problem = problemsRef.current.find((p) => p.id === problemId);
     setProblems((prev) =>
       prev.map((p) =>
         p.id === problemId
@@ -178,7 +183,7 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
     if (user && problem) {
       pushProblemToCloud(user.id, { ...problem, nextReviewDate: tomorrow, updatedAt: now });
     }
-  }, [user, problems]);
+  }, [user]);
 
   const handleImport = useCallback(
     async (file: File) => {
@@ -231,7 +236,7 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
 
   const handleToggleExclude = useCallback((problemId: string) => {
     const now = new Date().toISOString();
-    const problem = problems.find((p) => p.id === problemId);
+    const problem = problemsRef.current.find((p) => p.id === problemId);
     setProblems((prev) =>
       prev.map((p) =>
         p.id === problemId
@@ -242,7 +247,7 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
     if (user && problem) {
       pushProblemToCloud(user.id, { ...problem, excludeFromReview: !problem.excludeFromReview, updatedAt: now });
     }
-  }, [user, problems]);
+  }, [user]);
 
   const handleClearAllData = useCallback(() => {
     setProblems([]);

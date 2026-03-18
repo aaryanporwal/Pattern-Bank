@@ -56,7 +56,7 @@ function makeProblem(overrides: Partial<Problem> = {}): Problem {
 }
 
 const USER_ID = "user-abc";
-const DEFAULT_PREFS: Preferences = { dailyReviewGoal: 5, hidePatternsDuringReview: false };
+const DEFAULT_PREFS: Preferences = { dailyReviewGoal: 5, hidePatternsDuringReview: false, enabledExtraPatterns: [] };
 
 beforeEach(() => {
   vi.clearAllMocks();

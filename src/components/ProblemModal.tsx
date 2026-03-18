@@ -30,6 +30,7 @@ interface Props {
   onSave: (problem: Problem, confidenceChanged: boolean) => void;
   initialData: Problem | null;
   existingProblemNumbers?: Set<number>;
+  enabledExtraPatterns?: string[];
 }
 
 const EMPTY_FORM: ProblemFormState = {
@@ -43,7 +44,7 @@ const EMPTY_FORM: ProblemFormState = {
   excludeFromReview: false,
 };
 
-export default function ProblemModal({ isOpen, onClose, onSave, initialData, existingProblemNumbers = new Set() }: Props) {
+export default function ProblemModal({ isOpen, onClose, onSave, initialData, existingProblemNumbers = new Set(), enabledExtraPatterns }: Props) {
   useEffect(() => {
     if (!isOpen) return;
     const handleEsc = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -306,6 +307,7 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData, exi
             selected={form.patterns}
             onChange={(patterns) => updateForm({ patterns })}
             error={errors.patterns}
+            enabledExtraPatterns={enabledExtraPatterns}
           />
 
           <div>
