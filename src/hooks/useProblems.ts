@@ -65,7 +65,7 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
   });
   // Keep ref in sync so callbacks always read latest state without stale closures
   const problemsRef = useRef(problems);
-  problemsRef.current = problems;
+  useEffect(() => { problemsRef.current = problems; });
 
   // Persist to localStorage on change
   useEffect(() => { saveProblems(problems); }, [problems]);
