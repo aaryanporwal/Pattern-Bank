@@ -8,7 +8,7 @@ interface Props {
 export default function DailyGoalSection({ preferences, onUpdatePreferences }: Props) {
   const adjustGoal = (delta: number) => {
     const current = preferences.dailyReviewGoal;
-    const next = Math.min(10, Math.max(1, current + delta));
+    const next = Math.min(20, Math.max(1, current + delta));
     if (next !== current) {
       onUpdatePreferences({ dailyReviewGoal: next });
     }
@@ -32,7 +32,7 @@ export default function DailyGoalSection({ preferences, onUpdatePreferences }: P
         </span>
         <button
           onClick={() => adjustGoal(1)}
-          disabled={preferences.dailyReviewGoal >= 10}
+          disabled={preferences.dailyReviewGoal >= 20}
           className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-pb-border bg-transparent text-base font-semibold text-pb-text-muted transition-all duration-150 hover:border-pb-text-muted hover:text-pb-text disabled:cursor-not-allowed disabled:opacity-30"
         >
           +

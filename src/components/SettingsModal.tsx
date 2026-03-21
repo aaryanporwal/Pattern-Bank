@@ -6,6 +6,7 @@ import ProblemListPicker from "./ProblemListPicker";
 import BulkAddSection from "./BulkAddSection";
 import DataSection from "./DataSection";
 import FeedbackSection from "./FeedbackSection";
+import DangerZoneSection from "./DangerZoneSection";
 import ExtraPatternsSection from "./ExtraPatternsSection";
 import type { User } from "@supabase/supabase-js";
 import type { Preferences, LeetCodeProblem } from "../types";
@@ -25,6 +26,8 @@ interface Props {
   onSignInGitHub: () => Promise<{ error: Error | null }>;
   onSignInApple: () => Promise<{ error: Error | null }>;
   onSignOut: () => Promise<void>;
+  onSetAllDue: () => void;
+  onRequestClearData: () => void;
 }
 
 export default function SettingsModal({
@@ -42,6 +45,8 @@ export default function SettingsModal({
   onSignInGitHub,
   onSignInApple,
   onSignOut,
+  onSetAllDue,
+  onRequestClearData,
 }: Props) {
   // Escape key to close
   useEffect(() => {
@@ -154,6 +159,11 @@ export default function SettingsModal({
             </label>
             <FeedbackSection user={user} />
           </div>
+
+          <DangerZoneSection
+            onSetAllDue={onSetAllDue}
+            onRequestClearData={onRequestClearData}
+          />
 
           {/* Built by footer */}
           <div className="border-t border-pb-border pt-4 text-center">

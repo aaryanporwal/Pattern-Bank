@@ -49,6 +49,7 @@ interface UseProblemsReturn {
   handleUpdatePreferences: (updates: Partial<Preferences>) => void;
   handleBulkAdd: (lcProblems: LeetCodeProblem[], patternMap?: Map<number, string[]> | null) => void;
   handleToggleExclude: (problemId: string) => void;
+  handleSetAllDue: () => void;
   handleClearAllData: () => void;
 }
 
@@ -249,6 +250,19 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
     }
   }, [user]);
 
+  const handleSetAllDue = useCallback(() => {
+    const today = todayStr();
+    const now = new Date().toISOString();
+    setProblems((prev) =>
+      prev.map((p) => ({ ...p, nextReviewDate: today, lastReviewed: null, updatedAt: now }))
+    );
+    if (user) {
+      const current = problemsRef.current;
+      pushProblemsToCloud(user.id, current.map((p) => ({ ...p, nextReviewDate: today, lastReviewed: null, updatedAt: now })));
+    }
+    showToast("All problems set to due");
+  }, [user, showToast]);
+
   const handleClearAllData = useCallback(() => {
     setProblems([]);
     saveReviewLog([]);
@@ -269,6 +283,7 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
     handleUpdatePreferences,
     handleBulkAdd,
     handleToggleExclude,
+    handleSetAllDue,
     handleClearAllData,
   };
 }

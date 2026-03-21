@@ -30,6 +30,7 @@ export default function App() {
     handleUpdatePreferences,
     handleBulkAdd,
     handleToggleExclude,
+    handleSetAllDue,
     handleClearAllData,
   } = useProblems({ user, showToast: ui.showToast });
 
@@ -76,6 +77,8 @@ export default function App() {
         onSignInGitHub={signInWithGitHub}
         onSignInApple={signInWithApple}
         onSignOut={signOut}
+        onSetAllDue={() => { handleSetAllDue(); ui.setSettingsOpen(false); }}
+        onRequestClearData={ui.requestClearData}
       />
       <Header
         onSettingsClick={() => ui.setSettingsOpen(true)}
