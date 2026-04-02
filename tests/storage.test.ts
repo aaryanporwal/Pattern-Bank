@@ -26,6 +26,9 @@ const {
   countReviewedToday,
   loadPreferences,
   savePreferences,
+  loadReviewEvents,
+  saveReviewEvents,
+  logReviewEvent,
   importData,
   exportData,
 } = await import("../src/utils/storage");
@@ -166,6 +169,49 @@ describe("loadPreferences / savePreferences", () => {
   it("returns defaults on corrupted JSON", () => {
     localStorageMock.setItem("patternbank-preferences", "bad{json");
     expect(loadPreferences()).toEqual({ dailyReviewGoal: 5, hidePatternsDuringReview: false, enabledExtraPatterns: [] });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Review Events
+// ---------------------------------------------------------------------------
+
+describe("loadReviewEvents / saveReviewEvents", () => {
+  it("returns empty array when nothing stored", () => {
+    expect(loadReviewEvents()).toEqual([]);
+  });
+
+  it("round-trips review events", () => {
+    const events = [
+      { date: "2026-03-10", problemId: "abc", confidence: 3, patterns: ["DP"], timestamp: "2026-03-10T12:00:00.000Z" },
+    ];
+    saveReviewEvents(events);
+    expect(loadReviewEvents()).toEqual(events);
+  });
+
+  it("returns empty array on corrupted JSON", () => {
+    localStorageMock.setItem("patternbank-review-events", "not valid json{{{");
+    expect(loadReviewEvents()).toEqual([]);
+  });
+});
+
+describe("logReviewEvent", () => {
+  it("appends a review event with today's date", () => {
+    logReviewEvent("p1", 4, ["BFS", "Graph"]);
+    const events = loadReviewEvents();
+    expect(events).toHaveLength(1);
+    expect(events[0].date).toBe(todayStr());
+    expect(events[0].problemId).toBe("p1");
+    expect(events[0].confidence).toBe(4);
+    expect(events[0].patterns).toEqual(["BFS", "Graph"]);
+    expect(events[0].timestamp).toBeDefined();
+  });
+
+  it("accumulates multiple events", () => {
+    logReviewEvent("p1", 3, ["DP"]);
+    logReviewEvent("p2", 5, ["Tree"]);
+    logReviewEvent("p1", 4, ["DP"]);
+    expect(loadReviewEvents()).toHaveLength(3);
   });
 });
 
