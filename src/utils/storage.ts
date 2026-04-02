@@ -1,6 +1,6 @@
-import { STORAGE_KEY, REVIEW_LOG_KEY, PREFERENCES_KEY, DEFAULT_PREFERENCES } from "./constants";
+import { STORAGE_KEY, REVIEW_LOG_KEY, REVIEW_EVENTS_KEY, PREFERENCES_KEY, DEFAULT_PREFERENCES } from "./constants";
 import { todayStr, addDays } from "./dateHelpers";
-import type { Problem, ReviewLogEntry, Preferences, BackupData } from "../types";
+import type { Problem, ReviewLogEntry, ReviewEvent, Preferences, BackupData } from "../types";
 
 export function loadProblems(): Problem[] {
   try {
@@ -62,6 +62,35 @@ export function calculateStreak(): number {
   return streak;
 }
 
+export function loadReviewEvents(): ReviewEvent[] {
+  try {
+    const raw = localStorage.getItem(REVIEW_EVENTS_KEY);
+    return raw ? (JSON.parse(raw) as ReviewEvent[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveReviewEvents(events: ReviewEvent[]): void {
+  try {
+    localStorage.setItem(REVIEW_EVENTS_KEY, JSON.stringify(events));
+  } catch (e) {
+    console.error("Failed to save review events:", e);
+  }
+}
+
+export function logReviewEvent(problemId: string, confidence: number, patterns: string[]): void {
+  const events = loadReviewEvents();
+  events.push({
+    date: todayStr(),
+    problemId,
+    confidence,
+    patterns,
+    timestamp: new Date().toISOString(),
+  });
+  saveReviewEvents(events);
+}
+
 export function countReviewedToday(problems: Problem[]): number {
   const today = todayStr();
   return problems.filter((p) => p.lastReviewed === today).length;
@@ -120,6 +149,7 @@ export function exportData(): void {
     exportedAt: new Date().toISOString(),
     problems: loadProblems(),
     reviewLog: loadReviewLog(),
+    reviewEvents: loadReviewEvents(),
   };
   const blob = new Blob([JSON.stringify(data, null, 2)], {
     type: "application/json",

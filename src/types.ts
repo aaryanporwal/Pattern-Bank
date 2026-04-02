@@ -1,7 +1,7 @@
 export type Difficulty = "Easy" | "Medium" | "Hard";
 export type Confidence = 1 | 2 | 3 | 4 | 5;
 export type SyncStatus = "idle" | "syncing" | "synced" | "error";
-export type ActiveTab = "dashboard" | "problems";
+export type ActiveTab = "dashboard" | "progress" | "problems";
 
 export interface Problem {
   id: string;
@@ -30,6 +30,14 @@ export interface ReviewLogEntry {
   date: string;
 }
 
+export interface ReviewEvent {
+  date: string;
+  problemId: string;
+  confidence: number;
+  patterns: string[];
+  timestamp: string;
+}
+
 export interface Preferences {
   dailyReviewGoal: number;
   hidePatternsDuringReview: boolean;
@@ -45,6 +53,7 @@ export interface BackupData {
   exportedAt?: string;
   problems: Problem[];
   reviewLog?: ReviewLogEntry[];
+  reviewEvents?: ReviewEvent[];
 }
 
 export interface PatternColor {

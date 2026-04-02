@@ -7,6 +7,8 @@ import {
   saveProblems,
   saveReviewLog,
   logReviewToday,
+  logReviewEvent,
+  saveReviewEvents,
   importData,
 } from "../utils/storage";
 import usePreferences from "./usePreferences";
@@ -140,6 +142,7 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
         prev.map((p) => (p.id === problemId ? buildReviewedProblem(p, newConfidence) : p))
       );
       logReviewToday();
+      logReviewEvent(problemId, newConfidence, original?.patterns ?? []);
       posthog.capture("problem_reviewed", { old_confidence: original?.confidence, new_confidence: newConfidence, platform: "web" });
 
       if (user && updatedProblem && original) {
@@ -194,6 +197,9 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
         setProblems(mergedProblems);
         if (data.reviewLog) {
           saveReviewLog(data.reviewLog);
+        }
+        if (data.reviewEvents) {
+          saveReviewEvents(data.reviewEvents);
         }
         if (user) {
           pushProblemsToCloud(user.id, data.problems);
@@ -266,6 +272,7 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
   const handleClearAllData = useCallback(() => {
     setProblems([]);
     saveReviewLog([]);
+    saveReviewEvents([]);
     if (user) clearAllCloudData(user.id);
     showToast("All data cleared");
   }, [showToast, user]);
