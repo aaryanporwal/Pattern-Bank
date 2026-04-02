@@ -122,74 +122,106 @@ function StreakHeatmap({
   const containerRef = useRef<HTMLDivElement>(null);
   const [cellSize, setCellSize] = useState(12);
 
+  const countMap = useMemo(
+    () => buildReviewCountMap(reviewEvents, reviewLog),
+    [reviewEvents, reviewLog],
+  );
+
+  // Build date range: 52 weeks ending this Saturday
+  const today = todayStr();
+  const todayDate = new Date(today + "T00:00:00");
+  const todayDay = todayDate.getDay();
+  const endDate = new Date(todayDate);
+  endDate.setDate(endDate.getDate() + (6 - todayDay));
+  const startDate = new Date(endDate);
+  startDate.setDate(startDate.getDate() - 52 * 7 + 1);
+
+  type CellData = { date: string; count: number; isFuture: boolean };
+
+  // Build month blocks with split transition weeks
+  interface MonthBlock {
+    label: string;
+    columns: (CellData | null)[][]; // each column is 7 slots (Sun=0..Sat=6)
+  }
+
+  const monthBlocks = useMemo(() => {
+    const blocks: MonthBlock[] = [];
+    let currentBlock: MonthBlock | null = null;
+    let currentCol: (CellData | null)[] = Array(7).fill(null);
+    let prevMonth = -1;
+
+    const cursor = new Date(startDate);
+    while (cursor <= endDate) {
+      const dateStr = cursor.toISOString().split("T")[0];
+      const dayOfWeek = cursor.getDay(); // 0=Sun
+      const month = cursor.getMonth();
+      const isFuture = dateStr > today;
+
+      // Month changed — finalize previous column and block
+      if (month !== prevMonth) {
+        if (currentBlock) {
+          // Push partial column (end of old month) if it has any cells
+          if (currentCol.some((c) => c !== null)) {
+            currentBlock.columns.push(currentCol);
+          }
+          blocks.push(currentBlock);
+        }
+        // Start new block with a fresh column
+        currentCol = Array(7).fill(null) as (CellData | null)[];
+        currentBlock = {
+          label: cursor.toLocaleDateString("en-US", { month: "short" }),
+          columns: [],
+        };
+        prevMonth = month;
+      }
+
+      // If we're at Sunday and column has data, push it and start new
+      if (dayOfWeek === 0 && currentCol.some((c) => c !== null)) {
+        currentBlock!.columns.push(currentCol);
+        currentCol = Array(7).fill(null) as (CellData | null)[];
+      }
+
+      currentCol[dayOfWeek] = {
+        date: dateStr,
+        count: countMap.get(dateStr) ?? 0,
+        isFuture,
+      };
+
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    // Push final column and block
+    if (currentBlock) {
+      if (currentCol.some((c) => c !== null)) {
+        currentBlock.columns.push(currentCol);
+      }
+      blocks.push(currentBlock);
+    }
+
+    return blocks;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countMap, today]);
+
+  // Count total columns for cell size calculation
+  const totalColumns = monthBlocks.reduce((s, b) => s + b.columns.length, 0);
+  const monthGapCount = Math.max(0, monthBlocks.length - 1);
+
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const observer = new ResizeObserver(() => {
       const dayLabelWidth = 28;
       const gap = 2;
+      const monthGap = 6;
       const available = el.clientWidth - dayLabelWidth;
-      const size = Math.floor((available - 51 * gap) / 52);
+      const totalGaps = Math.max(0, totalColumns - 1) * gap
+        - monthGapCount * gap + monthGapCount * monthGap; // replace inter-cell gaps at month boundaries with month gaps
+      const size = Math.floor((available - totalGaps) / totalColumns);
       setCellSize(Math.max(8, Math.min(14, size)));
     });
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
-
-  const countMap = useMemo(
-    () => buildReviewCountMap(reviewEvents, reviewLog),
-    [reviewEvents, reviewLog],
-  );
-
-  // Build 52 weeks × 7 days grid ending today
-  const today = todayStr();
-  const todayDate = new Date(today + "T00:00:00");
-  const todayDay = todayDate.getDay(); // 0=Sun
-
-  // End of grid is this Saturday (end of current week)
-  const endDate = new Date(todayDate);
-  endDate.setDate(endDate.getDate() + (6 - todayDay));
-
-  // Start of grid is 52 weeks before the start of the end week
-  const startDate = new Date(endDate);
-  startDate.setDate(startDate.getDate() - 52 * 7 + 1);
-
-  // Build cells
-  const weeks: { date: string; count: number; isFuture: boolean }[][] = [];
-  const cursor = new Date(startDate);
-  let currentWeek: { date: string; count: number; isFuture: boolean }[] = [];
-
-  while (cursor <= endDate) {
-    const dateStr = cursor.toISOString().split("T")[0];
-    const isFuture = dateStr > today;
-    currentWeek.push({
-      date: dateStr,
-      count: countMap.get(dateStr) ?? 0,
-      isFuture,
-    });
-    if (currentWeek.length === 7) {
-      weeks.push(currentWeek);
-      currentWeek = [];
-    }
-    cursor.setDate(cursor.getDate() + 1);
-  }
-  if (currentWeek.length > 0) weeks.push(currentWeek);
-
-  // Month labels
-  const monthLabels: { label: string; weekIdx: number }[] = [];
-  let lastMonth = -1;
-  weeks.forEach((week, i) => {
-    // Use the Sunday (first day) of each week
-    const d = new Date(week[0].date + "T00:00:00");
-    const m = d.getMonth();
-    if (m !== lastMonth) {
-      monthLabels.push({
-        label: d.toLocaleDateString("en-US", { month: "short" }),
-        weekIdx: i,
-      });
-      lastMonth = m;
-    }
-  });
+  }, [totalColumns, monthGapCount]);
 
   const gap = 2;
   const dayLabels = ["", "Mon", "", "Wed", "", "Fri", ""];
@@ -214,69 +246,80 @@ function StreakHeatmap({
       </div>
 
       <div ref={containerRef} className="overflow-x-auto">
-        {/* Month labels */}
-        <div
-          className="flex"
-          style={{ paddingLeft: 28, gap, marginBottom: 4 }}
-        >
-          {weeks.map((_, i) => {
-            const ml = monthLabels.find((m) => m.weekIdx === i);
-            return (
+        <div className="flex">
+          {/* Day labels column */}
+          <div style={{ flexShrink: 0, paddingTop: 18 }}>
+            {dayLabels.map((label, i) => (
               <div
                 key={i}
                 style={{
-                  width: cellSize,
-                  flexShrink: 0,
+                  width: 24,
+                  height: cellSize,
+                  marginTop: i > 0 ? gap : 0,
                   fontSize: 10,
                   color: "#8b949e",
+                  textAlign: "right",
+                  paddingRight: 4,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-end",
                 }}
               >
-                {ml?.label ?? ""}
+                {label}
               </div>
-            );
-          })}
-        </div>
-
-        {/* Grid rows (Sun at top) */}
-        {Array.from({ length: 7 }).map((_, rowIdx) => (
-          <div key={rowIdx} className="flex items-center" style={{ gap }}>
-            <div
-              style={{
-                width: 24,
-                fontSize: 10,
-                color: "#8b949e",
-                textAlign: "right",
-                paddingRight: 4,
-                flexShrink: 0,
-              }}
-            >
-              {dayLabels[rowIdx]}
-            </div>
-            {weeks.map((week, colIdx) => {
-              const cell = week[rowIdx];
-              if (!cell) return <div key={colIdx} style={{ width: cellSize, height: cellSize, flexShrink: 0 }} />;
-              const bg = cell.isFuture ? "transparent" : getCellColor(cell.count);
-              const border =
-                cell.isFuture || cell.count > 0
-                  ? "none"
-                  : "1px solid var(--color-pb-border-light)";
-              return (
-                <div
-                  key={colIdx}
-                  title={`${cell.date}: ${cell.count} review${cell.count !== 1 ? "s" : ""}`}
-                  style={{
-                    width: cellSize,
-                    height: cellSize,
-                    borderRadius: 2,
-                    backgroundColor: bg,
-                    border,
-                    flexShrink: 0,
-                  }}
-                />
-              );
-            })}
+            ))}
           </div>
-        ))}
+
+          {/* Month blocks */}
+          {monthBlocks.map((block, blockIdx) => (
+            <div key={blockIdx} style={{ marginLeft: blockIdx > 0 ? 6 : 4, flexShrink: 0 }}>
+              {/* Month label */}
+              <div style={{ fontSize: 10, color: "#8b949e", marginBottom: 4, height: 14 }}>
+                {block.label}
+              </div>
+              {/* 7 rows */}
+              {Array.from({ length: 7 }).map((_, rowIdx) => (
+                <div key={rowIdx} className="flex" style={{ marginTop: rowIdx > 0 ? gap : 0 }}>
+                  {block.columns.map((col, colIdx) => {
+                    const cell = col[rowIdx];
+                    if (!cell) {
+                      return (
+                        <div
+                          key={colIdx}
+                          style={{
+                            width: cellSize,
+                            height: cellSize,
+                            marginLeft: colIdx > 0 ? gap : 0,
+                          }}
+                        />
+                      );
+                    }
+                    const bg = cell.isFuture ? "transparent" : getCellColor(cell.count);
+                    const border =
+                      cell.isFuture || cell.count > 0
+                        ? "none"
+                        : "1px solid var(--color-pb-border-light)";
+                    return (
+                      <div
+                        key={colIdx}
+                        title={`${cell.date}: ${cell.count} review${cell.count !== 1 ? "s" : ""}`}
+                        style={{
+                          width: cellSize,
+                          height: cellSize,
+                          borderRadius: 2,
+                          backgroundColor: bg,
+                          border,
+                          flexShrink: 0,
+                          marginLeft: colIdx > 0 ? gap : 0,
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Footer */}
