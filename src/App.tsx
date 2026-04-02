@@ -67,10 +67,11 @@ export default function App() {
       <ConfirmDialog
         isOpen={ui.clearDataConfirm}
         title="Clear all data?"
-        message="This will permanently delete all problems, review history, and streak data. This cannot be undone."
+        message="This will permanently delete all problems, review history, and streak data. You will be signed out. If you use PatternBank on another device, clear your data there too."
         confirmLabel="Clear Everything"
-        onConfirm={() => {
-          handleClearAllData();
+        onConfirm={async () => {
+          await handleClearAllData();
+          if (user) signOut();
           ui.setClearDataConfirm(false);
         }}
         onCancel={() => ui.setClearDataConfirm(false)}
