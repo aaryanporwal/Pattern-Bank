@@ -52,7 +52,7 @@ interface UseProblemsReturn {
   handleBulkAdd: (lcProblems: LeetCodeProblem[], patternMap?: Map<number, string[]> | null) => void;
   handleToggleExclude: (problemId: string) => void;
   handleSetAllDue: () => void;
-  handleClearAllData: () => void;
+  handleClearAllData: () => Promise<void>;
 }
 
 export default function useProblems({ user, showToast }: UseProblemsParams): UseProblemsReturn {
@@ -269,11 +269,13 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
     showToast("All problems set to due");
   }, [user, showToast]);
 
-  const handleClearAllData = useCallback(() => {
+  const handleClearAllData = useCallback(async () => {
     setProblems([]);
     saveReviewLog([]);
     saveReviewEvents([]);
-    if (user) clearAllCloudData(user.id);
+    if (user) {
+      await clearAllCloudData(user.id);
+    }
     showToast("All data cleared");
   }, [showToast, user]);
 
