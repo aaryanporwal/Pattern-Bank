@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { exportData } from "./utils/storage";
+import { exportData, loadReviewLog, loadReviewEvents } from "./utils/storage";
 
 import useAuth from "./hooks/useAuth";
 import useUI from "./hooks/useUI";
@@ -11,6 +11,7 @@ import Header from "./components/Header";
 import NavBar from "./components/NavBar";
 import ProblemModal from "./components/ProblemModal";
 import DashboardView from "./components/DashboardView";
+import ProgressView from "./components/ProgressView";
 import AllProblemsView from "./components/AllProblemsView";
 import SettingsModal from "./components/SettingsModal";
 
@@ -39,6 +40,12 @@ export default function App() {
     () => new Set(problems.map((p) => p.leetcodeNumber).filter((n): n is number => Boolean(n))),
     [problems],
   );
+
+  // Re-read from localStorage when problems change (a review likely happened)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const reviewLog = useMemo(() => loadReviewLog(), [problems]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const reviewEvents = useMemo(() => loadReviewEvents(), [problems]);
 
   return (
     <div className="min-h-screen bg-pb-bg pb-[70px]">
@@ -105,6 +112,14 @@ export default function App() {
           onAddClick={ui.openAddModal}
           onBulkAdd={handleBulkAdd}
           existingProblemNumbers={existingProblemNumbers}
+        />
+      )}
+      {ui.activeTab === "progress" && (
+        <ProgressView
+          problems={problems}
+          reviewLog={reviewLog}
+          reviewEvents={reviewEvents}
+          enabledExtraPatterns={preferences.enabledExtraPatterns}
         />
       )}
       {ui.activeTab === "problems" && (

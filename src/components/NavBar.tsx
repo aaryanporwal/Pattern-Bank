@@ -9,6 +9,7 @@ interface Props {
 export default function NavBar({ activeTab, onTabChange, onAddClick }: Props) {
   const tabs: { id: ActiveTab; label: string; icon: string }[] = [
     { id: "dashboard", label: "Dashboard", icon: "◫" },
+    { id: "progress", label: "Progress", icon: "▣" },
     { id: "problems", label: "All Problems", icon: "☰" },
   ];
 
