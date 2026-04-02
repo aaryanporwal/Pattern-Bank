@@ -12,9 +12,10 @@ interface Props {
   initialSort?: string;
   initialPatternFilter?: string;
   enabledExtraPatterns?: string[];
+  onAddClick: () => void;
 }
 
-export default function AllProblemsView({ problems, onEdit, onDelete, onToggleExclude, initialSort = "dateAdded", initialPatternFilter = "all", enabledExtraPatterns }: Props) {
+export default function AllProblemsView({ problems, onEdit, onDelete, onToggleExclude, initialSort = "dateAdded", initialPatternFilter = "all", enabledExtraPatterns, onAddClick }: Props) {
   const [search, setSearch] = useState("");
   const [filterPattern, setFilterPattern] = useState(initialPatternFilter);
   const [filterDifficulty, setFilterDifficulty] = useState("all");
@@ -125,9 +126,15 @@ export default function AllProblemsView({ problems, onEdit, onDelete, onToggleEx
           <h2 className="mb-2 text-lg font-semibold text-pb-text">
             No problems yet
           </h2>
-          <p className="text-sm text-pb-text-muted">
+          <p className="mb-5 text-sm text-pb-text-muted">
             Add your first LeetCode problem to start tracking.
           </p>
+          <button
+            onClick={onAddClick}
+            className="cursor-pointer rounded-lg border-none bg-pb-accent px-5 py-2.5 text-[13px] font-semibold text-white transition-opacity hover:opacity-85"
+          >
+            + Add Problem
+          </button>
         </div>
       </div>
     );

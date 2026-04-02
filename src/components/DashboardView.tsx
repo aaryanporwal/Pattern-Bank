@@ -2,10 +2,13 @@ import ReviewCard from "./ReviewCard";
 import SectionHeader from "./SectionHeader";
 import PatternHeatmap from "./PatternHeatmap";
 import StatsBar from "./StatsBar";
+import ProblemListPicker from "./ProblemListPicker";
+import PatternTag from "./PatternTag";
+import DifficultyBadge from "./DifficultyBadge";
 import { todayStr } from "../utils/dateHelpers";
 import { calculateStreak, countReviewedToday } from "../utils/storage";
-import { prioritizeProblems } from "../utils/spacedRepetition";
-import type { Problem, Confidence } from "../types";
+import { prioritizeProblems, INTERVALS } from "../utils/spacedRepetition";
+import type { Problem, Confidence, LeetCodeProblem } from "../types";
 
 interface Props {
   problems: Problem[];
@@ -17,6 +20,9 @@ interface Props {
   onUpdateNotes: (id: string, notes: string) => void;
   onViewAllDue: () => void;
   onPatternClick: (pattern: string) => void;
+  onAddClick: () => void;
+  onBulkAdd: (problems: LeetCodeProblem[], patternMap?: Map<number, string[]> | null) => void;
+  existingProblemNumbers: Set<number>;
 }
 
 export default function DashboardView({
@@ -29,6 +35,9 @@ export default function DashboardView({
   onUpdateNotes,
   onViewAllDue,
   onPatternClick,
+  onAddClick,
+  onBulkAdd,
+  existingProblemNumbers,
 }: Props) {
   const today = todayStr();
 
@@ -48,19 +57,119 @@ export default function DashboardView({
 
   const streak = calculateStreak();
 
-  // Empty state — no problems at all
+  // Empty state — Quick Start card
   if (problems.length === 0) {
     return (
       <div className="flex flex-col gap-6 p-5">
-        <div className="rounded-xl border border-pb-border bg-pb-surface px-6 py-12 text-center">
-          <img src="/favicon-32.png" alt="" className="mx-auto mb-4 h-12 w-12 rounded-lg" />
-          <h2 className="mb-2.5 text-xl font-semibold text-pb-text">
-            Welcome to PatternBank
-          </h2>
-          <p className="mx-auto max-w-[360px] text-sm leading-relaxed text-pb-text-muted">
-            Start by adding your first LeetCode problem. Track patterns, build
-            retention, and ace your interviews.
-          </p>
+        <div className="overflow-hidden rounded-xl border border-pb-border bg-pb-surface">
+          {/* Top accent line */}
+          <div className="h-0.5" style={{ background: "linear-gradient(90deg, transparent, #7c6bf5, transparent)" }} />
+
+          <div className="px-6 py-6">
+            {/* ---- Section 1: Welcome + Action paths ---- */}
+            <h2 className="mb-1.5 text-lg font-semibold text-pb-text">Welcome to PatternBank</h2>
+            <p className="mb-5 text-sm text-pb-text-muted">Add your first problem to get started with spaced repetition.</p>
+
+            <div className="flex flex-wrap gap-3">
+              {/* Add a problem */}
+              <div className="flex-[1_1_240px] rounded-[10px] border border-pb-border bg-pb-bg p-5">
+                <h3 className="mb-1.5 text-[13px] font-semibold text-pb-text">Add a problem</h3>
+                <p className="mb-4 text-xs leading-relaxed text-pb-text-muted">Search from 3,800+ LeetCode problems or create your own.</p>
+                <button
+                  onClick={onAddClick}
+                  className="cursor-pointer rounded-lg border-none bg-pb-accent px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-85"
+                >
+                  + Add Problem
+                </button>
+              </div>
+
+              {/* Import curated list */}
+              <div className="flex-[1_1_240px] rounded-[10px] border border-pb-border bg-pb-bg p-5">
+                <h3 className="mb-1.5 text-[13px] font-semibold text-pb-text">Import a curated list</h3>
+                <p className="mb-4 text-xs leading-relaxed text-pb-text-muted">Start with a popular set, already tagged by pattern.</p>
+                <ProblemListPicker existingIds={existingProblemNumbers} onBulkAdd={onBulkAdd} />
+              </div>
+            </div>
+
+            {/* ---- Section 2: How reviews work ---- */}
+            <div className="mt-6 border-t border-pb-border pt-6">
+              <h3 className="mb-1 text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">How reviews work</h3>
+              <p className="mb-4 text-[13px] leading-relaxed text-pb-text-muted">Rate your confidence after each review. Higher confidence means longer intervals.</p>
+
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium uppercase tracking-wide text-pb-text-dim">Confidence</span>
+                  <span className="text-xs font-medium uppercase tracking-wide text-pb-text-dim">Next review in...</span>
+                </div>
+                {([1, 2, 3, 4, 5] as Confidence[]).map((stars) => {
+                  const days = INTERVALS[stars];
+                  const color = stars <= 2 ? "text-pb-hard" : stars === 3 ? "text-pb-medium" : "text-pb-easy";
+                  return (
+                    <div key={stars} className="flex items-center justify-between">
+                      <span className="text-sm tracking-wide">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <span key={i} style={{ color: i <= stars ? "#e3b341" : "#30363d" }}>★</span>
+                        ))}
+                      </span>
+                      <span className={`font-mono text-[13px] tabular-nums ${color}`}>
+                        <span className="inline-block w-[18px] text-right">{days}</span> day{days !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* ---- Section 3: Good to know ---- */}
+            <div className="mt-6 border-t border-pb-border pt-6">
+              <ul className="m-0 flex list-inside list-disc flex-col gap-2 pl-0 text-[13px] text-pb-text-muted">
+                <li>Tap ◎ on any problem to exclude it from reviews</li>
+                <li>Enable 6 advanced patterns in Settings</li>
+              </ul>
+            </div>
+
+            {/* ---- Section 4: Review history preview ---- */}
+            <div className="mt-6 border-t border-pb-border pt-6">
+              <div className="rounded-[10px] border border-dashed border-pb-border bg-pb-bg/50 p-5" style={{ opacity: 0.75 }}>
+                {/* Mini problem card */}
+                <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[13px] font-semibold text-pb-text">Rotting Oranges</span>
+                    <span className="text-xs text-pb-text-muted">#994</span>
+                  </div>
+                  <DifficultyBadge difficulty="Medium" />
+                </div>
+                <div className="mb-4 flex flex-wrap gap-1.5">
+                  <PatternTag name="BFS" />
+                  <PatternTag name="Graph" />
+                </div>
+
+                {/* Mock review timeline */}
+                <div className="mb-3 flex flex-col gap-2 rounded-lg bg-pb-bg p-3">
+                  {[
+                    { date: "Today", stars: 4 },
+                    { date: "3 days ago", stars: 3 },
+                    { date: "1 week ago", stars: 2 },
+                  ].map((entry) => (
+                    <div key={entry.date} className="flex items-center gap-3">
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-pb-text-dim" />
+                      <span className="min-w-[72px] text-[13px] text-pb-text-muted">{entry.date}</span>
+                      <span className="ml-auto text-sm tracking-wide">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <span key={i} style={{ color: i <= entry.stars ? "#e3b341" : "#30363d" }}>★</span>
+                        ))}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Sign-in nudge */}
+                <p className="m-0 text-[13px] text-pb-text-muted">
+                  Sign in to track review history and sync across devices.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
