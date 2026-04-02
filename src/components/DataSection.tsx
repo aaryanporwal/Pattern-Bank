@@ -6,9 +6,10 @@ interface Props {
   onExport: () => void;
   onImport: (file: File) => void;
   onClose: () => void;
+  hideLabel?: boolean;
 }
 
-export default function DataSection({ problemCount, onExport, onImport, onClose }: Props) {
+export default function DataSection({ problemCount, onExport, onImport, onClose, hideLabel }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,9 +22,11 @@ export default function DataSection({ problemCount, onExport, onImport, onClose 
 
   return (
     <div>
-      <label className="mb-2 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-        Data
-      </label>
+      {!hideLabel && (
+        <label className="mb-2 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
+          Data
+        </label>
+      )}
       <div className="flex flex-col gap-2">
         <input
           ref={fileInputRef}

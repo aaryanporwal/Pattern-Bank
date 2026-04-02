@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import AccountSection from "./AccountSection";
 import MobileAppSection from "./MobileAppSection";
 import DailyGoalSection from "./DailyGoalSection";
@@ -10,6 +10,31 @@ import DangerZoneSection from "./DangerZoneSection";
 import ExtraPatternsSection from "./ExtraPatternsSection";
 import type { User } from "@supabase/supabase-js";
 import type { Preferences, LeetCodeProblem } from "../types";
+
+function CollapsibleSection({ title, defaultOpen = false, children }: {
+  title: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div>
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex w-full cursor-pointer items-center justify-between border-none bg-transparent py-0 text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted"
+      >
+        <span>{title}</span>
+        <span
+          className="text-[20px] text-pb-text-muted transition-transform duration-150"
+          style={{ transform: open ? "rotate(90deg)" : "rotate(0deg)" }}
+        >
+          ▸
+        </span>
+      </button>
+      {open && <div className="mt-2">{children}</div>}
+    </div>
+  );
+}
 
 interface Props {
   isOpen: boolean;
@@ -120,50 +145,56 @@ export default function SettingsModal({
             </p>
           </div>
 
-          <ExtraPatternsSection
-            enabledExtraPatterns={preferences.enabledExtraPatterns}
-            onToggle={(pattern) => {
-              const current = preferences.enabledExtraPatterns;
-              const updated = current.includes(pattern)
-                ? current.filter((p) => p !== pattern)
-                : [...current, pattern];
-              onUpdatePreferences({ enabledExtraPatterns: updated });
-            }}
-          />
+          <CollapsibleSection title="Additional Patterns">
+            <ExtraPatternsSection
+              hideLabel
+              enabledExtraPatterns={preferences.enabledExtraPatterns}
+              onToggle={(pattern) => {
+                const current = preferences.enabledExtraPatterns;
+                const updated = current.includes(pattern)
+                  ? current.filter((p) => p !== pattern)
+                  : [...current, pattern];
+                onUpdatePreferences({ enabledExtraPatterns: updated });
+              }}
+            />
+          </CollapsibleSection>
 
-          <ProblemListPicker
-            existingIds={existingProblemNumbers}
-            onBulkAdd={(problems, patternMap) => { onBulkAdd(problems, patternMap); onClose(); }}
-          />
+          <CollapsibleSection title="Import Problem List">
+            <ProblemListPicker
+              hideLabel
+              existingIds={existingProblemNumbers}
+              onBulkAdd={(problems, patternMap) => { onBulkAdd(problems, patternMap); onClose(); }}
+            />
+          </CollapsibleSection>
 
-          <div>
-            <label className="mb-2 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-              Bulk Add
-            </label>
+          <CollapsibleSection title="Bulk Add">
             <BulkAddSection
               onBulkAdd={(problems) => { onBulkAdd(problems); onClose(); }}
               existingIds={existingProblemNumbers}
             />
-          </div>
+          </CollapsibleSection>
 
-          <DataSection
-            problemCount={problemCount}
-            onExport={onExport}
-            onImport={onImport}
-            onClose={onClose}
-          />
+          <CollapsibleSection title="Data">
+            <DataSection
+              hideLabel
+              problemCount={problemCount}
+              onExport={onExport}
+              onImport={onImport}
+              onClose={onClose}
+            />
+          </CollapsibleSection>
 
-          <div>
-            <label className="mb-2 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-              Feedback
-            </label>
+          <CollapsibleSection title="Feedback">
             <FeedbackSection user={user} />
-          </div>
+          </CollapsibleSection>
 
-          <DangerZoneSection
-            onSetAllDue={onSetAllDue}
-            onRequestClearData={onRequestClearData}
-          />
+          <CollapsibleSection title="Danger Zone">
+            <DangerZoneSection
+              hideLabel
+              onSetAllDue={onSetAllDue}
+              onRequestClearData={onRequestClearData}
+            />
+          </CollapsibleSection>
 
           {/* Built by footer */}
           <div className="border-t border-pb-border pt-4 text-center">

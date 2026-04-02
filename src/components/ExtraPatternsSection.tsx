@@ -3,17 +3,22 @@ import { EXTRA_PATTERNS, PATTERN_COLORS } from "../utils/constants";
 interface Props {
   enabledExtraPatterns: string[];
   onToggle: (pattern: string) => void;
+  hideLabel?: boolean;
 }
 
-export default function ExtraPatternsSection({ enabledExtraPatterns, onToggle }: Props) {
+export default function ExtraPatternsSection({ enabledExtraPatterns, onToggle, hideLabel }: Props) {
   return (
     <div>
-      <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-        Additional Patterns
-      </label>
-      <p className="mb-3 text-xs leading-relaxed text-pb-text-dim">
-        Enable extra pattern categories for tracking.
-      </p>
+      {!hideLabel && (
+        <>
+          <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
+            Additional Patterns
+          </label>
+          <p className="mb-3 text-xs leading-relaxed text-pb-text-dim">
+            Enable extra pattern categories for tracking.
+          </p>
+        </>
+      )}
       <div className="flex flex-col gap-1.5">
         {EXTRA_PATTERNS.map((pattern) => {
           const enabled = enabledExtraPatterns.includes(pattern);

@@ -37,6 +37,27 @@
   50% { opacity: 0.4; }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+@keyframes landing-orb1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-25px, 18px) scale(1.04); }
+  66% { transform: translate(18px, -14px) scale(0.97); }
+}
+
+@keyframes landing-orb2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  45% { transform: translate(22px, -16px) scale(1.03); }
+  75% { transform: translate(-14px, 12px) scale(0.98); }
+}
+
+@keyframes landing-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
 * {
   box-sizing: border-box;
 }

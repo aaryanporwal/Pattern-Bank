@@ -1,14 +1,17 @@
 interface Props {
   onSetAllDue: () => void;
   onRequestClearData: () => void;
+  hideLabel?: boolean;
 }
 
-export default function DangerZoneSection({ onSetAllDue, onRequestClearData }: Props) {
+export default function DangerZoneSection({ onSetAllDue, onRequestClearData, hideLabel }: Props) {
   return (
     <div>
-      <label className="mb-2 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-        Danger Zone
-      </label>
+      {!hideLabel && (
+        <label className="mb-2 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
+          Danger Zone
+        </label>
+      )}
       <div className="flex flex-col gap-2">
         <button
           onClick={onSetAllDue}

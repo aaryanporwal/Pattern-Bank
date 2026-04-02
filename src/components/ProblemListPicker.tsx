@@ -6,9 +6,10 @@ import type { LeetCodeProblem } from "../types";
 interface Props {
   existingIds: Set<number>;
   onBulkAdd: (problems: LeetCodeProblem[], patternMap: Map<number, string[]> | null) => void;
+  hideLabel?: boolean;
 }
 
-export default function ProblemListPicker({ existingIds, onBulkAdd }: Props) {
+export default function ProblemListPicker({ existingIds, onBulkAdd, hideLabel }: Props) {
   const [selectedId, setSelectedId] = useState("");
 
   // Compute summaries for all lists based on current library
@@ -42,9 +43,11 @@ export default function ProblemListPicker({ existingIds, onBulkAdd }: Props) {
 
   return (
     <div>
-      <label className="mb-2 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-        Import Problem List
-      </label>
+      {!hideLabel && (
+        <label className="mb-2 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
+          Import Problem List
+        </label>
+      )}
 
       {/* Dropdown */}
       <div className="relative">

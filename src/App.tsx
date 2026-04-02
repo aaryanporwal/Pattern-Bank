@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { exportData } from "./utils/storage";
 
 import useAuth from "./hooks/useAuth";
@@ -33,6 +34,11 @@ export default function App() {
     handleSetAllDue,
     handleClearAllData,
   } = useProblems({ user, showToast: ui.showToast });
+
+  const existingProblemNumbers = useMemo(
+    () => new Set(problems.map((p) => p.leetcodeNumber).filter((n): n is number => Boolean(n))),
+    [problems],
+  );
 
   return (
     <div className="min-h-screen bg-pb-bg pb-[70px]">
@@ -71,7 +77,7 @@ export default function App() {
         onImport={handleImport}
         onBulkAdd={handleBulkAdd}
         problemCount={problems.length}
-        existingProblemNumbers={new Set(problems.map((p) => p.leetcodeNumber).filter((n): n is number => Boolean(n)))}
+        existingProblemNumbers={existingProblemNumbers}
         user={user}
         onSignInGoogle={signInWithGoogle}
         onSignInGitHub={signInWithGitHub}
@@ -96,6 +102,9 @@ export default function App() {
           onUpdateNotes={handleUpdateNotes}
           onViewAllDue={ui.handleViewAllDue}
           onPatternClick={ui.handlePatternClick}
+          onAddClick={ui.openAddModal}
+          onBulkAdd={handleBulkAdd}
+          existingProblemNumbers={existingProblemNumbers}
         />
       )}
       {ui.activeTab === "problems" && (
@@ -107,6 +116,7 @@ export default function App() {
           initialSort={ui.problemsInitialSort}
           initialPatternFilter={ui.problemsInitialPatternFilter}
           enabledExtraPatterns={preferences.enabledExtraPatterns}
+          onAddClick={ui.openAddModal}
         />
       )}
 
@@ -123,7 +133,7 @@ export default function App() {
           ui.closeModal();
         }}
         initialData={ui.editingProblem}
-        existingProblemNumbers={new Set(problems.map((p) => p.leetcodeNumber).filter((n): n is number => Boolean(n)))}
+        existingProblemNumbers={existingProblemNumbers}
         enabledExtraPatterns={preferences.enabledExtraPatterns}
       />
     </div>

@@ -24,17 +24,21 @@ The gap isn't tracking. It's retention. PatternBank fills that gap with spaced r
 ## Features
 
 - **Spaced Repetition** — SM-2 algorithm calculates review intervals based on your confidence rating (1-5 stars). Low confidence = review tomorrow. High confidence = review in two weeks.
-- **Pattern Organization** — 18 algorithmic categories from Two Pointers to Dynamic Programming. Tag problems by pattern and see where your gaps are.
+- **Pattern Organization** — 24 algorithmic categories — 18 core (Two Pointers through DP) plus 6 opt-in advanced patterns (Intervals, Mono Stack, Prefix Sum, Bit, System Design, OOD). Tag problems by pattern and see where your gaps are.
 - **Confidence Heatmap** — Visual grid showing average confidence per pattern. Red = weak, green = strong. Click any cell to filter problems by that pattern.
 - **Curated Problem Lists** — 6 built-in lists: NeetCode 75, NeetCode 150, NeetCode 250, Grind 75, Grind 169, and LeetCode Hot 100.
-- **Smart Daily Cap** — Set a daily review goal (1-10). The priority algorithm surfaces your weakest, most overdue problems first. Never says "overdue" or "behind."
-- **LeetCode Database** — 3,846 problems with instant search by number or title. Auto-fills title, difficulty, and URL.
+- **Smart Daily Cap** — Set a daily review goal (1-20). The priority algorithm surfaces your weakest, most overdue problems first. Never says "overdue" or "behind."
+- **LeetCode Database** — 3,800+ problems with instant search by number or title. Auto-fills title, difficulty, and URL.
 - **Bulk Add** — Paste LeetCode problem numbers, validated in real-time. Review dates staggered by difficulty to prevent queue overwhelm.
 - **Review History** — Per-problem timeline of past reviews with confidence progression (signed-in users).
 - **Exclude from Review** — Toggle problems out of the daily review queue while keeping them in your library.
 - **Cross-Platform** — React web app + React Native mobile app with shared Supabase backend.
 - **Cloud Sync** — Sign in with Google, GitHub, or Apple. Data syncs across devices with timestamp-based conflict resolution.
 - **Offline-First** — Works without an account. localStorage (web) and AsyncStorage (mobile) persist everything locally. Cloud sync is additive, never required.
+- **Extra Pattern Categories** — 6 opt-in advanced patterns with individual toggles in Settings. Enable the ones relevant to your prep.
+- **Hide Patterns During Review** — Toggle in Settings to hide pattern tags on review cards. Test your pattern recognition before revealing the answer.
+- **Danger Zone** — Set all problems due today or clear all data from Settings.
+- **Landing Page** — New visitors see an animated marketing page with pattern heatmap demo. Returning users go straight to the app.
 - **Push Notifications** — Daily review reminders on mobile with configurable time.
 
 ---
@@ -90,7 +94,7 @@ PatternBank follows a **localStorage-first** design. Every action writes locally
 | Auth | Supabase Auth (Google, GitHub, Apple) | Supabase Auth (Google, GitHub, Apple) |
 | Notifications | — | expo-notifications |
 | Hosting | Vercel | App Store (live via EAS Build) |
-| Testing | Vitest (unit) + Playwright (e2e) | Manual (Vitest + Playwright planned) |
+| Testing | Vitest (unit) + Playwright (e2e) | Jest (164 tests) |
 | Monitoring | Sentry, PostHog, Vercel Analytics + Speed Insights | Sentry, PostHog |
 
 ---
@@ -119,7 +123,7 @@ When more problems are due than the daily goal allows, a three-tier priority sor
 
 ```
 src/
-├── components/          33 components
+├── components/          35 components
 │   ├── PatternHeatmap   Radial gradient confidence grid
 │   ├── BulkAddSection   Chip input with LC database validation
 │   ├── ReviewCard       Active recall flow (notes hidden by default)
@@ -132,7 +136,7 @@ src/
 ├── utils/               11 modules
 │   ├── spacedRepetition SM-2 intervals + priority algorithm
 │   ├── problemTransforms Pure business logic (bulk add, import merge, review progress)
-│   ├── leetcodeProblems 3,846 problems with instant search
+│   ├── leetcodeProblems 3,800+ problems with instant search
 │   ├── sync             Bidirectional merge + fire-and-forget push
 │   ├── supabaseData     7 CRUD functions with field mapping
 │   └── ...
@@ -164,6 +168,9 @@ Built iteratively across 6+ sprints plus post-launch sessions:
 | 4 | React Native mobile app |
 | 5 | Heatmap, bulk add, accessibility, performance testing |
 | 6+ | TypeScript migration (strict mode), ESLint, Vitest + Playwright test infrastructure (278 unit + 24 e2e tests) |
+| V1.1 | Reddit launch, review history, bulk add improvements |
+| V1.2 | TypeScript strict mode, exclude from review, 301 tests, CI/CD pipeline |
+| V1.3 | 6 extra pattern categories, hide patterns during review, stale closure fixes, daily cap 20, landing page, danger zone |
 
 Each sprint was planned before coding — numbered task lists, discovery questions, architectural decisions made upfront.
 
