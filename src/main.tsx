@@ -1,4 +1,5 @@
-import { StrictMode } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import { StrictMode, useState, useCallback } from "react";
 import { createRoot } from "react-dom/client";
 import * as Sentry from "@sentry/react";
 import posthog from "posthog-js";
@@ -8,6 +9,7 @@ import "./index.css";
 import AuthProvider from "./contexts/AuthContext";
 import App from "./App";
 import PrivacyPolicy from "./PrivacyPolicy";
+import LandingPage from "./LandingPage";
 
 Sentry.init({
   dsn: "https://69c043b9d6841043de3e78617b522acf@o4510944607731712.ingest.us.sentry.io/4510944618151936",
@@ -22,7 +24,30 @@ if (window.location.hostname !== "localhost") {
   });
 }
 
-const isPrivacy = window.location.pathname === "/privacy";
+function Root() {
+  const [showApp, setShowApp] = useState(
+    () => sessionStorage.getItem("patternbank-skip-landing") === "true",
+  );
+  const isPrivacy = window.location.pathname === "/privacy";
+  const isLanding = !showApp
+    && window.location.pathname === "/"
+    && !localStorage.getItem("patternbank-problems");
+
+  const handleOpenApp = useCallback(() => {
+    sessionStorage.setItem("patternbank-skip-landing", "true");
+    setShowApp(true);
+  }, []);
+
+  if (isPrivacy) return <PrivacyPolicy />;
+  if (isLanding) return <LandingPage onOpenApp={handleOpenApp} />;
+  return (
+    <AuthProvider>
+      <App />
+      <Analytics />
+      <SpeedInsights />
+    </AuthProvider>
+  );
+}
 
 createRoot(document.getElementById("root")!, {
   onUncaughtError: Sentry.reactErrorHandler(),
@@ -30,14 +55,6 @@ createRoot(document.getElementById("root")!, {
   onRecoverableError: Sentry.reactErrorHandler(),
 }).render(
   <StrictMode>
-    {isPrivacy ? (
-      <PrivacyPolicy />
-    ) : (
-      <AuthProvider>
-        <App />
-        <Analytics />
-        <SpeedInsights />
-      </AuthProvider>
-    )}
-  </StrictMode>
+    <Root />
+  </StrictMode>,
 );
