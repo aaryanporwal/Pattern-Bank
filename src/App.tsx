@@ -23,6 +23,7 @@ export default function App() {
     problems,
     preferences,
     syncStatus,
+    reviewCount,
     handleSaveProblem,
     handleDeleteConfirm,
     handleReview,
@@ -41,11 +42,11 @@ export default function App() {
     [problems],
   );
 
-  // Re-read from localStorage when problems change (a review likely happened)
+  // Re-read from localStorage when review data changes
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const reviewLog = useMemo(() => loadReviewLog(), [problems]);
+  const reviewLog = useMemo(() => loadReviewLog(), [reviewCount]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const reviewEvents = useMemo(() => loadReviewEvents(), [problems]);
+  const reviewEvents = useMemo(() => loadReviewEvents(), [reviewCount]);
 
   return (
     <div className="min-h-screen bg-pb-bg pb-[70px]">

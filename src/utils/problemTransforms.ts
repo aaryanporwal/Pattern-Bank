@@ -85,8 +85,11 @@ export function mergeImportedProblems(
   let updated = 0;
   importedProblems.forEach((p) => {
     if (existing.has(p.id)) {
-      existing.set(p.id, p);
-      updated++;
+      const current = existing.get(p.id)!;
+      if (p.updatedAt > current.updatedAt) {
+        existing.set(p.id, p);
+        updated++;
+      }
     } else {
       existing.set(p.id, p);
       added++;

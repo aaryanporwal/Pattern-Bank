@@ -42,6 +42,7 @@ interface UseProblemsReturn {
   problems: Problem[];
   preferences: Preferences;
   syncStatus: SyncStatus;
+  reviewCount: number;
   handleSaveProblem: (problem: Problem, confidenceChanged?: boolean) => void;
   handleDeleteConfirm: (deleteTarget: Problem | null) => void;
   handleReview: (problemId: string, newConfidence: Confidence) => void;
@@ -66,6 +67,9 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
     }
     return deduped;
   });
+  // Tracks review-data mutations so App.tsx can re-read reviewLog/reviewEvents precisely
+  const [reviewCount, setReviewCount] = useState(0);
+
   // Keep ref in sync so callbacks always read latest state without stale closures
   const problemsRef = useRef(problems);
   useEffect(() => { problemsRef.current = problems; });
@@ -118,7 +122,10 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
       showToast("Problem added");
       posthog.capture("problem_added", { difficulty: problem.difficulty, pattern_count: problem.patterns.length, platform: "web" });
     }
-    if (confidenceChanged) logReviewToday();
+    if (confidenceChanged) {
+      logReviewToday();
+      setReviewCount((c) => c + 1);
+    }
     if (user) pushProblemToCloud(user.id, problem);
   }, [showToast, user]);
 
@@ -143,6 +150,7 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
       );
       logReviewToday();
       logReviewEvent(problemId, newConfidence, original?.patterns ?? []);
+      setReviewCount((c) => c + 1);
       posthog.capture("problem_reviewed", { old_confidence: original?.confidence, new_confidence: newConfidence, platform: "web" });
 
       if (user && updatedProblem && original) {
@@ -204,6 +212,7 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
         if (user) {
           pushProblemsToCloud(user.id, data.problems);
         }
+        setReviewCount((c) => c + 1);
         posthog.capture("data_imported", { added: addedCount, updated: updatedCount, platform: "web" });
         showToast(`Imported ${addedCount} new, ${updatedCount} updated`);
       } catch (err) {
@@ -273,6 +282,7 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
     setProblems([]);
     saveReviewLog([]);
     saveReviewEvents([]);
+    setReviewCount((c) => c + 1);
     if (user) {
       await clearAllCloudData(user.id);
     }
@@ -283,6 +293,7 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
     problems,
     preferences,
     syncStatus,
+    reviewCount,
     handleSaveProblem,
     handleDeleteConfirm,
     handleReview,

@@ -189,14 +189,32 @@ describe("mergeImportedProblems", () => {
     expect(updatedCount).toBe(0);
   });
 
-  it("overwrites existing problems by id", () => {
-    const existing = [{ id: "a", title: "Old Title", notes: "old" }] as Problem[];
-    const imported = [{ id: "a", title: "New Title", notes: "new" }] as Problem[];
+  it("overwrites existing problem when imported version is newer", () => {
+    const existing = [{ id: "a", title: "Old Title", notes: "old", updatedAt: "2026-01-01T00:00:00.000Z" }] as Problem[];
+    const imported = [{ id: "a", title: "New Title", notes: "new", updatedAt: "2026-01-02T00:00:00.000Z" }] as Problem[];
     const { mergedProblems, addedCount, updatedCount } = mergeImportedProblems(existing, imported);
     expect(mergedProblems).toHaveLength(1);
     expect(mergedProblems[0].title).toBe("New Title");
     expect(addedCount).toBe(0);
     expect(updatedCount).toBe(1);
+  });
+
+  it("preserves local problem when imported version is older", () => {
+    const existing = [{ id: "a", title: "Local Title", updatedAt: "2026-01-02T00:00:00.000Z" }] as Problem[];
+    const imported = [{ id: "a", title: "Stale Title", updatedAt: "2026-01-01T00:00:00.000Z" }] as Problem[];
+    const { mergedProblems, addedCount, updatedCount } = mergeImportedProblems(existing, imported);
+    expect(mergedProblems).toHaveLength(1);
+    expect(mergedProblems[0].title).toBe("Local Title");
+    expect(addedCount).toBe(0);
+    expect(updatedCount).toBe(0);
+  });
+
+  it("preserves local problem when timestamps are equal", () => {
+    const existing = [{ id: "a", title: "Local", updatedAt: "2026-01-01T00:00:00.000Z" }] as Problem[];
+    const imported = [{ id: "a", title: "Import", updatedAt: "2026-01-01T00:00:00.000Z" }] as Problem[];
+    const { mergedProblems, updatedCount } = mergeImportedProblems(existing, imported);
+    expect(mergedProblems[0].title).toBe("Local");
+    expect(updatedCount).toBe(0);
   });
 
   it("does not lose existing problems not in import", () => {
