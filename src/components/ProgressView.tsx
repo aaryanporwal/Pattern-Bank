@@ -6,6 +6,9 @@ import {
   calculateLongestStreak,
   buildReviewCountMap,
   getWeekStart,
+  groupEventsByWeek,
+  getConfidenceDistribution,
+  getTopPatterns,
 } from "../utils/progressUtils";
 import type { Problem, ReviewLogEntry, ReviewEvent } from "../types";
 
@@ -390,32 +393,11 @@ function ConfidenceTrend({
 
   // Group by week (last 12 weeks)
   const weekData = useMemo(() => {
-    const today = todayStr();
-    const twelveWeeksAgo = addDays(today, -12 * 7);
-
-    const recent = filteredEvents.filter((e) => e.date >= twelveWeeksAgo);
-    const byWeek = new Map<string, number[]>();
-    recent.forEach((e) => {
-      const ws = getWeekStart(e.date);
-      const arr = byWeek.get(ws) ?? [];
-      arr.push(e.confidence);
-      byWeek.set(ws, arr);
-    });
-
-    // Generate all 12 week starts
-    const weeks: { weekStart: string; label: string; avg: number | null }[] =
-      [];
-    let ws = getWeekStart(twelveWeeksAgo);
-    for (let i = 0; i < 12; i++) {
-      const vals = byWeek.get(ws);
-      weeks.push({
-        weekStart: ws,
-        label: formatWeekLabel(ws),
-        avg: vals ? vals.reduce((a, b) => a + b, 0) / vals.length : null,
-      });
-      ws = addDays(ws, 7);
-    }
-    return weeks;
+    const twelveWeeksAgo = addDays(todayStr(), -12 * 7);
+    return groupEventsByWeek(filteredEvents, 12, twelveWeeksAgo).map((w) => ({
+      ...w,
+      label: formatWeekLabel(w.weekStart),
+    }));
   }, [filteredEvents]);
 
   const dataPoints = weekData.filter((w) => w.avg !== null) as {
@@ -584,10 +566,7 @@ function ConfidenceTrend({
 // ── Confidence Spread ────────────────────────────────────
 
 function ConfidenceSpread({ problems }: { problems: Problem[] }) {
-  const counts = [0, 0, 0, 0, 0];
-  problems.forEach((p) => {
-    counts[p.confidence - 1]++;
-  });
+  const counts = getConfidenceDistribution(problems.map((p) => p.confidence));
   const maxCount = Math.max(...counts, 1);
   const barHeight = 100;
 
@@ -636,15 +615,10 @@ function ConfidenceSpread({ problems }: { problems: Problem[] }) {
 // ── Top Patterns ─────────────────────────────────────────
 
 function TopPatterns({ problems }: { problems: Problem[] }) {
-  const patternCounts = useMemo(() => {
-    const map = new Map<string, number>();
-    problems.forEach((p) =>
-      p.patterns.forEach((pat) => map.set(pat, (map.get(pat) ?? 0) + 1)),
-    );
-    return [...map.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
-  }, [problems]);
+  const patternCounts = useMemo(
+    () => getTopPatterns(problems.map((p) => p.patterns), 5),
+    [problems],
+  );
 
   const maxCount = patternCounts.length > 0 ? patternCounts[0][1] : 1;
 

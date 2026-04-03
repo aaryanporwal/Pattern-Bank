@@ -6,8 +6,9 @@ import ProblemListPicker from "./ProblemListPicker";
 import PatternTag from "./PatternTag";
 import DifficultyBadge from "./DifficultyBadge";
 import { todayStr } from "../utils/dateHelpers";
-import { calculateStreak, countReviewedToday } from "../utils/storage";
+import { calculateStreak } from "../utils/storage";
 import { prioritizeProblems, INTERVALS } from "../utils/spacedRepetition";
+import { computeReviewProgress } from "../utils/problemTransforms";
 import type { Problem, Confidence, LeetCodeProblem } from "../types";
 
 interface Props {
@@ -43,13 +44,9 @@ export default function DashboardView({
 
   // All problems past their review date (excluding excluded ones)
   const allDueProblems = problems.filter((p) => p.nextReviewDate <= today && !p.excludeFromReview);
-  const totalDueCount = allDueProblems.length;
 
-  // How many the user has reviewed today
-  const reviewedToday = countReviewedToday(problems);
-
-  // Effective goal: don't show "0 of 5" when only 3 problems exist to review
-  const effectiveGoal = Math.min(dailyGoal, totalDueCount + reviewedToday);
+  const { currentReviewed: reviewedToday, totalDue: totalDueCount, effectiveGoal } =
+    computeReviewProgress(problems, dailyGoal);
   const remainingSlots = Math.max(0, effectiveGoal - reviewedToday);
 
   // Prioritize and cap to remaining slots

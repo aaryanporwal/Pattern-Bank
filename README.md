@@ -39,6 +39,10 @@ The gap isn't tracking. It's retention. PatternBank fills that gap with spaced r
 - **Hide Patterns During Review** — Toggle in Settings to hide pattern tags on review cards. Test your pattern recognition before revealing the answer.
 - **Danger Zone** — Set all problems due today or clear all data from Settings.
 - **Landing Page** — New visitors see an animated marketing page with pattern heatmap demo. Returning users go straight to the app.
+- **Progress Dashboard** — Review activity heatmap (LeetCode-style month shapes), confidence trend chart with per-pattern filtering, streak tracking, confidence spread, and top patterns breakdown.
+- **Quick Start Onboarding** — New users see an interactive guide with action paths, interval reference table, tips, and a mock review timeline.
+- **Collapsible Settings** — Infrequently-used settings sections collapse by default to reduce visual clutter.
+- **Pull-to-Refresh** — Manual refresh on Dashboard and Progress screens (mobile).
 - **Push Notifications** — Daily review reminders on mobile with configurable time.
 
 ---
@@ -94,7 +98,7 @@ PatternBank follows a **localStorage-first** design. Every action writes locally
 | Auth | Supabase Auth (Google, GitHub, Apple) | Supabase Auth (Google, GitHub, Apple) |
 | Notifications | — | expo-notifications |
 | Hosting | Vercel | App Store (live via EAS Build) |
-| Testing | Vitest (unit) + Playwright (e2e) | Jest (164 tests) |
+| Testing | Vitest (307 unit) + Playwright (e2e) | Jest (192 tests) |
 | Monitoring | Sentry, PostHog, Vercel Analytics + Speed Insights | Sentry, PostHog |
 
 ---
@@ -123,19 +127,22 @@ When more problems are due than the daily goal allows, a three-tier priority sor
 
 ```
 src/
-├── components/          35 components
+├── components/          36 components
 │   ├── PatternHeatmap   Radial gradient confidence grid
 │   ├── BulkAddSection   Chip input with LC database validation
 │   ├── ReviewCard       Active recall flow (notes hidden by default)
 │   ├── DashboardView    Stats, review queue, heatmap
+│   ├── ProgressView     Streak heatmap, confidence trend, pattern analytics
 │   ├── SettingsModal    → AccountSection, DailyGoalSection, DataSection,
 │   │                      FeedbackSection, MobileAppSection
 │   ├── ProblemModal     → ModeToggle, ProblemInfo, PatternSelector,
 │   │                      NotesEditor, ConfidenceInfo
 │   └── ...
+├── LandingPage          Animated hero, heatmap demo, iOS QR popover
 ├── utils/               11 modules
 │   ├── spacedRepetition SM-2 intervals + priority algorithm
 │   ├── problemTransforms Pure business logic (bulk add, import merge, review progress)
+│   ├── progressUtils    Streak, heatmap, confidence trend, pattern stats
 │   ├── leetcodeProblems 3,800+ problems with instant search
 │   ├── sync             Bidirectional merge + fire-and-forget push
 │   ├── supabaseData     7 CRUD functions with field mapping
@@ -171,6 +178,7 @@ Built iteratively across 6+ sprints plus post-launch sessions:
 | V1.1 | Reddit launch, review history, bulk add improvements |
 | V1.2 | TypeScript strict mode, exclude from review, 301 tests, CI/CD pipeline |
 | V1.3 | 6 extra pattern categories, hide patterns during review, stale closure fixes, daily cap 20, landing page, danger zone |
+| V1.4 | Progress dashboard (heatmap, confidence trend, streak tracking), landing page, Quick Start onboarding, collapsible settings, pull-to-refresh, clear-all-data sync fix, OG image |
 
 Each sprint was planned before coding — numbered task lists, discovery questions, architectural decisions made upfront.
 
