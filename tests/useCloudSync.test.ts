@@ -7,6 +7,7 @@ import type { Problem, Preferences, ReviewLogEntry } from "../src/types";
 
 vi.mock("../src/utils/storage", () => ({
   loadReviewLog: vi.fn(() => []),
+  loadReviewEvents: vi.fn(() => []),
   loadProblems: vi.fn(() => []),
   saveProblems: vi.fn(),
   savePreferences: vi.fn(),
@@ -100,6 +101,7 @@ describe("useCloudSync", () => {
     expect(mockSyncOnSignIn).toHaveBeenCalledWith(
       mockUser.id,
       params.problems,
+      [],
       [],
       params.preferences
     );

@@ -7,15 +7,18 @@ import {
   deleteAllUserProblems,
   deleteAllUserReviewLog,
   fetchReviewLog,
+  fetchReviewEvents,
   logReview,
+  batchInsertReviewLogs,
   fetchPreferences,
   upsertPreferences,
 } from "./supabaseData";
-import type { Problem, ReviewLogEntry, Preferences, Confidence } from "../types";
+import type { Problem, ReviewLogEntry, ReviewEvent, Preferences, Confidence } from "../types";
 
 export interface SyncResult {
   problems: Problem[];
   reviewLog: ReviewLogEntry[];
+  reviewEvents: ReviewEvent[];
   preferences: Preferences;
   hasChanges: boolean;
   error: unknown;
@@ -32,24 +35,27 @@ export async function syncOnSignIn(
   userId: string,
   localProblems: Problem[],
   localReviewLog: ReviewLogEntry[],
+  localReviewEvents: ReviewEvent[],
   localPreferences: Preferences
 ): Promise<SyncResult> {
   try {
     // 1. Fetch everything from Supabase in parallel
-    const [cloudProblemsRes, cloudLogRes, cloudPrefsRes] = await Promise.all([
+    const [cloudProblemsRes, cloudLogRes, cloudEventsRes, cloudPrefsRes] = await Promise.all([
       fetchProblems(userId),
       fetchReviewLog(userId),
+      fetchReviewEvents(userId),
       fetchPreferences(userId),
     ]);
 
     // If any fetch failed critically, return local data unchanged
     if (cloudProblemsRes.error) {
       console.error("Sync: failed to fetch problems", cloudProblemsRes.error);
-      return { problems: localProblems, reviewLog: localReviewLog, preferences: localPreferences, hasChanges: false, error: cloudProblemsRes.error };
+      return { problems: localProblems, reviewLog: localReviewLog, reviewEvents: localReviewEvents, preferences: localPreferences, hasChanges: false, error: cloudProblemsRes.error };
     }
 
     const cloudProblems = cloudProblemsRes.data || [];
     const cloudLog = cloudLogRes.data || [];
+    const cloudEvents = cloudEventsRes.data || [];
     const cloudPrefs = cloudPrefsRes.data;
 
     // 2. Merge problems, then deduplicate by leetcodeNumber
@@ -64,7 +70,15 @@ export async function syncOnSignIn(
     // 3. Merge review log (deduplicate by date)
     const { log: mergedLog, addedFromCloud: logAddedFromCloud } = mergeReviewLog(localReviewLog, cloudLog);
 
-    // 4. Merge preferences
+    // 4. Merge review events (deduplicate by problemId+timestamp)
+    const { events: mergedEvents, addedFromCloud: eventsAddedFromCloud, localOnlyEvents } = mergeReviewEvents(localReviewEvents, cloudEvents);
+
+    // Push local-only review events to cloud
+    if (localOnlyEvents.length > 0) {
+      pushReviewEventsToCloud(userId, localOnlyEvents);
+    }
+
+    // 5. Merge preferences
     // If Supabase has preferences, use those (cloud state).
     // If not (first sign-in), push localStorage preferences to Supabase.
     let mergedPreferences: Preferences;
@@ -106,11 +120,13 @@ export async function syncOnSignIn(
       cloudWon > 0 ||
       dupIds.length > 0 ||
       logAddedFromCloud > 0 ||
+      eventsAddedFromCloud > 0 ||
       (cloudPrefs !== null && cloudPrefs.dailyReviewGoal !== localPreferences.dailyReviewGoal);
 
     return {
       problems: mergedProblems,
       reviewLog: mergedLog,
+      reviewEvents: mergedEvents,
       preferences: mergedPreferences,
       hasChanges,
       error: null,
@@ -120,6 +136,7 @@ export async function syncOnSignIn(
     return {
       problems: localProblems,
       reviewLog: localReviewLog,
+      reviewEvents: localReviewEvents,
       preferences: localPreferences,
       hasChanges: false,
       error: err,
@@ -207,6 +224,57 @@ export interface MergeReviewLogResult {
   addedFromCloud: number;
 }
 
+export interface MergeReviewEventsResult {
+  events: ReviewEvent[];
+  addedFromCloud: number;
+  localOnlyEvents: ReviewEvent[];
+}
+
+export function mergeReviewEvents(localEvents: ReviewEvent[], cloudEvents: ReviewEvent[]): MergeReviewEventsResult {
+  const keyFn = (e: ReviewEvent) => `${e.problemId}|${e.timestamp}`;
+
+  // Combine all events, then deduplicate
+  const all = [...localEvents, ...cloudEvents];
+
+  // Sort by timestamp so near-duplicate detection works in order
+  all.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+
+  // Deduplicate: exact key match OR same problemId within 5 seconds (legacy mismatch)
+  const kept: ReviewEvent[] = [];
+  const seenKeys = new Set<string>();
+
+  for (const event of all) {
+    const key = keyFn(event);
+    if (seenKeys.has(key)) continue;
+
+    // Check for near-duplicate: same problemId within 5s of an already-kept event
+    const ts = new Date(event.timestamp).getTime();
+    const isNearDup = kept.some(
+      (k) => k.problemId === event.problemId && Math.abs(new Date(k.timestamp).getTime() - ts) < 5000
+    );
+    if (isNearDup) continue;
+
+    seenKeys.add(key);
+    kept.push(event);
+  }
+
+  // Determine what was added from cloud and what's local-only
+  const localKeys = new Set(localEvents.map(keyFn));
+  const cloudKeys = new Set(cloudEvents.map(keyFn));
+  let addedFromCloud = 0;
+  const localOnlyEvents: ReviewEvent[] = [];
+
+  for (const event of kept) {
+    const key = keyFn(event);
+    const inLocal = localKeys.has(key);
+    const inCloud = cloudKeys.has(key);
+    if (inCloud && !inLocal) addedFromCloud++;
+    if (inLocal && !inCloud) localOnlyEvents.push(event);
+  }
+
+  return { events: kept, addedFromCloud, localOnlyEvents };
+}
+
 export function mergeReviewLog(localLog: ReviewLogEntry[], cloudLog: ReviewLogEntry[]): MergeReviewLogResult {
   // Deduplicate by date — we only need one entry per date for streak calculation
   const dates = new Set<string>();
@@ -257,10 +325,18 @@ export async function pushReviewToCloud(
   userId: string,
   problemId: string,
   oldConfidence: Confidence,
-  newConfidence: Confidence
+  newConfidence: Confidence,
+  patterns: string[],
+  timestamp?: string
 ): Promise<void> {
-  const { error } = await logReview(userId, problemId, oldConfidence, newConfidence);
+  const { error } = await logReview(userId, problemId, oldConfidence, newConfidence, patterns, timestamp);
   if (error) console.error("Cloud push failed (review):", error);
+}
+
+export async function pushReviewEventsToCloud(userId: string, events: ReviewEvent[]): Promise<void> {
+  if (!events.length) return;
+  const { error } = await batchInsertReviewLogs(userId, events);
+  if (error) console.error("Cloud push failed (review events batch):", error);
 }
 
 export async function pushPreferencesToCloud(userId: string, prefs: Preferences): Promise<void> {

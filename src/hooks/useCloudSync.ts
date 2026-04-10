@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { User } from "@supabase/supabase-js";
-import { loadReviewLog } from "../utils/storage";
+import { loadReviewLog, loadReviewEvents } from "../utils/storage";
 import { syncOnSignIn, SyncResult } from "../utils/sync";
 import type { Problem, Preferences, SyncStatus } from "../types";
 
@@ -37,7 +37,7 @@ export default function useCloudSync({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSyncStatus("syncing");
 
-    syncOnSignIn(user.id, problems, loadReviewLog(), preferences).then(
+    syncOnSignIn(user.id, problems, loadReviewLog(), loadReviewEvents(), preferences).then(
       (result) => {
         if (result.error) {
           setSyncStatus("error");

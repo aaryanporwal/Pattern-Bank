@@ -26,6 +26,7 @@ import {
   pushProblemsToCloud,
   deleteProblemFromCloud,
   pushReviewToCloud,
+  pushReviewEventsToCloud,
   deduplicateProblems,
   clearAllCloudData,
 } from "../utils/sync";
@@ -81,7 +82,9 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
   const handleSyncComplete = useCallback((result: SyncResult) => {
     setProblems(result.problems);
     saveReviewLog(result.reviewLog);
+    saveReviewEvents(result.reviewEvents);
     replacePreferences(result.preferences);
+    setReviewCount((c) => c + 1);
   }, [replacePreferences]);
 
   const { syncStatus } = useCloudSync({
@@ -145,17 +148,19 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
       const original = current.find((p) => p.id === problemId);
       const updatedProblem = original ? buildReviewedProblem(original, newConfidence) : null;
 
+      const reviewTimestamp = new Date().toISOString();
+
       setProblems((prev) =>
         prev.map((p) => (p.id === problemId ? buildReviewedProblem(p, newConfidence) : p))
       );
       logReviewToday();
-      logReviewEvent(problemId, newConfidence, original?.patterns ?? []);
+      logReviewEvent(problemId, newConfidence, original?.patterns ?? [], reviewTimestamp);
       setReviewCount((c) => c + 1);
       posthog.capture("problem_reviewed", { old_confidence: original?.confidence, new_confidence: newConfidence, platform: "web" });
 
       if (user && updatedProblem && original) {
         pushProblemToCloud(user.id, updatedProblem);
-        pushReviewToCloud(user.id, problemId, original.confidence, newConfidence);
+        pushReviewToCloud(user.id, problemId, original.confidence, newConfidence, original.patterns, reviewTimestamp);
       }
 
       const intervalDays = getIntervalDays(newConfidence);
@@ -211,6 +216,9 @@ export default function useProblems({ user, showToast }: UseProblemsParams): Use
         }
         if (user) {
           pushProblemsToCloud(user.id, data.problems);
+          if (data.reviewEvents?.length) {
+            pushReviewEventsToCloud(user.id, data.reviewEvents);
+          }
         }
         setReviewCount((c) => c + 1);
         posthog.capture("data_imported", { added: addedCount, updated: updatedCount, platform: "web" });

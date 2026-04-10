@@ -136,9 +136,9 @@ describe("pushReviewToCloud", () => {
     logReviewMock.mockResolvedValue({ error: null });
     const oldConf: Confidence = 2;
     const newConf: Confidence = 4;
-    await pushReviewToCloud(USER_ID, "problem-1", oldConf, newConf);
+    await pushReviewToCloud(USER_ID, "problem-1", oldConf, newConf, ["DP"]);
     expect(logReviewMock).toHaveBeenCalledOnce();
-    expect(logReviewMock).toHaveBeenCalledWith(USER_ID, "problem-1", oldConf, newConf);
+    expect(logReviewMock).toHaveBeenCalledWith(USER_ID, "problem-1", oldConf, newConf, ["DP"], undefined);
   });
 
   it("logs error on failure but does not throw", async () => {
@@ -146,7 +146,7 @@ describe("pushReviewToCloud", () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
     try {
       await expect(
-        pushReviewToCloud(USER_ID, "problem-1", 2, 4)
+        pushReviewToCloud(USER_ID, "problem-1", 2, 4, ["DP"])
       ).resolves.toBeUndefined();
       expect(spy).toHaveBeenCalled();
     } finally {
