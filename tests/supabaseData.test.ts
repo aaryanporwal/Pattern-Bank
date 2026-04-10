@@ -346,7 +346,7 @@ describe("fetchReviewLog", () => {
 describe("logReview", () => {
   it("returns { data: null, error: null } when supabase is null", async () => {
     mockSupabase = null;
-    const result = await logReview(USER_ID, "prob-1", 2, 3);
+    const result = await logReview(USER_ID, "prob-1", 2, 3, ["Two Pointers"]);
     expect(result).toEqual({ data: null, error: null });
   });
 
@@ -360,7 +360,7 @@ describe("logReview", () => {
     mockSupabase = createSupabaseMock({ data: insertedRow, error: null });
     // terminal is .single()
 
-    const result = await logReview(USER_ID, "prob-1", 2, 3);
+    const result = await logReview(USER_ID, "prob-1", 2, 3, ["Two Pointers"]);
 
     expect(result.error).toBeNull();
     expect(result.data).toEqual(insertedRow);
@@ -378,7 +378,7 @@ describe("logReview", () => {
     const supabaseError = { message: "Insert failed" };
     mockSupabase = createSupabaseMock({ data: null, error: supabaseError });
 
-    const result = await logReview(USER_ID, "prob-1", 2, 3);
+    const result = await logReview(USER_ID, "prob-1", 2, 3, ["Two Pointers"]);
     expect(result.data).toBeNull();
     expect(result.error).toBe(supabaseError);
   });

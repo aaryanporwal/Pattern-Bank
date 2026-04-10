@@ -79,14 +79,14 @@ export function saveReviewEvents(events: ReviewEvent[]): void {
   }
 }
 
-export function logReviewEvent(problemId: string, confidence: number, patterns: string[]): void {
+export function logReviewEvent(problemId: string, confidence: number, patterns: string[], timestamp?: string): void {
   const events = loadReviewEvents();
   events.push({
     date: todayStr(),
     problemId,
     confidence,
     patterns,
-    timestamp: new Date().toISOString(),
+    timestamp: timestamp ?? new Date().toISOString(),
   });
   saveReviewEvents(events);
 }

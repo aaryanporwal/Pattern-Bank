@@ -1,5 +1,5 @@
 import { supabase } from "./supabaseClient";
-import type { Problem, Confidence, Preferences, ReviewLogEntry, ReviewHistoryEntry, Difficulty } from "../types";
+import type { Problem, Confidence, Preferences, ReviewLogEntry, ReviewEvent, ReviewHistoryEntry, Difficulty } from "../types";
 
 // ============================================================
 // FIELD MAPPING: camelCase (localStorage) ↔ snake_case (Supabase)
@@ -162,18 +162,23 @@ export async function logReview(
   userId: string,
   problemId: string,
   oldConfidence: Confidence,
-  newConfidence: Confidence
+  newConfidence: Confidence,
+  patterns: string[],
+  timestamp?: string
 ): Promise<{ data: unknown; error: unknown }> {
   if (!supabase) return { data: null, error: null };
   try {
+    const row: Record<string, unknown> = {
+      user_id: userId,
+      problem_id: problemId,
+      old_confidence: oldConfidence,
+      new_confidence: newConfidence,
+      patterns,
+    };
+    if (timestamp) row.created_at = timestamp;
     const { data, error } = await supabase
       .from("review_log")
-      .insert({
-        user_id: userId,
-        problem_id: problemId,
-        old_confidence: oldConfidence,
-        new_confidence: newConfidence,
-      })
+      .insert(row)
       .select()
       .single();
     return { data, error: error || null };
@@ -203,6 +208,65 @@ export async function fetchProblemReviewHistory(
     return { data: history, error: null };
   } catch (err) {
     return { data: null, error: err };
+  }
+}
+
+// ============================================================
+// REVIEW EVENTS (rich view of review_log for Progress tab)
+// ============================================================
+
+export async function fetchReviewEvents(
+  userId: string,
+  since?: string
+): Promise<{ data: ReviewEvent[] | null; error: unknown }> {
+  if (!supabase) return { data: null, error: null };
+  try {
+    const sinceDate = since ?? new Date(Date.now() - 6 * 30 * 24 * 60 * 60 * 1000).toISOString();
+    const { data, error } = await supabase
+      .from("review_log")
+      .select("problem_id, new_confidence, patterns, review_date, created_at")
+      .eq("user_id", userId)
+      .gte("created_at", sinceDate)
+      .order("created_at", { ascending: true });
+    if (error) return { data: null, error };
+    const events = (data as Array<{ problem_id: string; new_confidence: number; patterns: string[] | null; review_date: string; created_at: string }>).map((row) => ({
+      date: row.review_date,
+      problemId: row.problem_id,
+      confidence: row.new_confidence,
+      patterns: row.patterns ?? [],
+      timestamp: row.created_at,
+    }));
+    return { data: events, error: null };
+  } catch (err) {
+    return { data: null, error: err };
+  }
+}
+
+export async function batchInsertReviewLogs(
+  userId: string,
+  events: ReviewEvent[]
+): Promise<{ error: unknown }> {
+  if (!supabase || !events.length) return { error: null };
+  try {
+    const rows = events.map((e) => ({
+      user_id: userId,
+      problem_id: e.problemId,
+      old_confidence: null,
+      new_confidence: e.confidence,
+      patterns: e.patterns,
+      review_date: e.date,
+      created_at: e.timestamp,
+    }));
+    // Chunk into batches of 500
+    const CHUNK_SIZE = 500;
+    for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
+      const chunk = rows.slice(i, i + CHUNK_SIZE);
+      const { error } = await supabase.from("review_log").insert(chunk);
+      if (error) return { error };
+    }
+    return { error: null };
+  } catch (err) {
+    return { error: err };
   }
 }
 

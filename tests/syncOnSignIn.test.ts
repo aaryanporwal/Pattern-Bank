@@ -4,6 +4,7 @@ import type { Problem, ReviewLogEntry, Preferences } from "../src/types";
 vi.mock("../src/utils/supabaseData", () => ({
   fetchProblems: vi.fn(),
   fetchReviewLog: vi.fn(),
+  fetchReviewEvents: vi.fn(),
   fetchPreferences: vi.fn(),
   upsertProblems: vi.fn(),
   deleteProblems: vi.fn(),
@@ -11,6 +12,7 @@ vi.mock("../src/utils/supabaseData", () => ({
   upsertProblem: vi.fn(),
   deleteProblem: vi.fn(),
   logReview: vi.fn(),
+  batchInsertReviewLogs: vi.fn(),
   fetchProblemReviewHistory: vi.fn(),
   submitFeedback: vi.fn(),
 }));
@@ -18,6 +20,7 @@ vi.mock("../src/utils/supabaseData", () => ({
 import {
   fetchProblems,
   fetchReviewLog,
+  fetchReviewEvents,
   fetchPreferences,
   upsertProblems,
   deleteProblems,
@@ -27,6 +30,7 @@ import { syncOnSignIn } from "../src/utils/sync";
 
 const mockFetchProblems = fetchProblems as ReturnType<typeof vi.fn>;
 const mockFetchReviewLog = fetchReviewLog as ReturnType<typeof vi.fn>;
+const mockFetchReviewEvents = fetchReviewEvents as ReturnType<typeof vi.fn>;
 const mockFetchPreferences = fetchPreferences as ReturnType<typeof vi.fn>;
 const mockUpsertProblems = upsertProblems as ReturnType<typeof vi.fn>;
 const mockDeleteProblems = deleteProblems as ReturnType<typeof vi.fn>;
@@ -66,6 +70,7 @@ beforeEach(() => {
   // Sensible defaults: no cloud data, no errors
   mockFetchProblems.mockResolvedValue({ data: [], error: null });
   mockFetchReviewLog.mockResolvedValue({ data: [], error: null });
+  mockFetchReviewEvents.mockResolvedValue({ data: [], error: null });
   mockFetchPreferences.mockResolvedValue({ data: null, error: null });
   mockUpsertProblems.mockResolvedValue({ data: [], error: null });
   mockDeleteProblems.mockResolvedValue({ error: null });
@@ -81,7 +86,7 @@ describe("syncOnSignIn", () => {
 
       mockFetchProblems.mockResolvedValue({ data: null, error: fetchError });
 
-      const result = await syncOnSignIn(USER_ID, [localProblem], localLog, defaultPrefs);
+      const result = await syncOnSignIn(USER_ID, [localProblem], localLog, [], defaultPrefs);
 
       expect(result.problems).toEqual([localProblem]);
       expect(result.reviewLog).toEqual(localLog);
@@ -99,7 +104,7 @@ describe("syncOnSignIn", () => {
       mockFetchProblems.mockResolvedValue({ data: [], error: null });
       mockFetchReviewLog.mockResolvedValue({ data: null, error: new Error("log fetch failed") });
 
-      const result = await syncOnSignIn(USER_ID, [localProblem], localLog, defaultPrefs);
+      const result = await syncOnSignIn(USER_ID, [localProblem], localLog, [], defaultPrefs);
 
       // fetchReviewLog error is non-fatal — cloudLog falls back to []
       expect(result.error).toBeNull();
@@ -113,7 +118,7 @@ describe("syncOnSignIn", () => {
 
       mockFetchPreferences.mockResolvedValue({ data: null, error: new Error("prefs fetch failed") });
 
-      const result = await syncOnSignIn(USER_ID, [localProblem], [], defaultPrefs);
+      const result = await syncOnSignIn(USER_ID, [localProblem], [], [], defaultPrefs);
 
       // cloudPrefs is null → use local, push to cloud
       expect(result.error).toBeNull();
@@ -129,7 +134,7 @@ describe("syncOnSignIn", () => {
 
       mockFetchProblems.mockResolvedValue({ data: [cloudProblem], error: null });
 
-      const result = await syncOnSignIn(USER_ID, [localProblem], [], defaultPrefs);
+      const result = await syncOnSignIn(USER_ID, [localProblem], [], [], defaultPrefs);
 
       expect(result.problems).toHaveLength(2);
       const ids = result.problems.map((p) => p.id);
@@ -154,7 +159,7 @@ describe("syncOnSignIn", () => {
 
       mockFetchProblems.mockResolvedValue({ data: [cloudProblem], error: null });
 
-      const result = await syncOnSignIn(USER_ID, [localProblem], [], defaultPrefs);
+      const result = await syncOnSignIn(USER_ID, [localProblem], [], [], defaultPrefs);
 
       expect(result.problems).toHaveLength(1);
       expect(result.problems[0].notes).toBe("cloud notes");
@@ -177,7 +182,7 @@ describe("syncOnSignIn", () => {
 
       mockFetchProblems.mockResolvedValue({ data: [cloudProblem], error: null });
 
-      const result = await syncOnSignIn(USER_ID, [localProblem], [], defaultPrefs);
+      const result = await syncOnSignIn(USER_ID, [localProblem], [], [], defaultPrefs);
 
       expect(result.problems).toHaveLength(1);
       expect(result.problems[0].notes).toBe("local notes");
@@ -198,7 +203,7 @@ describe("syncOnSignIn", () => {
 
       mockFetchProblems.mockResolvedValue({ data: [cloudProblem], error: null });
 
-      const result = await syncOnSignIn(USER_ID, [localProblem], [], defaultPrefs);
+      const result = await syncOnSignIn(USER_ID, [localProblem], [], [], defaultPrefs);
 
       // Only one should survive deduplication
       expect(result.problems).toHaveLength(1);
@@ -212,7 +217,7 @@ describe("syncOnSignIn", () => {
 
       mockFetchReviewLog.mockResolvedValue({ data: cloudLog, error: null });
 
-      const result = await syncOnSignIn(USER_ID, [], localLog, defaultPrefs);
+      const result = await syncOnSignIn(USER_ID, [], localLog, [], defaultPrefs);
 
       expect(result.reviewLog).toHaveLength(3);
       const dates = result.reviewLog.map((e) => e.date);
@@ -226,7 +231,7 @@ describe("syncOnSignIn", () => {
     it("uses cloud preferences when they exist", async () => {
       mockFetchPreferences.mockResolvedValue({ data: cloudPrefs, error: null });
 
-      const result = await syncOnSignIn(USER_ID, [], [], defaultPrefs);
+      const result = await syncOnSignIn(USER_ID, [], [], [], defaultPrefs);
 
       expect(result.preferences).toEqual(cloudPrefs);
       expect(result.preferences.dailyReviewGoal).toBe(10);
@@ -238,7 +243,7 @@ describe("syncOnSignIn", () => {
       // No cloud prefs (first sign-in scenario)
       mockFetchPreferences.mockResolvedValue({ data: null, error: null });
 
-      const result = await syncOnSignIn(USER_ID, [], [], defaultPrefs);
+      const result = await syncOnSignIn(USER_ID, [], [], [], defaultPrefs);
 
       expect(result.preferences).toEqual(defaultPrefs);
       expect(mockUpsertPreferences).toHaveBeenCalledOnce();
@@ -252,7 +257,7 @@ describe("syncOnSignIn", () => {
       // Cloud has no problems
       mockFetchProblems.mockResolvedValue({ data: [], error: null });
 
-      await syncOnSignIn(USER_ID, [localProblem], [], defaultPrefs);
+      await syncOnSignIn(USER_ID, [localProblem], [], [], defaultPrefs);
 
       expect(mockUpsertProblems).toHaveBeenCalledOnce();
       const [calledUserId, calledProblems] = mockUpsertProblems.mock.calls[0];
@@ -278,7 +283,7 @@ describe("syncOnSignIn", () => {
 
       mockFetchProblems.mockResolvedValue({ data: [cloudProblem], error: null });
 
-      await syncOnSignIn(USER_ID, [localProblem], [], defaultPrefs);
+      await syncOnSignIn(USER_ID, [localProblem], [], [], defaultPrefs);
 
       expect(mockUpsertProblems).toHaveBeenCalledOnce();
       const [, calledProblems] = mockUpsertProblems.mock.calls[0];
@@ -296,7 +301,7 @@ describe("syncOnSignIn", () => {
       mockFetchProblems.mockResolvedValue({ data: [cloudOnlyProblem], error: null });
 
       // No local problems at all
-      await syncOnSignIn(USER_ID, [], [], defaultPrefs);
+      await syncOnSignIn(USER_ID, [], [], [], defaultPrefs);
 
       // Cloud-only problems are not in localIds, and are in cloudIds — no push
       expect(mockUpsertProblems).not.toHaveBeenCalled();
@@ -317,7 +322,7 @@ describe("syncOnSignIn", () => {
 
       mockFetchProblems.mockResolvedValue({ data: [cloudA, cloudB], error: null });
 
-      const result = await syncOnSignIn(USER_ID, [], [], defaultPrefs);
+      const result = await syncOnSignIn(USER_ID, [], [], [], defaultPrefs);
 
       expect(result.problems).toHaveLength(1);
       expect(mockDeleteProblems).toHaveBeenCalledOnce();
@@ -337,7 +342,7 @@ describe("syncOnSignIn", () => {
       mockFetchProblems.mockResolvedValue({ data: [cloudProblem], error: null });
 
       // Empty local list — nothing for the push loop to act on
-      await syncOnSignIn(USER_ID, [], [], defaultPrefs);
+      await syncOnSignIn(USER_ID, [], [], [], defaultPrefs);
 
       expect(mockUpsertProblems).not.toHaveBeenCalled();
     });
@@ -352,7 +357,7 @@ describe("syncOnSignIn", () => {
       // Make Promise.all itself throw by rejecting fetchProblems in a way that bypasses the error check
       mockFetchProblems.mockRejectedValue(unexpected);
 
-      const result = await syncOnSignIn(USER_ID, [localProblem], localLog, defaultPrefs);
+      const result = await syncOnSignIn(USER_ID, [localProblem], localLog, [], defaultPrefs);
 
       expect(result.problems).toEqual([localProblem]);
       expect(result.reviewLog).toEqual(localLog);
