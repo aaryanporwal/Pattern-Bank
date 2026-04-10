@@ -8,10 +8,12 @@ interface UseUIReturn {
   toast: ToastState;
   deleteTarget: Problem | null;
   settingsOpen: boolean;
+  helpOpen: boolean;
   problemsInitialSort: string;
   problemsInitialPatternFilter: string;
   clearDataConfirm: boolean;
   setSettingsOpen: (open: boolean) => void;
+  setHelpOpen: (open: boolean) => void;
   setDeleteTarget: (problem: Problem | null) => void;
   setClearDataConfirm: (confirm: boolean) => void;
   showToast: (msg: string) => void;
@@ -33,6 +35,7 @@ export default function useUI(): UseUIReturn {
   const [toast, setToast] = useState<ToastState>({ visible: false, message: "" });
   const [deleteTarget, setDeleteTarget] = useState<Problem | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [problemsInitialSort, setProblemsInitialSort] = useState("dateAdded");
   const [problemsInitialPatternFilter, setProblemsInitialPatternFilter] = useState("all");
   const [clearDataConfirm, setClearDataConfirm] = useState(false);
@@ -96,10 +99,12 @@ export default function useUI(): UseUIReturn {
     toast,
     deleteTarget,
     settingsOpen,
+    helpOpen,
     problemsInitialSort,
     problemsInitialPatternFilter,
     clearDataConfirm,
     setSettingsOpen,
+    setHelpOpen,
     setDeleteTarget,
     setClearDataConfirm,
     showToast,

@@ -8,10 +8,11 @@ interface DotInfo {
 
 interface Props {
   onSettingsClick: () => void;
+  onHelpClick: () => void;
   syncStatus: SyncStatus;
 }
 
-export default function Header({ onSettingsClick, syncStatus }: Props) {
+export default function Header({ onSettingsClick, onHelpClick, syncStatus }: Props) {
   const dot: Partial<Record<SyncStatus, DotInfo>> = {
     syncing: { color: "#d29922", title: "Syncing...", animation: "sync-pulse 1.5s ease-in-out infinite" },
     synced: { color: "#3fb950", title: "Synced", animation: "none" },
@@ -42,6 +43,14 @@ export default function Header({ onSettingsClick, syncStatus }: Props) {
             }}
           />
         )}
+        <button
+          onClick={onHelpClick}
+          title="Help"
+          aria-label="Help"
+          className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-pb-border bg-transparent text-[18px] font-semibold text-pb-text-muted transition-all duration-150 hover:border-pb-text-muted hover:text-pb-text"
+        >
+          ?
+        </button>
         <button
           onClick={onSettingsClick}
           title="Settings"
