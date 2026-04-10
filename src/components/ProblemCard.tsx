@@ -33,7 +33,7 @@ export default function ProblemCard({ problem, onEdit, onDelete, onToggleExclude
   return (
     <div
       onClick={() => onEdit(problem)}
-      className={`cursor-pointer rounded-[10px] border border-pb-border bg-pb-surface px-5 py-4 transition-[border-color,box-shadow,opacity] duration-150 hover:border-pb-text-dim hover:shadow-[0_0_0_1px_rgba(124,107,245,0.1),0_4px_12px_rgba(0,0,0,0.3)] ${isExcluded ? "opacity-60" : ""}`}
+      className={`cursor-pointer rounded-[10px] border border-pb-border bg-pb-surface px-5 py-4 transition-[border-color,box-shadow,opacity] duration-150 hover:border-pb-text-dim hover:shadow-[0_0_0_1px_rgba(124,107,245,0.1),0_4px_12px_var(--color-pb-shadow)] ${isExcluded ? "opacity-60" : ""}`}
     >
       {/* Title row */}
       <div className="mb-2.5 flex items-start justify-between">
