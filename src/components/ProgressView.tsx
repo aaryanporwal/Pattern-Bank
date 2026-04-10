@@ -9,7 +9,9 @@ import {
   groupEventsByWeek,
   getConfidenceDistribution,
   getTopPatterns,
+  CONFIDENCE_BAR_COLORS,
 } from "../utils/progressUtils";
+import ProjectionCalculator from "./ProjectionCalculator";
 import type { Problem, ReviewLogEntry, ReviewEvent } from "../types";
 
 interface Props {
@@ -33,14 +35,6 @@ function getCellColor(count: number): string {
   if (count <= 6) return "rgba(63,185,80,0.65)";
   return "rgba(63,185,80,0.88)";
 }
-
-const CONFIDENCE_BAR_COLORS = [
-  "#f85149", // 1
-  "#f0883e", // 2
-  "#d29922", // 3
-  "#8fbd3a", // 4
-  "#3fb950", // 5
-];
 
 // ── Stats Row ────────────────────────────────────────────
 
@@ -260,7 +254,7 @@ function StreakHeatmap({
                   height: cellSize,
                   marginTop: i > 0 ? gap : 0,
                   fontSize: 10,
-                  color: "#8b949e",
+                  color: "var(--color-pb-text-muted)",
                   textAlign: "right",
                   paddingRight: 4,
                   display: "flex",
@@ -277,7 +271,7 @@ function StreakHeatmap({
           {monthBlocks.map((block, blockIdx) => (
             <div key={blockIdx} style={{ marginLeft: blockIdx > 0 ? 6 : 4, flexShrink: 0 }}>
               {/* Month label */}
-              <div style={{ fontSize: 10, color: "#8b949e", marginBottom: 4, height: 14 }}>
+              <div style={{ fontSize: 10, color: "var(--color-pb-text-muted)", marginBottom: 4, height: 14 }}>
                 {block.label}
               </div>
               {/* 7 rows */}
@@ -483,7 +477,7 @@ function ConfidenceTrend({
                 x={padL - 6}
                 y={toY(v) + 3.5}
                 textAnchor="end"
-                fill="#484f58"
+                fill="var(--color-pb-text-dim)"
                 fontSize={10}
               >
                 {v}
@@ -499,7 +493,7 @@ function ConfidenceTrend({
                 x={toX(i)}
                 y={svgH - 4}
                 textAnchor="middle"
-                fill="#484f58"
+                fill="var(--color-pb-text-dim)"
                 fontSize={9}
               >
                 {w.label}
@@ -587,7 +581,7 @@ function ConfidenceSpread({ problems }: { problems: Problem[] }) {
             >
               <span
                 className="text-[11px] font-semibold tabular-nums"
-                style={{ color: count > 0 ? color : "#484f58" }}
+                style={{ color: count > 0 ? color : "var(--color-pb-text-dim)" }}
               >
                 {count}
               </span>
@@ -707,6 +701,8 @@ export default function ProgressView({
         problems={problems}
         enabledExtraPatterns={enabledExtraPatterns}
       />
+
+      <ProjectionCalculator problems={problems} reviewEvents={reviewEvents} />
 
       <div className="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
         <ConfidenceSpread problems={problems} />

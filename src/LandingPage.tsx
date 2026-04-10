@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import qrCode from "./assets/qr-appstore.png";
+import LandingProjection from "./components/LandingProjection";
 
 // ---- Constants ----------------------------------------------------------------
 
@@ -502,6 +503,22 @@ export default function LandingPage({ onOpenApp }: LandingPageProps) {
             </FadeIn>
           ))}
         </div>
+      </section>
+
+      {/* ---- Projection ---- */}
+      <section id="projection" className="relative z-10 mx-auto max-w-[1120px] px-6 pb-20 pt-10">
+        <FadeIn style={{ marginBottom: 40 }}>
+          <div className="mb-2.5 font-mono text-[10px] uppercase tracking-widest text-pb-accent opacity-70">SEE THE MATH</div>
+          <h2 className="m-0 font-bold leading-[1.15] text-pb-text" style={{ fontSize: "clamp(24px, 2.8vw, 38px)", letterSpacing: "-0.5px" }}>
+            Spaced repetition compounds.
+          </h2>
+          <p className="mt-3 max-w-[520px] text-sm leading-relaxed text-pb-text-muted">
+            Adjust the sliders and watch 30 days of consistent review transform your library.
+          </p>
+        </FadeIn>
+        <FadeIn delay={0.15}>
+          <LandingProjection />
+        </FadeIn>
       </section>
 
       {/* ---- Features ---- */}
