@@ -8,88 +8,34 @@ interface Props {
   enabledExtraPatterns?: string[];
 }
 
-// 9-stop color scale: confidence → radial gradient + border + glow
-function getHeatGradient(avgConf: number, count: number): { background: string; border: string; glow: string } {
+// 9-stop color scale: confidence → flat tinted background + border
+function getCellStyle(avgConf: number, count: number): { background: string; border: string } {
   if (count === 0)
-    return {
-      background:
-        "radial-gradient(ellipse at 80% 80%, rgba(48,54,61,0.4) 0%, rgba(13,17,23,0.2) 70%)",
-      border: "rgba(48,54,61,0.5)",
-      glow: "none",
-    };
+    return { background: "var(--color-pb-heatmap-empty)", border: "var(--color-pb-border)" };
 
   if (avgConf < 1.5)
-    return {
-      background:
-        "radial-gradient(ellipse at 75% 75%, rgba(248,81,73,0.30) 0%, rgba(248,81,73,0.08) 50%, rgba(13,17,23,0.1) 100%)",
-      border: "rgba(248,81,73,0.30)",
-      glow: "inset 0 0 20px rgba(248,81,73,0.08)",
-    };
-
+    return { background: "rgba(248,81,73,0.12)", border: "rgba(248,81,73,0.25)" };
   if (avgConf < 2.0)
-    return {
-      background:
-        "radial-gradient(ellipse at 75% 75%, rgba(248,81,73,0.25) 0%, rgba(240,136,62,0.10) 50%, rgba(13,17,23,0.1) 100%)",
-      border: "rgba(248,81,73,0.25)",
-      glow: "inset 0 0 20px rgba(248,81,73,0.06)",
-    };
-
+    return { background: "rgba(240,136,62,0.12)", border: "rgba(240,136,62,0.25)" };
   if (avgConf < 2.5)
-    return {
-      background:
-        "radial-gradient(ellipse at 75% 75%, rgba(240,136,62,0.25) 0%, rgba(210,153,34,0.10) 50%, rgba(13,17,23,0.1) 100%)",
-      border: "rgba(240,136,62,0.25)",
-      glow: "inset 0 0 20px rgba(240,136,62,0.06)",
-    };
-
+    return { background: "rgba(240,136,62,0.14)", border: "rgba(240,136,62,0.28)" };
   if (avgConf < 3.0)
-    return {
-      background:
-        "radial-gradient(ellipse at 75% 75%, rgba(210,153,34,0.25) 0%, rgba(210,153,34,0.08) 50%, rgba(13,17,23,0.1) 100%)",
-      border: "rgba(210,153,34,0.25)",
-      glow: "inset 0 0 20px rgba(210,153,34,0.06)",
-    };
-
+    return { background: "rgba(210,153,34,0.14)", border: "rgba(210,153,34,0.28)" };
   if (avgConf < 3.5)
-    return {
-      background:
-        "radial-gradient(ellipse at 75% 75%, rgba(210,153,34,0.30) 0%, rgba(187,176,48,0.10) 50%, rgba(13,17,23,0.1) 100%)",
-      border: "rgba(210,153,34,0.30)",
-      glow: "inset 0 0 20px rgba(210,153,34,0.08)",
-    };
-
+    return { background: "rgba(210,153,34,0.16)", border: "rgba(210,153,34,0.30)" };
   if (avgConf < 4.0)
-    return {
-      background:
-        "radial-gradient(ellipse at 75% 75%, rgba(130,190,60,0.25) 0%, rgba(63,185,80,0.08) 50%, rgba(13,17,23,0.1) 100%)",
-      border: "rgba(130,190,60,0.25)",
-      glow: "inset 0 0 20px rgba(130,190,60,0.06)",
-    };
-
+    return { background: "rgba(130,190,60,0.14)", border: "rgba(130,190,60,0.28)" };
   if (avgConf < 4.5)
-    return {
-      background:
-        "radial-gradient(ellipse at 75% 75%, rgba(63,185,80,0.28) 0%, rgba(63,185,80,0.10) 50%, rgba(13,17,23,0.1) 100%)",
-      border: "rgba(63,185,80,0.30)",
-      glow: "inset 0 0 20px rgba(63,185,80,0.08)",
-    };
+    return { background: "rgba(63,185,80,0.16)", border: "rgba(63,185,80,0.30)" };
 
-  return {
-    background:
-      "radial-gradient(ellipse at 75% 75%, rgba(63,185,80,0.35) 0%, rgba(46,210,96,0.12) 50%, rgba(13,17,23,0.1) 100%)",
-    border: "rgba(63,185,80,0.40)",
-    glow: "inset 0 0 24px rgba(63,185,80,0.12)",
-  };
+  return { background: "rgba(63,185,80,0.20)", border: "rgba(63,185,80,0.35)" };
 }
 
 function getConfTextColor(avgConf: number, count: number): string {
-  if (count === 0) return "#30363d";
-  if (avgConf < 2.0) return "#f85149";
-  if (avgConf < 2.5) return "#f0883e";
-  if (avgConf < 3.0) return "#d29922";
-  if (avgConf < 3.5) return "#d4a72c";
-  if (avgConf < 4.0) return "#8fbd3a";
-  return "#3fb950";
+  if (count === 0) return "var(--color-pb-border)";
+  if (avgConf < 2.5) return "var(--color-pb-hard)";
+  if (avgConf < 3.5) return "var(--color-pb-medium)";
+  return "var(--color-pb-easy)";
 }
 
 export default function PatternHeatmap({ problems, onPatternClick, enabledExtraPatterns }: Props) {
@@ -117,7 +63,7 @@ export default function PatternHeatmap({ problems, onPatternClick, enabledExtraP
         {allPatterns.map((pattern) => {
           const data = statsMap[pattern];
           const avgConf = data.count > 0 ? data.totalConf / data.count : 0;
-          const heat = getHeatGradient(avgConf, data.count);
+          const cell = getCellStyle(avgConf, data.count);
           const isHovered = hovered === pattern;
           const confColor = getConfTextColor(avgConf, data.count);
 
@@ -128,8 +74,8 @@ export default function PatternHeatmap({ problems, onPatternClick, enabledExtraP
               onMouseEnter={() => setHovered(pattern)}
               onMouseLeave={() => setHovered(null)}
               style={{
-                background: heat.background,
-                border: `1px solid ${isHovered ? "#7c6bf5" : heat.border}`,
+                backgroundColor: cell.background,
+                border: `1px solid ${isHovered ? "#7c6bf5" : cell.border}`,
                 borderRadius: 10,
                 padding: "14px 12px",
                 cursor: "pointer",
@@ -139,8 +85,8 @@ export default function PatternHeatmap({ problems, onPatternClick, enabledExtraP
                 flexDirection: "column",
                 justifyContent: "space-between",
                 boxShadow: isHovered
-                  ? `0 0 0 1px rgba(124,107,245,0.3), ${heat.glow}`
-                  : heat.glow,
+                  ? "0 0 0 1px rgba(124,107,245,0.3)"
+                  : "none",
                 overflow: "hidden",
               }}
             >
@@ -148,7 +94,7 @@ export default function PatternHeatmap({ problems, onPatternClick, enabledExtraP
                 style={{
                   fontSize: 13,
                   fontWeight: 600,
-                  color: data.count > 0 ? "#e6edf3" : "#30363d",
+                  color: data.count > 0 ? "var(--color-pb-text)" : "var(--color-pb-border)",
                   lineHeight: 1.3,
                   marginBottom: 8,
                 }}
@@ -165,7 +111,7 @@ export default function PatternHeatmap({ problems, onPatternClick, enabledExtraP
                 <span
                   style={{
                     fontSize: 11,
-                    color: data.count > 0 ? "#8b949e" : "#21262d",
+                    color: data.count > 0 ? "var(--color-pb-text-muted)" : "var(--color-pb-border-light)",
                   }}
                 >
                   {data.count > 0 ? `${data.count} solved` : "—"}

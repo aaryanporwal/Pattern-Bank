@@ -84,7 +84,7 @@ export default function LeetCodeSearch({ onSelect }: Props) {
       />
 
       {isOpen && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-[240px] overflow-y-auto rounded-lg border border-pb-border bg-pb-surface shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-[240px] overflow-y-auto rounded-lg border border-pb-border bg-pb-surface shadow-[0_8px_32px_var(--color-pb-shadow)]">
           {results.map((problem, i) => (
             <button
               key={problem.n}

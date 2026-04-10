@@ -27,7 +27,7 @@ export default function StarRating({ value, onChange, size = 20 }: Props) {
           style={{
             cursor: interactive ? "pointer" : "default",
             fontSize: size,
-            color: star <= (hover || value) ? "#e3b341" : "#30363d",
+            color: star <= (hover || value) ? "var(--color-pb-star)" : "var(--color-pb-star-empty)",
           }}
         >
           ★

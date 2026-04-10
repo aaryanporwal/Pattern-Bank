@@ -60,7 +60,7 @@ export default function DashboardView({
       <div className="flex flex-col gap-6 p-5">
         <div className="overflow-hidden rounded-xl border border-pb-border bg-pb-surface">
           {/* Top accent line */}
-          <div className="h-0.5" style={{ background: "linear-gradient(90deg, transparent, #7c6bf5, transparent)" }} />
+          <div className="h-0.5" style={{ background: "linear-gradient(90deg, transparent, var(--color-pb-accent), transparent)" }} />
 
           <div className="px-6 py-6">
             {/* ---- Section 1: Welcome + Action paths ---- */}
@@ -105,7 +105,7 @@ export default function DashboardView({
                     <div key={stars} className="flex items-center justify-between">
                       <span className="text-sm tracking-wide">
                         {[1, 2, 3, 4, 5].map((i) => (
-                          <span key={i} style={{ color: i <= stars ? "#e3b341" : "#30363d" }}>★</span>
+                          <span key={i} style={{ color: i <= stars ? "var(--color-pb-star)" : "var(--color-pb-star-empty)" }}>★</span>
                         ))}
                       </span>
                       <span className={`font-mono text-[13px] tabular-nums ${color}`}>
@@ -153,7 +153,7 @@ export default function DashboardView({
                       <span className="min-w-[72px] text-[13px] text-pb-text-muted">{entry.date}</span>
                       <span className="ml-auto text-sm tracking-wide">
                         {[1, 2, 3, 4, 5].map((i) => (
-                          <span key={i} style={{ color: i <= entry.stars ? "#e3b341" : "#30363d" }}>★</span>
+                          <span key={i} style={{ color: i <= entry.stars ? "var(--color-pb-star)" : "var(--color-pb-star-empty)" }}>★</span>
                         ))}
                       </span>
                     </div>

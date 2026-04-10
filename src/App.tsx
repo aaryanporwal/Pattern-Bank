@@ -8,6 +8,7 @@ import useProblems from "./hooks/useProblems";
 import Toast from "./components/Toast";
 import ConfirmDialog from "./components/ConfirmDialog";
 import Header from "./components/Header";
+import HelpModal from "./components/HelpModal";
 import NavBar from "./components/NavBar";
 import ProblemModal from "./components/ProblemModal";
 import DashboardView from "./components/DashboardView";
@@ -95,8 +96,13 @@ export default function App() {
         onSetAllDue={() => { handleSetAllDue(); ui.setSettingsOpen(false); }}
         onRequestClearData={ui.requestClearData}
       />
+      <HelpModal
+        isOpen={ui.helpOpen}
+        onClose={() => ui.setHelpOpen(false)}
+      />
       <Header
         onSettingsClick={() => ui.setSettingsOpen(true)}
+        onHelpClick={() => ui.setHelpOpen(true)}
         syncStatus={syncStatus}
       />
 
