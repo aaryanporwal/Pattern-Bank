@@ -6,8 +6,9 @@ import {
   mergeImportedProblems,
   computeReviewProgress,
   buildReviewedProblem,
+  computeNextReviewDate,
 } from "../src/utils/problemTransforms";
-import type { LeetCodeProblem, Problem } from "../src/types";
+import type { Confidence, LeetCodeProblem, Problem } from "../src/types";
 
 // Mock storage for countReviewedToday
 const mockLocalStorage = (() => {
@@ -334,5 +335,56 @@ describe("buildReviewedProblem", () => {
 
     expect(r1.nextReviewDate).not.toBe(r3.nextReviewDate);
     expect(r3.nextReviewDate).not.toBe(r5.nextReviewDate);
+  });
+});
+
+describe("computeNextReviewDate", () => {
+  const today = "2026-04-27";
+
+  it("uses SRS interval for new problem at confidence 1", () => {
+    expect(computeNextReviewDate(null, 1 as Confidence, today)).toBe("2026-04-28");
+  });
+
+  it("uses SRS interval for new problem at confidence 2", () => {
+    expect(computeNextReviewDate(null, 2 as Confidence, today)).toBe("2026-04-28");
+  });
+
+  it("uses SRS interval for new problem at confidence 3", () => {
+    expect(computeNextReviewDate(null, 3 as Confidence, today)).toBe("2026-04-30");
+  });
+
+  it("uses SRS interval for new problem at confidence 4", () => {
+    expect(computeNextReviewDate(null, 4 as Confidence, today)).toBe("2026-05-04");
+  });
+
+  it("uses SRS interval for new problem at confidence 5", () => {
+    expect(computeNextReviewDate(null, 5 as Confidence, today)).toBe("2026-05-11");
+  });
+
+  it("reschedules from today when confidence changes on edit", () => {
+    const initial = {
+      id: "a",
+      confidence: 3 as Confidence,
+      nextReviewDate: "2030-01-01",
+    } as Problem;
+    expect(computeNextReviewDate(initial, 5 as Confidence, today)).toBe("2026-05-11");
+  });
+
+  it("preserves nextReviewDate on edit when confidence is unchanged", () => {
+    const initial = {
+      id: "a",
+      confidence: 4 as Confidence,
+      nextReviewDate: "2026-05-15",
+    } as Problem;
+    expect(computeNextReviewDate(initial, 4 as Confidence, today)).toBe("2026-05-15");
+  });
+
+  it("preserves overdue nextReviewDate on cosmetic edit", () => {
+    const initial = {
+      id: "a",
+      confidence: 2 as Confidence,
+      nextReviewDate: "2020-01-01",
+    } as Problem;
+    expect(computeNextReviewDate(initial, 2 as Confidence, today)).toBe("2020-01-01");
   });
 });

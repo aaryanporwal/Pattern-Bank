@@ -130,3 +130,18 @@ export function buildReviewedProblem(problem: Problem, newConfidence: Confidence
     updatedAt: new Date().toISOString(),
   };
 }
+
+// New problems and edits-with-changed-confidence reschedule from today.
+// Cosmetic edits (notes/patterns/etc with same confidence) preserve the existing schedule.
+export function computeNextReviewDate(
+  initialData: Problem | null,
+  newConfidence: Confidence,
+  today: string
+): string {
+  const confidenceChanged =
+    initialData != null && newConfidence !== initialData.confidence;
+  if (!initialData || confidenceChanged) {
+    return addDays(today, getIntervalDays(newConfidence));
+  }
+  return initialData.nextReviewDate;
+}
