@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { DIFFICULTIES } from "../utils/constants";
-import { todayStr, addDays, generateId } from "../utils/dateHelpers";
-import { getIntervalDays } from "../utils/spacedRepetition";
+import { todayStr, generateId } from "../utils/dateHelpers";
+import { computeNextReviewDate } from "../utils/problemTransforms";
 import StarRating from "./StarRating";
 import InlineError from "./InlineError";
 import LeetCodeSearch from "./LeetCodeSearch";
@@ -146,9 +146,7 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData, exi
       lastReviewed: confidenceChanged
         ? today
         : initialData?.lastReviewed || null,
-      nextReviewDate: initialData
-        ? addDays(today, getIntervalDays(form.confidence))
-        : addDays(today, 1),
+      nextReviewDate: computeNextReviewDate(initialData, form.confidence, today),
       updatedAt: new Date().toISOString(),
     };
     onSave(problem, !!confidenceChanged);
