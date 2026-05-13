@@ -9,6 +9,7 @@ import DataSection from "./DataSection";
 import FeedbackSection from "./FeedbackSection";
 import DangerZoneSection from "./DangerZoneSection";
 import ExtraPatternsSection from "./ExtraPatternsSection";
+import ThemePicker from "./ThemePicker";
 import type { User } from "@supabase/supabase-js";
 import type { Preferences, LeetCodeProblem } from "../types";
 
@@ -74,7 +75,7 @@ export default function SettingsModal({
   onSetAllDue,
   onRequestClearData,
 }: Props) {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   // Escape key to close
   useEffect(() => {
@@ -117,21 +118,7 @@ export default function SettingsModal({
             <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
               Theme
             </label>
-            <div className="flex overflow-hidden rounded-lg border border-pb-border">
-              {(["dark", "light"] as const).map((t) => (
-                <button
-                  key={t}
-                  onClick={theme !== t ? toggleTheme : undefined}
-                  className={`flex-1 cursor-pointer border-none px-3 py-2 text-sm font-medium capitalize transition-colors duration-150 ${
-                    theme === t
-                      ? "bg-pb-accent text-white"
-                      : "bg-transparent text-pb-text-muted hover:text-pb-text"
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
+            <ThemePicker value={theme} onChange={setTheme} />
           </div>
 
           <MobileAppSection />
