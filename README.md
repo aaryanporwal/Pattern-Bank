@@ -167,6 +167,8 @@ The companion React Native app lives in a [separate repository](https://github.c
 
 Built iteratively across 6+ sprints plus post-launch sessions:
 
+For self-hosting, see [Supabase Setup For Self-Hosting](docs/supabase-setup.md). The guide covers creating a Supabase project, applying migrations, configuring auth URLs, setting environment variables, and deploying to Netlify.
+
 | Sprint | Focus |
 |--------|-------|
 | 1 | Extract from prototype, deploy to Vercel |
