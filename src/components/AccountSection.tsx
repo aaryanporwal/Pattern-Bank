@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { User } from "@supabase/supabase-js";
+import InlineError from "./InlineError";
 
 interface Props {
   user: User | null;
@@ -17,30 +18,48 @@ export default function AccountSection({
   onSignOut,
 }: Props) {
   const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | undefined>();
+
+  const getAuthErrorMessage = (provider: string, error: Error) => {
+    const message = error.message.toLowerCase();
+    if (
+      message.includes("unsupported provider") ||
+      message.includes("provider is not enabled")
+    ) {
+      return `${provider} sign-in is not enabled in Supabase. Enable the provider in Authentication > Providers and add its OAuth credentials.`;
+    }
+    return error.message;
+  };
 
   const handleSignInGoogle = async () => {
     setAuthLoading(true);
+    setAuthError(undefined);
     const { error } = await onSignInGoogle();
     if (error) {
       setAuthLoading(false);
+      setAuthError(getAuthErrorMessage("Google", error));
       console.error("Sign-in error:", error.message);
     }
   };
 
   const handleSignInGitHub = async () => {
     setAuthLoading(true);
+    setAuthError(undefined);
     const { error } = await onSignInGitHub();
     if (error) {
       setAuthLoading(false);
+      setAuthError(getAuthErrorMessage("GitHub", error));
       console.error("Sign-in error:", error.message);
     }
   };
 
   const handleSignInApple = async () => {
     setAuthLoading(true);
+    setAuthError(undefined);
     const { error } = await onSignInApple();
     if (error) {
       setAuthLoading(false);
+      setAuthError(getAuthErrorMessage("Apple", error));
       console.error("Sign-in error:", error.message);
     }
   };
@@ -134,6 +153,7 @@ export default function AccountSection({
               </svg>
             </button>
           </div>
+          <InlineError message={authError} />
         </div>
       )}
     </div>

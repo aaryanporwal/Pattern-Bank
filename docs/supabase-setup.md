@@ -80,7 +80,23 @@ https://your-site.netlify.app/**
 
 If you use Netlify deploy previews, add a preview URL pattern that matches your site. Supabase documents redirect URL behavior and wildcard matching in [Redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls).
 
-For Google, GitHub, or Apple sign-in, also configure each provider in **Authentication > Providers** with the OAuth credentials from that provider.
+For Google, GitHub, or Apple sign-in, also enable each provider in **Authentication > Providers** with the OAuth credentials from that provider. If a provider is not enabled, Supabase returns a 400 response like:
+
+```json
+{"code":400,"error_code":"validation_failed","msg":"Unsupported provider: provider is not enabled"}
+```
+
+For Google sign-in:
+
+1. Create OAuth credentials in Google Cloud Console.
+2. Add this Supabase callback URL as an authorized redirect URI:
+
+   ```text
+   https://<project-ref>.supabase.co/auth/v1/callback
+   ```
+
+3. Paste the Google client ID and client secret into **Authentication > Providers > Google** in Supabase.
+4. Save the provider and confirm it is enabled.
 
 ## 5. Run Locally
 
