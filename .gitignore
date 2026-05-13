@@ -34,3 +34,9 @@ dist-ssr
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Local Netlify folder
+.netlify
+
+# Supabase CLI local state
+supabase/.temp/
