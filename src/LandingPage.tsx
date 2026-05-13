@@ -574,11 +574,9 @@ export default function LandingPage({ onOpenApp }: LandingPageProps) {
       {/* ---- Footer ---- */}
       <footer className="relative z-10 mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-4 border-t border-pb-border-light px-6 pb-10 pt-6">
         <span className="text-sm font-semibold text-pb-text-muted">PatternBank</span>
-        <span className="text-xs text-pb-text-dim">Built by Derek Zhang</span>
         <div className="flex gap-5">
           {([
-            ["GitHub", "https://github.com/DerekZ-113"],
-            ["LinkedIn", "https://linkedin.com/in/derekz113"],
+            ["GitHub", "https://github.com/aaryanporwal/Pattern-Bank"],
             ["Privacy", "/privacy"],
           ] as const).map(([label, href]) => (
             <a
