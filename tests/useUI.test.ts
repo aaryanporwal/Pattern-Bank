@@ -47,6 +47,11 @@ describe("useUI", () => {
       expect(result.current.problemsInitialSort).toBe("dateAdded");
       expect(result.current.problemsInitialPatternFilter).toBe("all");
     });
+
+    it("starts with theme menu closed", () => {
+      const { result } = renderHook(() => useUI());
+      expect(result.current.themeOpen).toBe(false);
+    });
   });
 
   describe("toast", () => {
@@ -162,6 +167,21 @@ describe("useUI", () => {
       });
       expect(result.current.settingsOpen).toBe(false);
       expect(result.current.clearDataConfirm).toBe(true);
+    });
+  });
+
+  describe("theme menu", () => {
+    it("setThemeOpen toggles the standalone theme menu", () => {
+      const { result } = renderHook(() => useUI());
+      act(() => {
+        result.current.setThemeOpen(true);
+      });
+      expect(result.current.themeOpen).toBe(true);
+
+      act(() => {
+        result.current.setThemeOpen(false);
+      });
+      expect(result.current.themeOpen).toBe(false);
     });
   });
 });

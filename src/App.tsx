@@ -15,6 +15,7 @@ import DashboardView from "./components/DashboardView";
 import ProgressView from "./components/ProgressView";
 import AllProblemsView from "./components/AllProblemsView";
 import SettingsModal from "./components/SettingsModal";
+import ThemeMenu from "./components/ThemeMenu";
 
 export default function App() {
   const { user, signInWithGoogle, signInWithGitHub, signInWithApple, signOut } = useAuth();
@@ -100,9 +101,14 @@ export default function App() {
         isOpen={ui.helpOpen}
         onClose={() => ui.setHelpOpen(false)}
       />
+      <ThemeMenu
+        isOpen={ui.themeOpen}
+        onClose={() => ui.setThemeOpen(false)}
+      />
       <Header
         onSettingsClick={() => ui.setSettingsOpen(true)}
         onHelpClick={() => ui.setHelpOpen(true)}
+        onThemeClick={() => ui.setThemeOpen(true)}
         syncStatus={syncStatus}
       />
 

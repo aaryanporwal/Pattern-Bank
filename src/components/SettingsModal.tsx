@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import useTheme from "../hooks/useTheme";
 import AccountSection from "./AccountSection";
 import MobileAppSection from "./MobileAppSection";
 import DailyGoalSection from "./DailyGoalSection";
@@ -9,7 +8,6 @@ import DataSection from "./DataSection";
 import FeedbackSection from "./FeedbackSection";
 import DangerZoneSection from "./DangerZoneSection";
 import ExtraPatternsSection from "./ExtraPatternsSection";
-import ThemePicker from "./ThemePicker";
 import type { User } from "@supabase/supabase-js";
 import type { Preferences, LeetCodeProblem } from "../types";
 
@@ -75,8 +73,6 @@ export default function SettingsModal({
   onSetAllDue,
   onRequestClearData,
 }: Props) {
-  const { theme, setTheme } = useTheme();
-
   // Escape key to close
   useEffect(() => {
     if (!isOpen) return;
@@ -113,13 +109,6 @@ export default function SettingsModal({
             onSignInApple={onSignInApple}
             onSignOut={onSignOut}
           />
-
-          <div>
-            <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-              Theme
-            </label>
-            <ThemePicker value={theme} onChange={setTheme} />
-          </div>
 
           <MobileAppSection />
 
