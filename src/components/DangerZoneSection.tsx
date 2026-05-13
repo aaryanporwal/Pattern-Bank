@@ -8,8 +8,8 @@ export default function DangerZoneSection({ onSetAllDue, onRequestClearData, hid
   return (
     <div>
       {!hideLabel && (
-        <label className="mb-2 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-          Danger Zone
+        <label className="mb-2 block text-[13px] font-semibold tracking-wide text-pb-text-muted">
+          Danger zone
         </label>
       )}
       <div className="flex flex-col gap-2">

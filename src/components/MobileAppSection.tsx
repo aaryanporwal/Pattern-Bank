@@ -8,8 +8,8 @@ export default function MobileAppSection() {
 
   return (
     <div>
-      <label className="mb-2 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-        Mobile App
+      <label className="mb-2 block text-[13px] font-semibold tracking-wide text-pb-text-muted">
+        Mobile app
       </label>
 
       {/* Desktop: button that toggles QR */}

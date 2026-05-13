@@ -32,7 +32,7 @@ export default function ConfidenceInfo() {
       {open && (
         <div className="absolute left-0 top-6 z-50 w-52 rounded-lg border border-pb-border bg-pb-surface p-3 shadow-lg">
           <p className="mb-2 text-[11px] font-semibold text-pb-text-muted">
-            Review Schedule
+            Review schedule
           </p>
           <div className="flex flex-col gap-1">
             {([1, 2, 3, 4, 5] as Confidence[]).map((stars) => (

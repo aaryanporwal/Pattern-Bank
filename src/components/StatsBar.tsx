@@ -23,7 +23,7 @@ export default function StatsBar({ total, due, reviewedToday, streak }: Props) {
           <div className={`text-lg font-bold leading-tight ${s.color}`}>
             {s.value}
           </div>
-          <div className="mt-1 text-[11px] font-medium uppercase tracking-wide text-pb-text-muted">
+          <div className="mt-1 text-[11px] font-medium tracking-wide text-pb-text-muted">
             {s.label}
           </div>
         </div>

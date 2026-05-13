@@ -18,7 +18,7 @@ export default function NotesEditor({ value, onChange, inputClassName }: Props) 
 
   return (
     <div>
-      <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
+      <label className="mb-1.5 block text-[13px] font-semibold tracking-wide text-pb-text-muted">
         Notes
       </label>
       <textarea

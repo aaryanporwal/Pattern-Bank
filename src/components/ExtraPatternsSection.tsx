@@ -11,8 +11,8 @@ export default function ExtraPatternsSection({ enabledExtraPatterns, onToggle, h
     <div>
       {!hideLabel && (
         <>
-          <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-            Additional Patterns
+          <label className="mb-1.5 block text-[13px] font-semibold tracking-wide text-pb-text-muted">
+            Additional patterns
           </label>
           <p className="mb-3 text-xs leading-relaxed text-pb-text-dim">
             Enable extra pattern categories for tracking.

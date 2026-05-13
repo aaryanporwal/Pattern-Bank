@@ -78,7 +78,7 @@ export default function ProjectionCalculator({ problems, reviewEvents }: Props) 
   return (
     <div className="rounded-xl border border-pb-border bg-pb-surface p-5">
       <h3 className="mb-4 text-[15px] font-semibold text-pb-text">
-        30-Day Projection
+        30-day projection
       </h3>
 
       {isMastered ? (

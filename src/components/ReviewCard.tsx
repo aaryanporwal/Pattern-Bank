@@ -157,7 +157,7 @@ export default function ReviewCard({ problem, hidePatterns, onReview, onDismiss,
               onClick={handleStartReview}
               className="flex-1 cursor-pointer rounded-lg border-none bg-pb-accent-subtle py-2 text-[13px] font-semibold text-pb-accent transition-all duration-150 hover:bg-pb-accent hover:text-white"
             >
-              Review Now
+              Review now
             </button>
             <button
               onClick={() => onDismiss(problem.id)}

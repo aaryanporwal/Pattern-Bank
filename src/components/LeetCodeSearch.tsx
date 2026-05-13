@@ -69,8 +69,8 @@ export default function LeetCodeSearch({ onSelect }: Props) {
 
   return (
     <div ref={containerRef} className="relative">
-      <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-        Search LeetCode Problem
+      <label className="mb-1.5 block text-[13px] font-semibold tracking-wide text-pb-text-muted">
+        Search LeetCode problem
       </label>
       <input
         ref={inputRef}
@@ -102,7 +102,7 @@ export default function LeetCodeSearch({ onSelect }: Props) {
               <span className="flex-1 truncate text-pb-text">
                 {problem.t}
               </span>
-              <span className={`text-[11px] font-semibold uppercase ${diffColor[problem.d] || ""}`}>
+              <span className={`text-[11px] font-semibold ${diffColor[problem.d] || ""}`}>
                 {problem.d}
               </span>
             </button>

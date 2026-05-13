@@ -58,7 +58,7 @@ export default function AccountSection({
 
   return (
     <div>
-      <label className="mb-2 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
+      <label className="mb-2 block text-[13px] font-semibold tracking-wide text-pb-text-muted">
         Account
       </label>
 
@@ -91,7 +91,7 @@ export default function AccountSection({
             disabled={authLoading}
             className="cursor-pointer rounded-lg border border-pb-border bg-transparent px-3 py-1.5 text-xs font-medium text-pb-text-muted transition-all duration-150 hover:border-pb-text-muted hover:text-pb-text disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Sign Out
+            Sign out
           </button>
         </div>
       ) : (

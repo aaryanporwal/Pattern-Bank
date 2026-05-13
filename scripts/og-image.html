@@ -3,12 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <style>
+    @import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;500;600;700&family=Atkinson+Hyperlegible+Next:wght@400;500;600;700&display=swap");
+
+    :root {
+      --font-sans: "Atkinson Hyperlegible Next", sans-serif;
+      --font-mono: "Atkinson Hyperlegible Mono", monospace;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       width: 1200px;
       height: 630px;
       background: #0d1117;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+      font-family: var(--font-sans);
       color: #e6edf3;
       overflow: hidden;
       position: relative;
@@ -100,7 +107,7 @@
       background: #7c6bf5;
     }
     .pill-text {
-      font-family: monospace;
+      font-family: var(--font-mono);
       font-size: 11px;
       color: #7c6bf5;
       letter-spacing: 0.08em;
@@ -139,11 +146,10 @@
       font-size: 10px;
       font-weight: 600;
       letter-spacing: 0.12em;
-      text-transform: uppercase;
       color: #8b949e;
     }
     .heatmap-count {
-      font-family: monospace;
+      font-family: var(--font-mono);
       font-size: 11px;
       color: #484f58;
     }
@@ -180,7 +186,7 @@
       color: #8b949e;
     }
     .cell-conf {
-      font-family: monospace;
+      font-family: var(--font-mono);
       font-size: 14px;
       font-weight: 700;
       letter-spacing: -0.5px;
@@ -195,12 +201,11 @@
     }
     .avg-label {
       font-size: 10px;
-      text-transform: uppercase;
       letter-spacing: 0.06em;
       color: #484f58;
     }
     .avg-value {
-      font-family: monospace;
+      font-family: var(--font-mono);
       font-size: 20px;
       font-weight: 700;
       color: #e3b341;
@@ -250,7 +255,7 @@
 
       <div class="pill">
         <span class="pill-dot"></span>
-        <span class="pill-text">SPACED REPETITION FOR LEETCODE</span>
+        <span class="pill-text">Spaced repetition for LeetCode</span>
       </div>
 
       <div class="headline">
@@ -266,28 +271,28 @@
     <div class="right">
       <div class="heatmap-card">
         <div class="heatmap-header">
-          <span class="heatmap-label">Pattern Confidence</span>
+          <span class="heatmap-label">Pattern confidence</span>
           <span class="heatmap-count">156 problems</span>
         </div>
 
         <div class="heatmap-grid">
           <!-- Row 1 -->
           <div class="cell" style="background:rgba(63,185,80,0.10); border:1px solid rgba(63,185,80,0.20)">
-            <span class="cell-name">Two Pointers</span>
+            <span class="cell-name">Two pointers</span>
             <div class="cell-bottom">
               <span class="cell-count">14</span>
               <span class="cell-conf" style="color:#3fb950">4.2</span>
             </div>
           </div>
           <div class="cell" style="background:rgba(227,179,65,0.08); border:1px solid rgba(227,179,65,0.20)">
-            <span class="cell-name">Hash Table</span>
+            <span class="cell-name">Hash table</span>
             <div class="cell-bottom">
               <span class="cell-count">22</span>
               <span class="cell-conf" style="color:#e3b341">3.8</span>
             </div>
           </div>
           <div class="cell" style="background:rgba(63,185,80,0.10); border:1px solid rgba(63,185,80,0.20)">
-            <span class="cell-name">Sliding Window</span>
+            <span class="cell-name">Sliding window</span>
             <div class="cell-bottom">
               <span class="cell-count">9</span>
               <span class="cell-conf" style="color:#3fb950">4.5</span>
@@ -295,14 +300,14 @@
           </div>
           <!-- Row 2 -->
           <div class="cell" style="background:rgba(210,153,34,0.10); border:1px solid rgba(210,153,34,0.20)">
-            <span class="cell-name">Binary Search</span>
+            <span class="cell-name">Binary search</span>
             <div class="cell-bottom">
               <span class="cell-count">11</span>
               <span class="cell-conf" style="color:#d29922">3.1</span>
             </div>
           </div>
           <div class="cell" style="background:rgba(210,153,34,0.10); border:1px solid rgba(210,153,34,0.20)">
-            <span class="cell-name">Linked List</span>
+            <span class="cell-name">Linked list</span>
             <div class="cell-bottom">
               <span class="cell-count">7</span>
               <span class="cell-conf" style="color:#d29922">2.8</span>
