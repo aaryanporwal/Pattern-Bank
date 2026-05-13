@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import useTheme from "../hooks/useTheme";
 import AccountSection from "./AccountSection";
 import MobileAppSection from "./MobileAppSection";
 import DailyGoalSection from "./DailyGoalSection";
@@ -74,8 +73,6 @@ export default function SettingsModal({
   onSetAllDue,
   onRequestClearData,
 }: Props) {
-  const { theme, toggleTheme } = useTheme();
-
   // Escape key to close
   useEffect(() => {
     if (!isOpen) return;
@@ -112,27 +109,6 @@ export default function SettingsModal({
             onSignInApple={onSignInApple}
             onSignOut={onSignOut}
           />
-
-          <div>
-            <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-              Theme
-            </label>
-            <div className="flex overflow-hidden rounded-lg border border-pb-border">
-              {(["dark", "light"] as const).map((t) => (
-                <button
-                  key={t}
-                  onClick={theme !== t ? toggleTheme : undefined}
-                  className={`flex-1 cursor-pointer border-none px-3 py-2 text-sm font-medium capitalize transition-colors duration-150 ${
-                    theme === t
-                      ? "bg-pb-accent text-white"
-                      : "bg-transparent text-pb-text-muted hover:text-pb-text"
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          </div>
 
           <MobileAppSection />
 

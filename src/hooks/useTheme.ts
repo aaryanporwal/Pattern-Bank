@@ -3,7 +3,7 @@ import { getTheme, setTheme as persistTheme, applyTheme, type Theme } from "../u
 
 interface UseThemeReturn {
   theme: Theme;
-  toggleTheme: () => void;
+  setTheme: (theme: Theme) => void;
 }
 
 export default function useTheme(): UseThemeReturn {
@@ -13,12 +13,11 @@ export default function useTheme(): UseThemeReturn {
     applyTheme(theme);
   }, [theme]);
 
-  const toggleTheme = useCallback(() => {
-    const next: Theme = theme === "dark" ? "light" : "dark";
+  const setTheme = useCallback((next: Theme) => {
     persistTheme(next);
     applyTheme(next);
     setThemeState(next);
-  }, [theme]);
+  }, []);
 
-  return { theme, toggleTheme };
+  return { theme, setTheme };
 }

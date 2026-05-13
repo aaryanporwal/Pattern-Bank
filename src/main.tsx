@@ -10,6 +10,9 @@ import AuthProvider from "./contexts/AuthContext";
 import App from "./App";
 import PrivacyPolicy from "./PrivacyPolicy";
 import LandingPage from "./LandingPage";
+import { applyTheme, getTheme } from "./utils/theme";
+
+applyTheme(getTheme());
 
 Sentry.init({
   dsn: "https://69c043b9d6841043de3e78617b522acf@o4510944607731712.ingest.us.sentry.io/4510944618151936",

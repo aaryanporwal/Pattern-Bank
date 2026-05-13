@@ -41,8 +41,19 @@ test.describe("Navigation & Modals", () => {
   test("settings modal opens and closes", async ({ page }) => {
     await page.getByRole("button", { name: "Settings" }).click();
     await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Theme" })).not.toBeVisible();
 
     await page.keyboard.press("Escape");
     await expect(page.getByRole("heading", { name: "Settings" })).not.toBeVisible();
+  });
+
+  test("theme menu opens from top navigation", async ({ page }) => {
+    await page.getByRole("button", { name: "Theme" }).click();
+    await expect(page.getByRole("heading", { name: "Theme" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Default/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Light/i })).toBeVisible();
+
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("heading", { name: "Theme" })).not.toBeVisible();
   });
 });
