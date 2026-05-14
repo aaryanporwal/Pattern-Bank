@@ -76,7 +76,7 @@ export default function DashboardView({
                   onClick={onAddClick}
                   className="cursor-pointer rounded-lg border-none bg-pb-accent px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-85"
                 >
-                  + Add Problem
+                  + Add problem
                 </button>
               </div>
 
@@ -90,13 +90,13 @@ export default function DashboardView({
 
             {/* ---- Section 2: How reviews work ---- */}
             <div className="mt-6 border-t border-pb-border pt-6">
-              <h3 className="mb-1 text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">How reviews work</h3>
+              <h3 className="mb-1 text-[13px] font-semibold tracking-wide text-pb-text-muted">How reviews work</h3>
               <p className="mb-4 text-[13px] leading-relaxed text-pb-text-muted">Rate your confidence after each review. Higher confidence means longer intervals.</p>
 
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium uppercase tracking-wide text-pb-text-dim">Confidence</span>
-                  <span className="text-xs font-medium uppercase tracking-wide text-pb-text-dim">Next review in...</span>
+                  <span className="text-xs font-medium tracking-wide text-pb-text-dim">Confidence</span>
+                  <span className="text-xs font-medium tracking-wide text-pb-text-dim">Next review in...</span>
                 </div>
                 {([1, 2, 3, 4, 5] as Confidence[]).map((stars) => {
                   const days = INTERVALS[stars];
@@ -121,7 +121,7 @@ export default function DashboardView({
             <div className="mt-6 border-t border-pb-border pt-6">
               <ul className="m-0 flex list-inside list-disc flex-col gap-2 pl-0 text-[13px] text-pb-text-muted">
                 <li>Tap ◎ on any problem to exclude it from reviews</li>
-                <li>Enable 6 advanced patterns in Settings</li>
+                <li>Enable 6 advanced patterns in settings</li>
               </ul>
             </div>
 
@@ -184,7 +184,7 @@ export default function DashboardView({
       {/* Pattern Confidence Heatmap */}
       {problems.length > 0 && (
         <div>
-          <SectionHeader title="Pattern Confidence" />
+          <SectionHeader title="Pattern confidence" />
           <PatternHeatmap problems={problems} onPatternClick={onPatternClick} enabledExtraPatterns={enabledExtraPatterns} />
         </div>
       )}
@@ -193,7 +193,7 @@ export default function DashboardView({
       <div>
         <div className="mb-3 flex items-center gap-2">
           <h2 className="text-[15px] font-semibold text-pb-text">
-            Today's Reviews
+            Today's reviews
           </h2>
           <span className="rounded-[10px] bg-pb-bg px-2 py-px text-xs font-semibold text-pb-text-muted">
             {reviewedToday} of {effectiveGoal}

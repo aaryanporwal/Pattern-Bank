@@ -36,18 +36,18 @@ export default function HelpModal({ isOpen, onClose }: Props) {
         </div>
 
         <div className="flex flex-col gap-5 px-6 py-5">
-          {/* Review Schedule */}
+          {/* Review schedule */}
           <div>
-            <h3 className="mb-1 text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-              Review Schedule
+            <h3 className="mb-1 text-[13px] font-semibold tracking-wide text-pb-text-muted">
+              Review schedule
             </h3>
             <p className="mb-3 text-[13px] leading-relaxed text-pb-text-muted">
               Higher confidence means longer intervals.
             </p>
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium uppercase tracking-wide text-pb-text-dim">Confidence</span>
-                <span className="text-xs font-medium uppercase tracking-wide text-pb-text-dim">Next review in...</span>
+                <span className="text-xs font-medium tracking-wide text-pb-text-dim">Confidence</span>
+                <span className="text-xs font-medium tracking-wide text-pb-text-dim">Next review in...</span>
               </div>
               {([1, 2, 3, 4, 5] as Confidence[]).map((stars) => {
                 const days = INTERVALS[stars];
@@ -68,10 +68,10 @@ export default function HelpModal({ isOpen, onClose }: Props) {
             </div>
           </div>
 
-          {/* How Reviews Are Prioritized */}
+          {/* How reviews are prioritized */}
           <div className="border-t border-pb-border pt-5">
-            <h3 className="mb-1 text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-              How Reviews Are Prioritized
+            <h3 className="mb-1 text-[13px] font-semibold tracking-wide text-pb-text-muted">
+              How reviews are prioritized
             </h3>
             <p className="text-[13px] leading-relaxed text-pb-text-muted">
               Reviews are ordered by confidence (lowest first), then by how overdue they are.
@@ -81,12 +81,12 @@ export default function HelpModal({ isOpen, onClose }: Props) {
 
           {/* Tips */}
           <div className="border-t border-pb-border pt-5">
-            <h3 className="mb-2 text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
+            <h3 className="mb-2 text-[13px] font-semibold tracking-wide text-pb-text-muted">
               Tips
             </h3>
             <ul className="m-0 flex list-inside list-disc flex-col gap-2 pl-0 text-[13px] text-pb-text-muted">
               <li>Tap ◎ on any problem to exclude it from reviews</li>
-              <li>Enable 6 advanced patterns in Settings</li>
+              <li>Enable 6 advanced patterns in settings</li>
             </ul>
           </div>
 

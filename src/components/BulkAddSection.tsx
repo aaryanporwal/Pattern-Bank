@@ -98,7 +98,7 @@ export default function BulkAddSection({ onBulkAdd, existingIds }: Props) {
         className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg border border-pb-border bg-transparent px-3.5 py-2.5 text-[13px] font-medium text-pb-text-muted transition-all duration-150 hover:border-pb-text-muted hover:text-pb-text"
       >
         <span className="text-sm">+</span>
-        Bulk Add Problems
+        Bulk add problems
       </button>
     );
   }
@@ -247,7 +247,7 @@ export default function BulkAddSection({ onBulkAdd, existingIds }: Props) {
 
       {/* Hint text */}
       <p className="mt-2 text-[11px] leading-relaxed text-pb-text-dim">
-        Type or paste LeetCode numbers. Press Enter after each.
+        Type or paste LeetCode numbers. Press enter after each.
         Problems arrive with no patterns — tag them during review.
       </p>
 
@@ -257,7 +257,7 @@ export default function BulkAddSection({ onBulkAdd, existingIds }: Props) {
           onClick={handleAdd}
           className="mt-3 w-full cursor-pointer rounded-lg border-none bg-pb-accent py-2.5 text-[13px] font-semibold text-white transition-opacity duration-150 hover:opacity-85"
         >
-          Add {validCount} Problem{validCount !== 1 ? "s" : ""}
+          Add {validCount} problem{validCount !== 1 ? "s" : ""}
         </button>
       )}
     </div>

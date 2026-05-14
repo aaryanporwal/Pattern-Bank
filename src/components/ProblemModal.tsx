@@ -168,7 +168,7 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData, exi
         {/* Header */}
         <div className="flex items-center justify-between border-b border-pb-border px-6 py-4">
           <h2 className="text-base font-semibold text-pb-text">
-            {isEdit ? "Problem Details" : "Add New Problem"}
+            {isEdit ? "Problem details" : "Add new problem"}
           </h2>
           <button
             onClick={onClose}
@@ -211,8 +211,8 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData, exi
             <>
               {!isLeetCodeEdit && (
                 <div>
-                  <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-                    Problem Title *
+                  <label className="mb-1.5 block text-[13px] font-semibold tracking-wide text-pb-text-muted">
+                    Problem title *
                   </label>
                   <input
                     className={errors.title ? inputError : inputNormal}
@@ -227,7 +227,7 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData, exi
               {isLeetCodeEdit ? null : (
                 <div className="grid grid-cols-[1fr_2fr] gap-3">
                   <div>
-                    <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
+                    <label className="mb-1.5 block text-[13px] font-semibold tracking-wide text-pb-text-muted">
                       Problem #
                     </label>
                     <input
@@ -241,7 +241,7 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData, exi
                     />
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
+                    <label className="mb-1.5 block text-[13px] font-semibold tracking-wide text-pb-text-muted">
                       URL
                     </label>
                     <input
@@ -257,7 +257,7 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData, exi
 
               {mode === "custom" && !form.leetcodeNumber && (
                 <div>
-                  <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
+                  <label className="mb-1.5 block text-[13px] font-semibold tracking-wide text-pb-text-muted">
                     Difficulty *
                   </label>
                   <div className="flex gap-2">
@@ -309,7 +309,7 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData, exi
           />
 
           <div>
-            <label className="mb-1.5 flex items-center text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
+            <label className="mb-1.5 flex items-center text-[13px] font-semibold tracking-wide text-pb-text-muted">
               Confidence
               <span className="ml-[15px]"><ConfidenceInfo /></span>
             </label>
@@ -348,7 +348,7 @@ export default function ProblemModal({ isOpen, onClose, onSave, initialData, exi
                 : "cursor-pointer bg-pb-accent hover:opacity-85"
             }`}
           >
-            {isEdit ? "Save Changes" : "Save Problem"}
+            {isEdit ? "Save changes" : "Save problem"}
           </button>
         </div>
       </div>

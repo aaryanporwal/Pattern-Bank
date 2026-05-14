@@ -16,8 +16,8 @@ export default function DailyGoalSection({ preferences, onUpdatePreferences }: P
 
   return (
     <div>
-      <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-        Daily Review Goal
+      <label className="mb-1.5 block text-[13px] font-semibold tracking-wide text-pb-text-muted">
+        Daily review goal
       </label>
       <div className="flex items-center gap-4">
         <button
@@ -40,7 +40,7 @@ export default function DailyGoalSection({ preferences, onUpdatePreferences }: P
       </div>
       <p className="mt-2 text-xs leading-relaxed text-pb-text-dim">
         Maximum reviews shown on your dashboard each day.
-        You can always see more from All Problems.
+        You can always see more from all problems.
       </p>
     </div>
   );

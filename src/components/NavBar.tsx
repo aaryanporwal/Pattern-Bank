@@ -10,7 +10,7 @@ export default function NavBar({ activeTab, onTabChange, onAddClick }: Props) {
   const tabs: { id: ActiveTab; label: string; icon: string }[] = [
     { id: "dashboard", label: "Dashboard", icon: "◫" },
     { id: "progress", label: "Progress", icon: "▣" },
-    { id: "problems", label: "All Problems", icon: "☰" },
+    { id: "problems", label: "All problems", icon: "☰" },
   ];
 
   return (
@@ -39,7 +39,7 @@ export default function NavBar({ activeTab, onTabChange, onAddClick }: Props) {
         <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-pb-accent-subtle text-sm leading-none">
           +
         </span>
-        Add Problem
+        Add problem
       </button>
     </div>
   );

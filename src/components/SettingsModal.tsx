@@ -21,7 +21,7 @@ function CollapsibleSection({ title, defaultOpen = false, children }: {
     <div>
       <button
         onClick={() => setOpen(!open)}
-        className="flex w-full cursor-pointer items-center justify-between border-none bg-transparent py-0 text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted"
+        className="flex w-full cursor-pointer items-center justify-between border-none bg-transparent py-0 text-[13px] font-semibold tracking-wide text-pb-text-muted"
       >
         <span>{title}</span>
         <span
@@ -118,8 +118,8 @@ export default function SettingsModal({
           />
 
           <div>
-            <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-              Hide Patterns During Review
+            <label className="mb-1.5 block text-[13px] font-semibold tracking-wide text-pb-text-muted">
+              Hide patterns during review
             </label>
             <button
               onClick={() => onUpdatePreferences({ hidePatternsDuringReview: !preferences.hidePatternsDuringReview })}
@@ -145,7 +145,7 @@ export default function SettingsModal({
             </p>
           </div>
 
-          <CollapsibleSection title="Additional Patterns">
+          <CollapsibleSection title="Additional patterns">
             <ExtraPatternsSection
               hideLabel
               enabledExtraPatterns={preferences.enabledExtraPatterns}
@@ -159,7 +159,7 @@ export default function SettingsModal({
             />
           </CollapsibleSection>
 
-          <CollapsibleSection title="Import Problem List">
+          <CollapsibleSection title="Import problem list">
             <ProblemListPicker
               hideLabel
               existingIds={existingProblemNumbers}
@@ -167,7 +167,7 @@ export default function SettingsModal({
             />
           </CollapsibleSection>
 
-          <CollapsibleSection title="Bulk Add">
+          <CollapsibleSection title="Bulk add">
             <BulkAddSection
               onBulkAdd={(problems) => { onBulkAdd(problems); onClose(); }}
               existingIds={existingProblemNumbers}
@@ -188,7 +188,7 @@ export default function SettingsModal({
             <FeedbackSection user={user} />
           </CollapsibleSection>
 
-          <CollapsibleSection title="Danger Zone">
+          <CollapsibleSection title="Danger zone">
             <DangerZoneSection
               hideLabel
               onSetAllDue={onSetAllDue}

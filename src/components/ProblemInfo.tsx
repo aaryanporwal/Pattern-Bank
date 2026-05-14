@@ -24,7 +24,7 @@ export default function ProblemInfo({ form, isEdit, onClear, isDuplicate }: Prop
         {form.title}
       </span>
       <span
-        className={`text-[11px] font-semibold uppercase ${
+        className={`text-[11px] font-semibold ${
           isDuplicate
             ? "text-pb-text-dim"
             : form.difficulty === "Easy"

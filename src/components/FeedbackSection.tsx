@@ -37,7 +37,7 @@ export default function FeedbackSection({ user }: Props) {
         onClick={() => setIsOpen(true)}
         className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg border border-pb-border bg-transparent px-3.5 py-2.5 text-[13px] font-medium text-pb-text-muted transition-all duration-150 hover:border-pb-text-muted hover:text-pb-text"
       >
-        {status === "sent" ? "Feedback sent \u2713" : "Leave Feedback"}
+        {status === "sent" ? "Feedback sent \u2713" : "Leave feedback"}
       </button>
     );
   }
@@ -74,7 +74,7 @@ export default function FeedbackSection({ user }: Props) {
         disabled={!message.trim() || status === "sending"}
         className="mt-2 w-full cursor-pointer rounded-lg border border-pb-border bg-transparent py-2.5 text-[13px] font-semibold text-pb-text-muted transition-all duration-150 hover:border-pb-text-muted hover:text-pb-text disabled:cursor-not-allowed disabled:opacity-40"
       >
-        {status === "sending" ? "Sending..." : status === "error" ? "Failed \u2014 try again" : "Send Feedback"}
+        {status === "sending" ? "Sending..." : status === "error" ? "Failed \u2014 try again" : "Send feedback"}
       </button>
     </div>
   );

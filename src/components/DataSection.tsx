@@ -23,7 +23,7 @@ export default function DataSection({ problemCount, onExport, onImport, onClose,
   return (
     <div>
       {!hideLabel && (
-        <label className="mb-2 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
+        <label className="mb-2 block text-[13px] font-semibold tracking-wide text-pb-text-muted">
           Data
         </label>
       )}
@@ -41,7 +41,7 @@ export default function DataSection({ problemCount, onExport, onImport, onClose,
             className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg border border-pb-border bg-transparent px-3.5 py-2.5 text-[13px] font-medium text-pb-text-muted transition-all duration-150 hover:border-pb-text-muted hover:text-pb-text"
           >
             <span className="text-sm">↓</span>
-            Export Backup
+            Export backup
           </button>
         )}
         <button
@@ -49,7 +49,7 @@ export default function DataSection({ problemCount, onExport, onImport, onClose,
           className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg border border-pb-border bg-transparent px-3.5 py-2.5 text-[13px] font-medium text-pb-text-muted transition-all duration-150 hover:border-pb-text-muted hover:text-pb-text"
         >
           <span className="text-sm">↑</span>
-          Import Backup
+          Import backup
         </button>
       </div>
     </div>

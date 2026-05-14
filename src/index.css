@@ -1,6 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;500;600;700&family=Atkinson+Hyperlegible+Next:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 @theme {
+  --font-sans: "Atkinson Hyperlegible Next", sans-serif;
+  --font-mono: "Atkinson Hyperlegible Mono", monospace;
+
   --color-pb-bg: #0d1117;
   --color-pb-surface: #161b22;
   --color-pb-surface-hover: #1c2129;
@@ -120,8 +124,7 @@ body {
   margin: 0;
   background-color: var(--color-pb-bg);
   color: var(--color-pb-text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans",
-    Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
 }
 
 html[data-theme="light"],

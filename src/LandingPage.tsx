@@ -7,12 +7,12 @@ import LandingProjection from "./components/LandingProjection";
 const APP_STORE_URL = "https://apps.apple.com/app/patternbank/id6759760762";
 
 const PATTERNS = [
-  { name: "Two Pointers", count: 14, conf: 4.2 },
-  { name: "Hash Table", count: 22, conf: 3.8 },
-  { name: "Sliding Window", count: 9, conf: 4.5 },
-  { name: "Binary Search", count: 11, conf: 3.1 },
+  { name: "Two pointers", count: 14, conf: 4.2 },
+  { name: "Hash table", count: 22, conf: 3.8 },
+  { name: "Sliding window", count: 9, conf: 4.5 },
+  { name: "Binary search", count: 11, conf: 3.1 },
   { name: "Sorting", count: 8, conf: 4.0 },
-  { name: "Linked List", count: 7, conf: 2.8 },
+  { name: "Linked list", count: 7, conf: 2.8 },
   { name: "Stack", count: 12, conf: 4.1 },
   { name: "Queue", count: 4, conf: 2.3 },
   { name: "Tree", count: 18, conf: 3.5 },
@@ -22,7 +22,7 @@ const PATTERNS = [
   { name: "Greedy", count: 8, conf: 4.3 },
   { name: "Backtracking", count: 6, conf: 2.5 },
   { name: "Graph", count: 9, conf: 2.1 },
-  { name: "Union Find", count: 3, conf: 1.8 },
+  { name: "Union find", count: 3, conf: 1.8 },
   { name: "Trie", count: 4, conf: 3.0 },
   { name: "DP", count: 15, conf: 2.6 },
 ];
@@ -40,12 +40,12 @@ const PAIN_POINTS = [
 ];
 
 const FEATURES = [
-  { icon: "\u25EB", title: "24 Pattern Categories", desc: "Two Pointers through System Design. See your confidence at a glance." },
-  { icon: "\u2605", title: "Confidence Tracking", desc: "Rate 1-5 stars. The app schedules reviews based on how well you know it." },
-  { icon: "\u27F3", title: "Spaced Repetition", desc: "SM-2 intervals. Low confidence = review tomorrow. High = review in 2 weeks." },
-  { icon: "\u2601", title: "Cloud Sync", desc: "Sign in with Google, GitHub, or Apple. Your data follows you everywhere." },
-  { icon: "\u26A1", title: "Works Offline", desc: "localStorage-first. No account needed. Your data stays on your device." },
-  { icon: "\u25CE", title: "Open Source", desc: "Free forever. No ads, no paywalls, no tracking. Built by a fellow grinder." },
+  { icon: "\u25EB", title: "24 pattern categories", desc: "Two pointers through system design. See your confidence at a glance." },
+  { icon: "\u2605", title: "Confidence tracking", desc: "Rate 1-5 stars. The app schedules reviews based on how well you know it." },
+  { icon: "\u27F3", title: "Spaced repetition", desc: "SM-2 intervals. Low confidence = review tomorrow. High = review in 2 weeks." },
+  { icon: "\u2601", title: "Cloud sync", desc: "Sign in with Google, GitHub, or Apple. Your data follows you everywhere." },
+  { icon: "\u26A1", title: "Works offline", desc: "localStorage-first. No account needed. Your data stays on your device." },
+  { icon: "\u25CE", title: "Open source", desc: "Free forever. No ads, no paywalls, no tracking. Built by a fellow grinder." },
 ];
 
 // ---- Helpers ------------------------------------------------------------------
@@ -156,7 +156,7 @@ function IOSPopover({ open, onClose }: { open: boolean; onClose: () => void }) {
         </div>
 
         <div className="mx-auto mb-4 flex h-[180px] w-[180px] items-center justify-center rounded-xl bg-white p-3">
-          <img src={qrCode} alt="App Store QR Code" className="h-full w-full object-contain" />
+          <img src={qrCode} alt="App Store QR code" className="h-full w-full object-contain" />
         </div>
 
         <div className="mb-5 text-xs text-pb-text-muted">
@@ -198,8 +198,8 @@ function HeatmapCard() {
       />
 
       <div className="mb-4 flex items-center justify-between">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-pb-text-muted">
-          Pattern Confidence
+        <span className="text-[10px] font-semibold tracking-widest text-pb-text-muted">
+          Pattern confidence
         </span>
         <span className="font-mono text-[11px] text-pb-text-dim">
           {totalProblems} problems
@@ -252,7 +252,7 @@ function HeatmapCard() {
 
       <div className="flex items-center justify-between border-t border-pb-border-light pt-3.5">
         <div>
-          <span className="text-[10px] uppercase tracking-wide text-pb-text-dim">Avg. Confidence</span>
+          <span className="text-[10px] tracking-wide text-pb-text-dim">Avg. confidence</span>
           <div className="mt-0.5 font-mono text-[22px] font-bold text-pb-star">
             {(avgConf / 10).toFixed(1)}
           </div>
@@ -333,7 +333,7 @@ export default function LandingPage({ onOpenApp }: LandingPageProps) {
               onClick={handleOpenApp}
               className="cursor-pointer rounded-lg border border-pb-accent/15 bg-pb-accent-subtle px-4 py-2 text-[13px] font-semibold text-pb-accent transition-opacity hover:opacity-85"
             >
-              Open App →
+              Open app →
             </button>
           </div>
         </div>
@@ -359,7 +359,7 @@ export default function LandingPage({ onOpenApp }: LandingPageProps) {
               style={{ animation: "landing-pulse 2.5s ease-in-out infinite" }}
             />
             <span className="font-mono text-[11px] tracking-wider text-pb-accent">
-              SPACED REPETITION FOR LEETCODE
+              Spaced repetition for LeetCode
             </span>
           </div>
 
@@ -453,7 +453,7 @@ export default function LandingPage({ onOpenApp }: LandingPageProps) {
       {/* ---- The Problem ---- */}
       <section className="relative z-10 mx-auto max-w-[1120px] px-6 pb-20 pt-10">
         <FadeIn style={{ marginBottom: 40 }}>
-          <div className="mb-2.5 font-mono text-[10px] uppercase tracking-widest text-pb-accent opacity-70">THE PROBLEM</div>
+          <div className="mb-2.5 font-mono text-[10px] tracking-widest text-pb-accent opacity-70">The problem</div>
           <h2 className="m-0 font-bold leading-[1.15]" style={{ fontSize: "clamp(24px, 2.8vw, 38px)", letterSpacing: "-0.5px" }}>
             <span className="text-pb-text">You've solved hundreds of problems.</span>
             <br />
@@ -480,7 +480,7 @@ export default function LandingPage({ onOpenApp }: LandingPageProps) {
       {/* ---- How It Works ---- */}
       <section id="how" className="relative z-10 mx-auto max-w-[1120px] px-6 pb-20 pt-10">
         <FadeIn style={{ marginBottom: 40 }}>
-          <div className="mb-2.5 font-mono text-[10px] uppercase tracking-widest text-pb-accent opacity-70">HOW IT WORKS</div>
+          <div className="mb-2.5 font-mono text-[10px] tracking-widest text-pb-accent opacity-70">How it works</div>
           <h2 className="m-0 font-bold leading-[1.15] text-pb-text" style={{ fontSize: "clamp(24px, 2.8vw, 38px)", letterSpacing: "-0.5px" }}>
             Three steps. Zero friction.
           </h2>
@@ -508,7 +508,7 @@ export default function LandingPage({ onOpenApp }: LandingPageProps) {
       {/* ---- Projection ---- */}
       <section id="projection" className="relative z-10 mx-auto max-w-[1120px] px-6 pb-20 pt-10">
         <FadeIn style={{ marginBottom: 40 }}>
-          <div className="mb-2.5 font-mono text-[10px] uppercase tracking-widest text-pb-accent opacity-70">SEE THE MATH</div>
+          <div className="mb-2.5 font-mono text-[10px] tracking-widest text-pb-accent opacity-70">See the math</div>
           <h2 className="m-0 font-bold leading-[1.15] text-pb-text" style={{ fontSize: "clamp(24px, 2.8vw, 38px)", letterSpacing: "-0.5px" }}>
             Spaced repetition compounds.
           </h2>
@@ -524,7 +524,7 @@ export default function LandingPage({ onOpenApp }: LandingPageProps) {
       {/* ---- Features ---- */}
       <section id="features" className="relative z-10 mx-auto max-w-[1120px] px-6 pb-20 pt-10">
         <FadeIn style={{ marginBottom: 40 }}>
-          <div className="mb-2.5 font-mono text-[10px] uppercase tracking-widest text-pb-accent opacity-70">FEATURES</div>
+          <div className="mb-2.5 font-mono text-[10px] tracking-widest text-pb-accent opacity-70">Features</div>
           <h2 className="m-0 font-bold leading-[1.15] text-pb-text" style={{ fontSize: "clamp(24px, 2.8vw, 38px)", letterSpacing: "-0.5px" }}>
             Everything you need. Nothing you don't.
           </h2>

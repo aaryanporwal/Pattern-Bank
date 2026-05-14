@@ -52,7 +52,7 @@ export default function PatternSelector({ selected, onChange, error, enabledExtr
 
   return (
     <div>
-      <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
+      <label className="mb-1.5 block text-[13px] font-semibold tracking-wide text-pb-text-muted">
         Patterns * (select at least one)
       </label>
       <div className="grid grid-cols-3 gap-1.5">

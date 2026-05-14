@@ -67,12 +67,12 @@ function StatsRow({
 
   const stats = [
     {
-      label: "Total Reviews",
+      label: "Total reviews",
       value: totalReviews,
       color: "text-pb-text",
     },
     {
-      label: "Active Days",
+      label: "Active days",
       value: activeDays,
       color: activeDays > 0 ? "text-pb-accent" : "text-pb-text-muted",
     },
@@ -82,7 +82,7 @@ function StatsRow({
       color: streak > 0 ? "text-pb-accent" : "text-pb-text-muted",
     },
     {
-      label: "Avg Confidence",
+      label: "Avg confidence",
       value: avgConf > 0 ? avgConf.toFixed(1) : "—",
       color: avgConfColor,
     },
@@ -98,7 +98,7 @@ function StatsRow({
           <div className={`text-lg font-bold leading-tight ${s.color}`}>
             {s.value}
           </div>
-          <div className="mt-1 text-[11px] font-medium uppercase tracking-wide text-pb-text-muted">
+          <div className="mt-1 text-[11px] font-medium tracking-wide text-pb-text-muted">
             {s.label}
           </div>
         </div>
@@ -237,7 +237,7 @@ function StreakHeatmap({
     <div className="rounded-xl border border-pb-border bg-pb-surface p-5">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-[15px] font-semibold text-pb-text">
-          Review Activity
+          Review activity
         </h3>
         <span className="text-[13px] text-pb-text-dim">Last 12 months</span>
       </div>
@@ -429,14 +429,14 @@ function ConfidenceTrend({
     <div className="rounded-xl border border-pb-border bg-pb-surface p-5">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-[15px] font-semibold text-pb-text">
-          Confidence Trend
+          Confidence trend
         </h3>
         <select
           value={selectedPattern}
           onChange={(e) => setSelectedPattern(e.target.value)}
           className="cursor-pointer appearance-none rounded-lg border border-pb-border bg-pb-bg px-2.5 py-1.5 text-[12px] text-pb-text outline-none focus:border-pb-accent"
         >
-          <option value="all">All Patterns</option>
+          <option value="all">All patterns</option>
           {availablePatterns.map((p) => (
             <option key={p} value={p}>
               {p}
@@ -567,7 +567,7 @@ function ConfidenceSpread({ problems }: { problems: Problem[] }) {
   return (
     <div className="rounded-xl border border-pb-border bg-pb-surface p-5">
       <h3 className="mb-4 text-[15px] font-semibold text-pb-text">
-        Confidence Spread
+        Confidence spread
       </h3>
       <div className="flex items-end justify-around" style={{ height: barHeight + 40 }}>
         {counts.map((count, i) => {
@@ -619,7 +619,7 @@ function TopPatterns({ problems }: { problems: Problem[] }) {
   return (
     <div className="rounded-xl border border-pb-border bg-pb-surface p-5">
       <h3 className="mb-4 text-[15px] font-semibold text-pb-text">
-        Top Patterns
+        Top patterns
       </h3>
       {patternCounts.length === 0 ? (
         <div className="py-4 text-center text-[13px] text-pb-text-dim">

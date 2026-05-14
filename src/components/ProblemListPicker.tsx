@@ -44,8 +44,8 @@ export default function ProblemListPicker({ existingIds, onBulkAdd, hideLabel }:
   return (
     <div>
       {!hideLabel && (
-        <label className="mb-2 block text-[13px] font-semibold uppercase tracking-wide text-pb-text-muted">
-          Import Problem List
+        <label className="mb-2 block text-[13px] font-semibold tracking-wide text-pb-text-muted">
+          Import problem list
         </label>
       )}
 
@@ -110,7 +110,7 @@ export default function ProblemListPicker({ existingIds, onBulkAdd, hideLabel }:
                 onClick={handleAdd}
                 className="w-full cursor-pointer rounded-lg border-none bg-pb-accent py-2.5 text-[13px] font-semibold text-white transition-opacity duration-150 hover:opacity-85"
               >
-                Add {selected.newCount} Problem{selected.newCount !== 1 ? "s" : ""}
+                Add {selected.newCount} problem{selected.newCount !== 1 ? "s" : ""}
               </button>
             </>
           ) : (

@@ -38,30 +38,30 @@ export default function AllProblemsView({ problems, onEdit, onDelete, onToggleEx
     ),
   ];
   const patternOptions = [
-    { value: "all", label: "All Patterns" },
+    { value: "all", label: "All patterns" },
     ...allFilterPatterns.map((p) => ({ value: p, label: p })),
   ];
   const difficultyOptions = [
-    { value: "all", label: "All Difficulty" },
+    { value: "all", label: "All difficulty" },
     ...DIFFICULTIES.map((d) => ({ value: d, label: d })),
   ];
   const confidenceOptions = [
-    { value: "all", label: "All Confidence" },
+    { value: "all", label: "All confidence" },
     ...[1, 2, 3, 4, 5].map((c) => ({
       value: String(c),
       label: `${"★".repeat(c)}${"☆".repeat(5 - c)} (${c})`,
     })),
   ];
   const reviewStatusOptions = [
-    { value: "all", label: "All Status" },
+    { value: "all", label: "All status" },
     { value: "active", label: "Active" },
     { value: "excluded", label: "Excluded" },
   ];
   const sortOptions = [
-    { value: "dateAdded", label: "Date Added (Newest)" },
-    { value: "confidence", label: "Confidence (Low → High)" },
-    { value: "nextReview", label: "Next Review (Soonest)" },
-    { value: "leetcodeNumber", label: "Problem Index (Low → High)" },
+    { value: "dateAdded", label: "Date added (newest)" },
+    { value: "confidence", label: "Confidence (low → high)" },
+    { value: "nextReview", label: "Next review (soonest)" },
+    { value: "leetcodeNumber", label: "Problem index (low → high)" },
   ];
 
   const filtered = problems.filter((p) => {
@@ -133,7 +133,7 @@ export default function AllProblemsView({ problems, onEdit, onDelete, onToggleEx
             onClick={onAddClick}
             className="cursor-pointer rounded-lg border-none bg-pb-accent px-5 py-2.5 text-[13px] font-semibold text-white transition-opacity hover:opacity-85"
           >
-            + Add Problem
+            + Add problem
           </button>
         </div>
       </div>
