@@ -433,15 +433,41 @@ export interface NotificationSubscriptionInput {
   enabled: boolean;
 }
 
+async function edgeFunctionError(error: unknown): Promise<unknown> {
+  if (!error || typeof error !== "object" || !("context" in error)) return error;
+
+  const context = (error as { context?: unknown }).context;
+  if (!(context instanceof Response)) return error;
+
+  try {
+    const body = await context.clone().json() as { error?: unknown; message?: unknown };
+    const message = typeof body.error === "string"
+      ? body.error
+      : typeof body.message === "string"
+        ? body.message
+        : null;
+    if (message) return new Error(message);
+  } catch {
+    try {
+      const text = await context.clone().text();
+      if (text) return new Error(text);
+    } catch {
+      // Fall through to the original Supabase error.
+    }
+  }
+
+  return error;
+}
+
 export async function saveNotificationSubscription(input: NotificationSubscriptionInput): Promise<{ error: unknown }> {
   if (!supabase) return { error: new Error("Supabase not configured") };
   try {
     const { error } = await supabase.functions.invoke("save-notification-subscription", {
       body: input,
     });
-    return { error: error || null };
+    return { error: error ? await edgeFunctionError(error) : null };
   } catch (err) {
-    return { error: err };
+    return { error: await edgeFunctionError(err) };
   }
 }
 
@@ -449,9 +475,9 @@ export async function sendTestNotification(): Promise<{ error: unknown }> {
   if (!supabase) return { error: new Error("Supabase not configured") };
   try {
     const { error } = await supabase.functions.invoke("test-notification", { body: {} });
-    return { error: error || null };
+    return { error: error ? await edgeFunctionError(error) : null };
   } catch (err) {
-    return { error: err };
+    return { error: await edgeFunctionError(err) };
   }
 }
 
@@ -461,8 +487,8 @@ export async function trackNotificationClick(clickToken: string): Promise<{ erro
     const { error } = await supabase.functions.invoke("track-notification-click", {
       body: { clickToken },
     });
-    return { error: error || null };
+    return { error: error ? await edgeFunctionError(error) : null };
   } catch (err) {
-    return { error: err };
+    return { error: await edgeFunctionError(err) };
   }
 }

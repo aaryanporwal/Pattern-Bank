@@ -74,6 +74,7 @@ import {
   fetchProblemReviewHistory,
   fetchPreferences,
   upsertPreferences,
+  sendTestNotification,
   submitFeedback,
 } from "../src/utils/supabaseData";
 
@@ -534,5 +535,32 @@ describe("submitFeedback", () => {
     const insertCall = mockSupabase.insert.mock.calls[0][0];
     expect(insertCall.user_id).toBeNull();
     expect(insertCall.message).toBe("Anonymous feedback");
+  });
+});
+
+// ============================================================
+// Edge Functions
+// ============================================================
+
+describe("sendTestNotification", () => {
+  it("returns the Edge Function response error instead of the generic Supabase message", async () => {
+    mockSupabase = createSupabaseMock({});
+    const response = new Response(JSON.stringify({ error: "No active push subscriptions" }), {
+      status: 400,
+      headers: { "content-type": "application/json" },
+    });
+    mockSupabase.functions.invoke.mockResolvedValue({
+      data: null,
+      error: {
+        name: "FunctionsHttpError",
+        message: "Edge Function returned a non-2xx status code",
+        context: response,
+      },
+    });
+
+    const result = await sendTestNotification();
+
+    expect(result.error).toBeInstanceOf(Error);
+    expect((result.error as Error).message).toBe("No active push subscriptions");
   });
 });
