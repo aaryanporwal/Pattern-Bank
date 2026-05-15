@@ -1,11 +1,10 @@
 # PatternBank
 
-![CI](https://github.com/aaryanporwal/Pattern-Bank/actions/workflows/ci.yml/badge.svg)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/b5657775-7a03-4627-8c6b-b0b9a8988dc7/deploy-status)](https://app.netlify.com/projects/patternbank/deploys)
 ![React](https://img.shields.io/badge/React-61DAFB)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6)
 ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4)
-![Netlify](https://img.shields.io/badge/Netlify-00C7B7)
 
 Spaced repetition for LeetCode interview prep.
 
@@ -51,26 +50,26 @@ For a complete backend setup, see [Supabase Setup For Self-Hosting](docs/supabas
 
 ## Scripts
 
-| Command | Description |
-| --- | --- |
-| `npm run dev` | Start the Vite dev server |
-| `npm run build` | Type-check and build for production |
-| `npm run preview` | Preview the production build locally |
-| `npm run lint` | Run ESLint |
-| `npm run test` | Run unit tests |
-| `npm run test:e2e` | Run Playwright tests |
+| Command            | Description                          |
+| ------------------ | ------------------------------------ |
+| `npm run dev`      | Start the Vite dev server            |
+| `npm run build`    | Type-check and build for production  |
+| `npm run preview`  | Preview the production build locally |
+| `npm run lint`     | Run ESLint                           |
+| `npm run test`     | Run unit tests                       |
+| `npm run test:e2e` | Run Playwright tests                 |
 
 ## Deployment
 
 This fork is intended to deploy on Netlify.
 
-| Setting | Value |
-| --- | --- |
-| Build command | `npm run build` |
-| Publish directory | `dist` |
-| SPA fallback | Rewrite `/*` to `/index.html` |
+| Setting           | Value                                         |
+| ----------------- | --------------------------------------------- |
+| Build command     | `npm run build`                               |
+| Publish directory | `dist`                                        |
+| SPA fallback      | Rewrite `/*` to `/index.html`                 |
 | Required env vars | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` |
-| Optional env vars | `VITE_SENTRY_DSN`, `VITE_POSTHOG_KEY` |
+| Optional env vars | `VITE_SENTRY_DSN`, `VITE_POSTHOG_KEY`         |
 
 ## Attribution
 
