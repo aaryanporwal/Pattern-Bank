@@ -433,11 +433,19 @@ export interface NotificationSubscriptionInput {
   enabled: boolean;
 }
 
+async function getFunctionAuthHeaders(): Promise<Record<string, string>> {
+  if (!supabase) return {};
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export async function saveNotificationSubscription(input: NotificationSubscriptionInput): Promise<{ error: unknown }> {
   if (!supabase) return { error: new Error("Supabase not configured") };
   try {
     const { error } = await supabase.functions.invoke("save-notification-subscription", {
       body: input,
+      headers: await getFunctionAuthHeaders(),
     });
     return { error: error || null };
   } catch (err) {
@@ -448,7 +456,10 @@ export async function saveNotificationSubscription(input: NotificationSubscripti
 export async function sendTestNotification(): Promise<{ error: unknown }> {
   if (!supabase) return { error: new Error("Supabase not configured") };
   try {
-    const { error } = await supabase.functions.invoke("test-notification", { body: {} });
+    const { error } = await supabase.functions.invoke("test-notification", {
+      body: {},
+      headers: await getFunctionAuthHeaders(),
+    });
     return { error: error || null };
   } catch (err) {
     return { error: err };
