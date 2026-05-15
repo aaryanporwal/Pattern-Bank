@@ -134,7 +134,7 @@ export default function useReviewReminders(userId: string | null, enabled: boole
         timezone,
         platform: detectPlatform(),
         userAgent: navigator.userAgent,
-        enabled,
+        enabled: true,
       });
       if (error) throw error;
       setStatus("subscribed");
@@ -147,7 +147,7 @@ export default function useReviewReminders(userId: string | null, enabled: boole
     } finally {
       setBusy(false);
     }
-  }, [enabled, publicVapidKey, supported, userId]);
+  }, [publicVapidKey, supported, userId]);
 
   const sendTest = useCallback(async () => {
     setBusy(true);
