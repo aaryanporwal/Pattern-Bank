@@ -63,15 +63,11 @@ export function createServiceClient() {
 }
 
 export async function getAuthenticatedUser(req: Request) {
-  const url = Deno.env.get("SUPABASE_URL");
-  const anon = Deno.env.get("SUPABASE_ANON_KEY");
-  if (!url || !anon) throw new Error("Missing Supabase auth credentials");
-  const authHeader = req.headers.get("authorization") ?? "";
-  const client = createClient(url, anon, {
-    global: { headers: { authorization: authHeader } },
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-  const { data, error } = await client.auth.getUser();
+  const token = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
+  if (!token) return null;
+
+  const client = createServiceClient();
+  const { data, error } = await client.auth.getUser(token);
   if (error || !data.user) return null;
   return data.user;
 }

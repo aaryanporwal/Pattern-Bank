@@ -18,10 +18,16 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return jsonResponse({});
   if (req.method !== "POST") return jsonResponse({ error: "Method not allowed" }, { status: 405 });
 
+  const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
+  const vapidPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY");
+  if (!vapidPublicKey || !vapidPrivateKey) {
+    return jsonResponse({ error: "Missing VAPID Edge Function secrets" }, { status: 500 });
+  }
+
   webPush.setVapidDetails(
     Deno.env.get("VAPID_SUBJECT") || "mailto:reminders@pattern-bank.app",
-    Deno.env.get("VAPID_PUBLIC_KEY") || "",
-    Deno.env.get("VAPID_PRIVATE_KEY") || "",
+    vapidPublicKey,
+    vapidPrivateKey,
   );
 
   const now = new Date();

@@ -15,6 +15,12 @@ interface MockResult {
 
 export interface SupabaseMock {
   from: ReturnType<typeof vi.fn>;
+  auth: {
+    getSession: ReturnType<typeof vi.fn>;
+  };
+  functions: {
+    invoke: ReturnType<typeof vi.fn>;
+  };
   select: ReturnType<typeof vi.fn>;
   eq: ReturnType<typeof vi.fn>;
   in: ReturnType<typeof vi.fn>;
@@ -31,6 +37,12 @@ export function createSupabaseMock(result: MockResult = { data: null, error: nul
 
   const mock: SupabaseMock = {
     from: vi.fn(),
+    auth: {
+      getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
+    },
+    functions: {
+      invoke: vi.fn(),
+    },
     select: vi.fn(),
     eq: vi.fn(),
     in: vi.fn(),

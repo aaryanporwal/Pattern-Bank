@@ -433,6 +433,32 @@ export interface NotificationSubscriptionInput {
   enabled: boolean;
 }
 
+async function edgeFunctionError(error: unknown): Promise<unknown> {
+  if (!error || typeof error !== "object" || !("context" in error)) return error;
+
+  const context = (error as { context?: unknown }).context;
+  if (!(context instanceof Response)) return error;
+
+  try {
+    const body = await context.clone().json() as { error?: unknown; message?: unknown };
+    const message = typeof body.error === "string"
+      ? body.error
+      : typeof body.message === "string"
+        ? body.message
+        : null;
+    if (message) return new Error(message);
+  } catch {
+    try {
+      const text = await context.clone().text();
+      if (text) return new Error(text);
+    } catch {
+      // Fall through to the original Supabase error.
+    }
+  }
+
+  return error;
+}
+
 async function getFunctionAuthHeaders(): Promise<Record<string, string>> {
   if (!supabase) return {};
   const { data } = await supabase.auth.getSession();
@@ -447,9 +473,9 @@ export async function saveNotificationSubscription(input: NotificationSubscripti
       body: input,
       headers: await getFunctionAuthHeaders(),
     });
-    return { error: error || null };
+    return { error: error ? await edgeFunctionError(error) : null };
   } catch (err) {
-    return { error: err };
+    return { error: await edgeFunctionError(err) };
   }
 }
 
@@ -460,9 +486,9 @@ export async function sendTestNotification(): Promise<{ error: unknown }> {
       body: {},
       headers: await getFunctionAuthHeaders(),
     });
-    return { error: error || null };
+    return { error: error ? await edgeFunctionError(error) : null };
   } catch (err) {
-    return { error: err };
+    return { error: await edgeFunctionError(err) };
   }
 }
 
@@ -472,8 +498,8 @@ export async function trackNotificationClick(clickToken: string): Promise<{ erro
     const { error } = await supabase.functions.invoke("track-notification-click", {
       body: { clickToken },
     });
-    return { error: error || null };
+    return { error: error ? await edgeFunctionError(error) : null };
   } catch (err) {
-    return { error: err };
+    return { error: await edgeFunctionError(err) };
   }
 }
