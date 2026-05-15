@@ -12,7 +12,7 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   webServer: {
-    command: "npm run dev",
+    command: "bun run dev",
     port: 5173,
     reuseExistingServer: true,
   },

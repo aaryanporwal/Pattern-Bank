@@ -4,11 +4,11 @@ React app for tracking LeetCode problems with spaced repetition. localStorage-fi
 
 ## Commands
 
-- `npm run dev` — Vite dev server (port 5173)
-- `npm run build` — production build
-- `npm run lint` — ESLint
-- `npm test` — Vitest (run once)
-- `npm run test:watch` — Vitest watch mode
+- `bun run dev` — Vite dev server (port 5173)
+- `bun run build` — production build
+- `bun run lint` — ESLint
+- `bun run test` — Vitest (run once)
+- `bun run test:watch` — Vitest watch mode
 
 ## Architecture
 

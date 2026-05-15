@@ -4,7 +4,7 @@ This guide creates a production Supabase backend for PatternBank and deploys the
 
 ## Prerequisites
 
-- Node.js and npm
+- Bun
 - A Supabase account
 - Supabase CLI: `npm install -g supabase`
 - Netlify CLI, if deploying to Netlify: `npm install -g netlify-cli`
@@ -24,7 +24,7 @@ Do not put the `service_role` key in `.env.local`, Netlify client env vars, or a
 From the repo root:
 
 ```bash
-npm install
+bun install
 cp .env.example .env.local
 ```
 
@@ -41,14 +41,14 @@ VITE_VAPID_PUBLIC_KEY="your-web-push-public-key"
 Log in and link this repository to your Supabase project:
 
 ```bash
-npx supabase login
-npx supabase link --project-ref <project-ref>
+bunx supabase login
+bunx supabase link --project-ref <project-ref>
 ```
 
 Push the migration:
 
 ```bash
-npx supabase db push
+bunx supabase db push
 ```
 
 The migration creates these public tables with row level security enabled:
@@ -70,8 +70,8 @@ Supabase’s migration flow is documented in [Database Migrations](https://supab
 Generate VAPID keys and configure Supabase secrets:
 
 ```bash
-npx web-push generate-vapid-keys
-npx supabase secrets set \
+bunx web-push generate-vapid-keys
+bunx supabase secrets set \
   VAPID_PUBLIC_KEY="your-web-push-public-key" \
   VAPID_PRIVATE_KEY="your-web-push-private-key" \
   VAPID_SUBJECT="mailto:you@example.com" \
@@ -84,11 +84,11 @@ npx supabase secrets set \
 Deploy the functions:
 
 ```bash
-npx supabase functions deploy save-notification-subscription
-npx supabase functions deploy track-notification-click
-npx supabase functions deploy send-morning-review-pushes
-npx supabase functions deploy send-review-email-followups
-npx supabase functions deploy test-notification
+bunx supabase functions deploy save-notification-subscription
+bunx supabase functions deploy track-notification-click
+bunx supabase functions deploy send-morning-review-pushes
+bunx supabase functions deploy send-review-email-followups
+bunx supabase functions deploy test-notification
 ```
 
 Schedule both reminder jobs to run every few minutes from Supabase Scheduled Functions or an external cron:
@@ -140,7 +140,7 @@ For Google sign-in:
 ## 6. Run Locally
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 Open the local Vite URL, sign in, and verify cloud sync by adding a problem and refreshing after sign-in.
@@ -178,8 +178,8 @@ netlify deploy --prod --build
 
 ## Verification Checklist
 
-- `npm run build` completes locally.
-- `npx supabase db push` completes against the linked Supabase project.
+- `bun run build` completes locally.
+- `bunx supabase db push` completes against the linked Supabase project.
 - Supabase Table Editor shows `problems`, `review_log`, `user_preferences`, and `feedback`.
 - Supabase Table Editor shows the three `notification_*` tables.
 - A signed-in user can enable review reminders from Settings.
