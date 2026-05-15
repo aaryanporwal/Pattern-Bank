@@ -33,6 +33,7 @@ Set the copied Supabase values in `.env.local`:
 ```bash
 VITE_SUPABASE_URL="https://your-project.supabase.co"
 VITE_SUPABASE_ANON_KEY="your-anon-key"
+VITE_VAPID_PUBLIC_KEY="your-web-push-public-key"
 ```
 
 ## 3. Apply Database Migrations
@@ -56,12 +57,50 @@ The migration creates these public tables with row level security enabled:
 - `review_log`
 - `user_preferences`
 - `feedback`
+- `notification_preferences`
+- `notification_subscriptions`
+- `notification_deliveries`
 
 Authenticated users can only read and manage their own synced data. Feedback can be submitted anonymously or by signed-in users.
 
 Supabase’s migration flow is documented in [Database Migrations](https://supabase.com/docs/guides/deployment/database-migrations).
 
-## 4. Configure Auth URLs
+## 4. Deploy Reminder Edge Functions
+
+Generate VAPID keys and configure Supabase secrets:
+
+```bash
+npx web-push generate-vapid-keys
+npx supabase secrets set \
+  VAPID_PUBLIC_KEY="your-web-push-public-key" \
+  VAPID_PRIVATE_KEY="your-web-push-private-key" \
+  VAPID_SUBJECT="mailto:you@example.com" \
+  WEB_PUSH_CLICK_SECRET="a-long-random-secret" \
+  RESEND_API_KEY="your-resend-api-key" \
+  REMINDER_EMAIL_FROM="PatternBank <reminders@example.com>" \
+  APP_URL="https://your-site.netlify.app"
+```
+
+Deploy the functions:
+
+```bash
+npx supabase functions deploy save-notification-subscription
+npx supabase functions deploy track-notification-click
+npx supabase functions deploy send-morning-review-pushes
+npx supabase functions deploy send-review-email-followups
+npx supabase functions deploy test-notification
+```
+
+Schedule both reminder jobs to run every few minutes from Supabase Scheduled Functions or an external cron:
+
+```text
+POST https://<project-ref>.supabase.co/functions/v1/send-morning-review-pushes
+POST https://<project-ref>.supabase.co/functions/v1/send-review-email-followups
+```
+
+The functions enforce the local 9 AM and 6 PM windows, so the cron can be frequent. Automated email is limited to the failed-push immediate fallback and the unclicked-push evening follow-up.
+
+## 5. Configure Auth URLs
 
 In Supabase, open **Authentication > URL Configuration**.
 
@@ -98,7 +137,7 @@ For Google sign-in:
 3. Paste the Google client ID and client secret into **Authentication > Providers > Google** in Supabase.
 4. Save the provider and confirm it is enabled.
 
-## 5. Run Locally
+## 6. Run Locally
 
 ```bash
 npm run dev
@@ -106,7 +145,7 @@ npm run dev
 
 Open the local Vite URL, sign in, and verify cloud sync by adding a problem and refreshing after sign-in.
 
-## 6. Configure Netlify
+## 7. Configure Netlify
 
 Link or create the Netlify site:
 
@@ -120,6 +159,7 @@ Set frontend environment variables:
 ```bash
 netlify env:set VITE_SUPABASE_URL "https://your-project.supabase.co"
 netlify env:set VITE_SUPABASE_ANON_KEY "your-anon-key"
+netlify env:set VITE_VAPID_PUBLIC_KEY "your-web-push-public-key"
 ```
 
 If you use optional monitoring or analytics, set those values too:
@@ -141,6 +181,9 @@ netlify deploy --prod --build
 - `npm run build` completes locally.
 - `npx supabase db push` completes against the linked Supabase project.
 - Supabase Table Editor shows `problems`, `review_log`, `user_preferences`, and `feedback`.
+- Supabase Table Editor shows the three `notification_*` tables.
+- A signed-in user can enable review reminders from Settings.
+- A test push arrives on a supported browser after enabling reminders.
 - A signed-in user can add, edit, review, and delete problems.
 - Review history appears for a signed-in user after completing reviews.
 - Settings changes persist after refresh.

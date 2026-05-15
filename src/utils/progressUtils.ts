@@ -42,9 +42,9 @@ export function buildReviewCountMap(
 }
 
 export function getWeekStart(dateStr: string): string {
-  const d = new Date(dateStr + "T00:00:00");
-  const day = d.getDay(); // 0=Sun
-  d.setDate(d.getDate() - day);
+  const d = new Date(`${dateStr}T00:00:00Z`);
+  const day = d.getUTCDay(); // 0=Sun
+  d.setUTCDate(d.getUTCDate() - day);
   return d.toISOString().split("T")[0];
 }
 

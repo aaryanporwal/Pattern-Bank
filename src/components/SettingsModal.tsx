@@ -8,6 +8,7 @@ import DataSection from "./DataSection";
 import FeedbackSection from "./FeedbackSection";
 import DangerZoneSection from "./DangerZoneSection";
 import ExtraPatternsSection from "./ExtraPatternsSection";
+import NotificationReminderSection from "./NotificationReminderSection";
 import type { User } from "@supabase/supabase-js";
 import type { Preferences, LeetCodeProblem } from "../types";
 
@@ -53,6 +54,7 @@ interface Props {
   onSignOut: () => Promise<void>;
   onSetAllDue: () => void;
   onRequestClearData: () => void;
+  showToast: (message: string) => void;
 }
 
 export default function SettingsModal({
@@ -72,6 +74,7 @@ export default function SettingsModal({
   onSignOut,
   onSetAllDue,
   onRequestClearData,
+  showToast,
 }: Props) {
   // Escape key to close
   useEffect(() => {
@@ -115,6 +118,13 @@ export default function SettingsModal({
           <DailyGoalSection
             preferences={preferences}
             onUpdatePreferences={onUpdatePreferences}
+          />
+
+          <NotificationReminderSection
+            user={user}
+            preferences={preferences}
+            onUpdatePreferences={onUpdatePreferences}
+            showToast={showToast}
           />
 
           <div>
