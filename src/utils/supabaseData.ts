@@ -277,18 +277,39 @@ export async function batchInsertReviewLogs(
 export async function fetchPreferences(userId: string): Promise<{ data: Preferences | null; error: unknown }> {
   if (!supabase) return { data: null, error: null };
   try {
-    const { data, error } = await supabase
+    const [appPrefsRes, notificationPrefsRes] = await Promise.all([
+      supabase
       .from("user_preferences")
       .select("*")
       .eq("user_id", userId)
-      .maybeSingle();
+        .maybeSingle(),
+      supabase
+        .from("notification_preferences")
+        .select("*")
+        .eq("user_id", userId)
+        .maybeSingle(),
+    ]);
+    const { data, error } = appPrefsRes;
     if (error) return { data: null, error };
     if (!data) return { data: null, error: null };
+    const notificationPrefs = notificationPrefsRes.data as {
+      reminders_enabled?: boolean;
+      email_enabled?: boolean;
+      timezone?: string;
+    } | null;
+    const notificationFields = notificationPrefs && "reminders_enabled" in notificationPrefs
+      ? {
+          reviewRemindersEnabled: notificationPrefs.reminders_enabled ?? false,
+          emailRemindersEnabled: notificationPrefs.email_enabled ?? true,
+          reminderTimezone: notificationPrefs.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC",
+        }
+      : {};
     return {
       data: {
         dailyReviewGoal: (data as { daily_review_goal: number }).daily_review_goal,
         hidePatternsDuringReview: (data as { hide_patterns_during_review?: boolean }).hide_patterns_during_review ?? false,
         enabledExtraPatterns: (data as { enabled_extra_patterns?: string[] }).enabled_extra_patterns ?? [],
+        ...notificationFields,
       },
       error: null,
     };
@@ -356,21 +377,92 @@ export async function upsertPreferences(userId: string, prefs: Preferences): Pro
       enabled_extra_patterns: prefs.enabledExtraPatterns,
       updated_at: new Date().toISOString(),
     };
-    const { data, error } = await supabase
+    const [{ data, error }, notificationResult] = await Promise.all([
+      supabase
       .from("user_preferences")
       .upsert(row, { onConflict: "user_id" })
       .select()
-      .single();
+        .single(),
+      supabase
+        .from("notification_preferences")
+        .upsert({
+          user_id: userId,
+          reminders_enabled: prefs.reviewRemindersEnabled ?? false,
+          email_enabled: prefs.emailRemindersEnabled ?? true,
+          timezone: prefs.reminderTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
+          updated_at: new Date().toISOString(),
+        }, { onConflict: "user_id" })
+        .select()
+        .single(),
+    ]);
     if (error) return { data: null, error };
+    if (notificationResult.error) return { data: null, error: notificationResult.error };
+    const notificationPrefs = notificationResult.data as {
+      reminders_enabled?: boolean;
+      email_enabled?: boolean;
+      timezone?: string;
+    } | null;
+    const notificationFields = notificationPrefs && "reminders_enabled" in notificationPrefs
+      ? {
+          reviewRemindersEnabled: notificationPrefs.reminders_enabled ?? false,
+          emailRemindersEnabled: notificationPrefs.email_enabled ?? true,
+          reminderTimezone: notificationPrefs.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC",
+        }
+      : {};
     return {
       data: {
         dailyReviewGoal: (data as { daily_review_goal: number }).daily_review_goal,
         hidePatternsDuringReview: (data as { hide_patterns_during_review?: boolean }).hide_patterns_during_review ?? false,
         enabledExtraPatterns: (data as { enabled_extra_patterns?: string[] }).enabled_extra_patterns ?? [],
+        ...notificationFields,
       },
       error: null,
     };
   } catch (err) {
     return { data: null, error: err };
+  }
+}
+
+export interface NotificationSubscriptionInput {
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  timezone: string;
+  platform: string;
+  userAgent: string;
+  enabled: boolean;
+}
+
+export async function saveNotificationSubscription(input: NotificationSubscriptionInput): Promise<{ error: unknown }> {
+  if (!supabase) return { error: new Error("Supabase not configured") };
+  try {
+    const { error } = await supabase.functions.invoke("save-notification-subscription", {
+      body: input,
+    });
+    return { error: error || null };
+  } catch (err) {
+    return { error: err };
+  }
+}
+
+export async function sendTestNotification(): Promise<{ error: unknown }> {
+  if (!supabase) return { error: new Error("Supabase not configured") };
+  try {
+    const { error } = await supabase.functions.invoke("test-notification", { body: {} });
+    return { error: error || null };
+  } catch (err) {
+    return { error: err };
+  }
+}
+
+export async function trackNotificationClick(clickToken: string): Promise<{ error: unknown }> {
+  if (!supabase) return { error: null };
+  try {
+    const { error } = await supabase.functions.invoke("track-notification-click", {
+      body: { clickToken },
+    });
+    return { error: error || null };
+  } catch (err) {
+    return { error: err };
   }
 }

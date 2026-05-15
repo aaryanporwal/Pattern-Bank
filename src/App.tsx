@@ -96,6 +96,7 @@ export default function App() {
         onSignOut={signOut}
         onSetAllDue={() => { handleSetAllDue(); ui.setSettingsOpen(false); }}
         onRequestClearData={ui.requestClearData}
+        showToast={ui.showToast}
       />
       <HelpModal
         isOpen={ui.helpOpen}

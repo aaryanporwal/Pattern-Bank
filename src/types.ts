@@ -42,6 +42,9 @@ export interface Preferences {
   dailyReviewGoal: number;
   hidePatternsDuringReview: boolean;
   enabledExtraPatterns: string[];
+  reviewRemindersEnabled?: boolean;
+  emailRemindersEnabled?: boolean;
+  reminderTimezone?: string;
 }
 
 export interface ToastState {
