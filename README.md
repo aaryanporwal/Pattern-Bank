@@ -34,9 +34,9 @@ This is Aaryan Porwal's maintained fork of PatternBank. The web app is deployed 
 ## Quick Start
 
 ```bash
-npm install
+bun install
 cp .env.example .env.local
-npm run dev
+bun run dev
 ```
 
 Set these values in `.env.local`:
@@ -52,12 +52,12 @@ For a complete backend setup, see [Supabase Setup For Self-Hosting](docs/supabas
 
 | Command            | Description                          |
 | ------------------ | ------------------------------------ |
-| `npm run dev`      | Start the Vite dev server            |
-| `npm run build`    | Type-check and build for production  |
-| `npm run preview`  | Preview the production build locally |
-| `npm run lint`     | Run ESLint                           |
-| `npm run test`     | Run unit tests                       |
-| `npm run test:e2e` | Run Playwright tests                 |
+| `bun run dev`      | Start the Vite dev server            |
+| `bun run build`    | Type-check and build for production  |
+| `bun run preview`  | Preview the production build locally |
+| `bun run lint`     | Run ESLint                           |
+| `bun run test`     | Run unit tests                       |
+| `bun run test:e2e` | Run Playwright tests                 |
 
 ## Deployment
 
@@ -65,7 +65,7 @@ This fork is intended to deploy on Netlify.
 
 | Setting           | Value                                         |
 | ----------------- | --------------------------------------------- |
-| Build command     | `npm run build`                               |
+| Build command     | `bun run build`                               |
 | Publish directory | `dist`                                        |
 | SPA fallback      | Rewrite `/*` to `/index.html`                 |
 | Required env vars | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` |

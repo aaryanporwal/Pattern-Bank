@@ -2,6 +2,7 @@
   "name": "pattern-bank",
   "private": true,
   "version": "0.0.0",
+  "packageManager": "bun@1.3.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,11 +13,11 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "npx playwright test",
-    "test:e2e:headed": "npx playwright test --headed",
-    "test:e2e:ui": "npx playwright test --ui",
+    "test:e2e": "bunx playwright test",
+    "test:e2e:headed": "bunx playwright test --headed",
+    "test:e2e:ui": "bunx playwright test --ui",
     "typecheck": "tsc --noEmit",
-    "og-image": "npx playwright test --config=scripts/og-playwright.config.ts"
+    "og-image": "bunx playwright test --config=scripts/og-playwright.config.ts"
   },
   "dependencies": {
     "@sentry/react": "^10.40.0",
@@ -39,7 +40,7 @@
     "@typescript-eslint/parser": "^8.57.0",
     "@vitejs/plugin-react": "^5.1.1",
     "eslint": "^9.39.1",
-    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-hooks": "7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
     "jsdom": "^28.1.0",
